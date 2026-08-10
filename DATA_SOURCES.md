@@ -142,6 +142,7 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
  * @property {string} label         // UI label
  * @property {boolean} requiresAuth // whether the source needs credentials
  * @property {(options?: object) => Promise<Word[]>} load
+ * @property {(ctx: { t: Function, setStatus: Function }) => object} [createUI]
  */
 ```
 
@@ -151,6 +152,22 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
 2. Fetch or parse raw data.
 3. Map each item with `KaniKai.createWord(...)` into the shared **Word** shape.
 4. Return the full mapped list for the source’s natural universe (or as much as the source can provide).
+
+### Optional `createUI(ctx)`
+
+Adapters may provide their own setup/panel UI. Return an object with any of:
+
+| Field | Role |
+| --- | --- |
+| `setup` | `HTMLElement` rendered above the shared load card (optional; unused by built-in adapters) |
+| `panel` | `HTMLElement` rendered inside the load card (WaniKani token, CSV textarea/file picker) |
+| `getLoadOptions()` | Extra fields merged into `load` options (`token`, `csvText`, `file`, …) |
+| `prepareLoad()` | Return `false` to abort before loading |
+| `messageForError(error)` | Map error codes to user-facing strings |
+| `suppressStatus()` | When true, keep the status line quiet after a successful load |
+| `applyTranslations()` | Extra refresh after i18n (e.g. file name label) |
+
+The app mounts UI into `#sourceSetupHost` / `#sourcePanelHost` via `KaniKai.createSourceUIHost`. Only the selected source’s UI is shown.
 
 The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency (for example WaniKani querying by date) as long as the returned words still satisfy the shared contract.
 
@@ -168,6 +185,7 @@ The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filte
 | `applyLoadOptionsWithMeta(words, options)`          | Same, plus `totalMatched` before limit                        |
 | `loadFromSource(sourceId, options)`                 | Registry lookup → `source.load` → apply shared options        |
 | `parseWordCsv(text)`                                | Parse CSV-like paste/file text into Word[]                    |
+| `createSourceUIHost({ setupHost, panelHost })`      | Mount/teardown adapter `createUI` into page slots             |
 | `isWordSource(source)`                              | Structural check for the source interface                     |
 | `registerSource(source)`                            | Add a source to the registry                                  |
 | `getSource(id)` / `listSources()` / `hasSource(id)` | Registry lookup                                               |
@@ -182,6 +200,7 @@ sources/
     registry.js         # registerSource / listSources
     loader.js           # loadFromSource entry point
     csv.js              # shared CSV-like parser (paste + file)
+    source-ui.js        # adapter UI host (setup + panel slots)
   adapters/             # individual data sources
     wanikani.js
     csv-paste.js
@@ -199,6 +218,7 @@ Include scripts before the main app (order matters: core, then adapters):
 <script src="sources/core/registry.js"></script>
 <script src="sources/core/loader.js"></script>
 <script src="sources/core/csv.js"></script>
+<script src="sources/core/source-ui.js"></script>
 <script src="sources/adapters/your-source.js"></script>
 ```
 

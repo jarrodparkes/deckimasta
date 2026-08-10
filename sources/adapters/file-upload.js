@@ -1,6 +1,6 @@
 /**
  * CSV file-upload data source — same row format as csv-paste (KaniKai.parseWordCsv).
- * The UI reads the selected file and passes { csvText } (or a File via { file }).
+ * The UI reads the selected file and passes { file } (or csvText).
  */
 (function (global) {
   "use strict";
@@ -8,12 +8,12 @@
   const KaniKai = global.KaniKai;
   if (!KaniKai || typeof KaniKai.registerSource !== "function") {
     throw new Error(
-      "KaniKai source registry must be loaded before the file-upload adapter.",
+      "KaniKai source registry must be loaded before the file-upload adapter."
     );
   }
   if (typeof KaniKai.parseWordCsv !== "function") {
     throw new Error(
-      "KaniKai.parseWordCsv must be loaded before the file-upload adapter.",
+      "KaniKai.parseWordCsv must be loaded before the file-upload adapter."
     );
   }
 
@@ -31,17 +31,68 @@
         reject(
           sourceError(
             "Could not read the selected file.",
-            "CSV_FILE_READ_ERROR",
-          ),
+            "CSV_FILE_READ_ERROR"
+          )
         );
       reader.readAsText(file);
     });
+  }
+
+  function createUI(ctx) {
+    const t = ctx.t;
+    const panel = document.createElement("div");
+    panel.innerHTML = `
+      <div class="csv-format">
+        <div data-i18n="csvFileIntro">Upload a .csv or .txt file using the same format as CSV paste.</div>
+        <code>word,alternatives,meanings[,created_at,last_seen_at,parts_of_speech]</code>
+        <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
+      </div>
+      <label for="csvFile" data-i18n="csvFileLabel">CSV file</label>
+      <div class="file-picker">
+        <input id="csvFile" type="file" accept=".csv,.txt,text/csv,text/plain">
+        <button id="csvChooseFile" type="button" class="secondary" data-i18n="csvChooseFile">Choose file</button>
+        <span id="csvFileName" class="file-name">No file chosen</span>
+      </div>
+    `;
+
+    const fileInput = panel.querySelector("#csvFile");
+    const fileName = panel.querySelector("#csvFileName");
+
+    function updateFileName() {
+      const file = fileInput.files && fileInput.files[0];
+      fileName.textContent = file ? file.name : t("csvNoFileChosen");
+    }
+
+    panel.querySelector("#csvChooseFile").addEventListener("click", () => {
+      fileInput.click();
+    });
+    fileInput.addEventListener("change", updateFileName);
+
+    return {
+      panel,
+      getLoadOptions() {
+        return {
+          file: fileInput.files && fileInput.files[0] ? fileInput.files[0] : null
+        };
+      },
+      messageForError(error) {
+        if (error && error.code === "CSV_EMPTY") return t("csvFileEmpty");
+        return null;
+      },
+      applyTranslations() {
+        updateFileName();
+      },
+      onActivate() {
+        updateFileName();
+      }
+    };
   }
 
   KaniKai.registerSource({
     id: "file-upload",
     label: "CSV File",
     requiresAuth: false,
+    createUI,
 
     /**
      * @param {object} [options]
@@ -63,10 +114,10 @@
       if (!words.length) {
         throw sourceError(
           "No word rows found in the uploaded file.",
-          "CSV_EMPTY",
+          "CSV_EMPTY"
         );
       }
       return words;
-    },
+    }
   });
 })(window);

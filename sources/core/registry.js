@@ -3,13 +3,14 @@
  *
  * A WordSource:
  *   {
- *     id: string,            // stable machine id, e.g. "wanikani"
- *     label: string,         // UI label
+ *     id: string,
+ *     label: string,
  *     requiresAuth: boolean,
- *     load: (options?) => Promise<Word[]>
+ *     load: (options?) => Promise<Word[]>,
+ *     createUI?: (ctx) => SourceUI   // optional adapter-owned UI
  *   }
  *
- * Auth/credentials are owned by each source, not by shared LoadOptions.
+ * Auth/credentials and source-specific controls are owned by each source.
  */
 (function (global) {
   "use strict";

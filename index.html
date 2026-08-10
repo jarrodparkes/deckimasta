@@ -82,8 +82,11 @@
       margin: 12px 0;
       box-shadow: 0 3px 12px rgba(0,0,0,.04);
     }
-    #tokenCard.collapsed {
-      padding: 12px 16px;
+    .token-panel {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: rgba(127,127,127,.06);
     }
     .token-compact {
       display: none;
@@ -92,10 +95,11 @@
       gap: 12px;
     }
     .token-compact .help { margin: 2px 0 0; }
+    #tokenCard.collapsed {
+      padding: 10px 12px;
+    }
     #tokenCard.collapsed .token-compact { display: flex; }
     #tokenCard.collapsed .token-body { display: none; }
-    #tokenCard.collapsed .status:empty { display: none; margin: 0; min-height: 0; }
-    #tokenCard.collapsed .status:not(:empty) { margin-top: 8px; }
     label { display: block; font-weight: 650; margin-bottom: 7px; }
     input, select, button, textarea {
       font: inherit;
@@ -176,7 +180,8 @@
       background: var(--card);
     }
     .source-panel { margin-top: 14px; }
-    .source-panel[hidden] { display: none !important; }
+    #sourceSetupHost:empty { display: none; }
+    #sourcePanelHost:empty { display: none; }
     .csv-format {
       margin: 0 0 10px;
       padding: 10px 12px;
@@ -253,33 +258,10 @@
     </div>
   </div>
 
-  <section id="tokenCard" class="card">
-    <div class="token-compact">
-      <div>
-        <h2 data-i18n="connectTitle">1. Connect WaniKani</h2>
-        <p class="help" data-i18n="tokenSavedCompact">Token saved on this device.</p>
-      </div>
-      <button id="expandToken" class="secondary" type="button" data-i18n="manageToken">Manage token</button>
-    </div>
-    <div class="token-body">
-      <h2 data-i18n="connectTitle">1. Connect WaniKani</h2>
-      <p class="help" data-i18n="tokenHelp">Your API token is stored only in this browser. It is never included in this project file.</p>
-      <label for="token" data-i18n="tokenLabel">WaniKani API token</label>
-      <input id="token" type="password" autocomplete="off" data-i18n="tokenPlaceholder" data-i18n-attr="placeholder" placeholder="Paste your API token here">
-      <div class="actions">
-        <button id="saveToken" type="button" data-i18n="saveToken">Save token</button>
-        <button id="clearToken" class="secondary" type="button" data-i18n="forgetToken">Forget token</button>
-        <button id="collapseToken" class="secondary" type="button" hidden data-i18n="done">Done</button>
-      </div>
-      <details>
-        <summary data-i18n="tokenFaqSummary">Where do I get my token?</summary>
-        <p data-i18n="tokenFaqBody">In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.</p>
-      </details>
-    </div>
-  </section>
+  <div id="sourceSetupHost"></div>
 
   <section class="card">
-    <h2 data-i18n="loadTitle">2. Get recently learned words</h2>
+    <h2 data-i18n="loadTitle">Get recently learned words</h2>
     <div class="row">
       <div>
         <label for="source" data-i18n="dataSource">Data source</label>
@@ -306,34 +288,7 @@
       <button id="load" data-i18n="loadVocabulary">Load vocabulary</button>
     </div>
 
-    <div id="panel-csv-paste" class="source-panel" hidden>
-      <div class="csv-format">
-        <div data-i18n="csvFormatIntro">Paste headerless CSV-like rows. Required columns:</div>
-        <code>word,alternatives,meanings</code>
-        <div data-i18n="csvFormatOptional">Optional columns:</div>
-        <code>word,alternatives,meanings,created_at,last_seen_at,parts_of_speech</code>
-        <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
-        <div class="csv-examples">
-          <code>本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun</code>
-        </div>
-      </div>
-      <label for="csvPaste" data-i18n="csvPasteLabel">Word list</label>
-      <textarea id="csvPaste" spellcheck="false" data-i18n="csvPastePlaceholder" data-i18n-attr="placeholder" placeholder="本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun"></textarea>
-    </div>
-
-    <div id="panel-file-upload" class="source-panel" hidden>
-      <div class="csv-format">
-        <div data-i18n="csvFileIntro">Upload a .csv or .txt file using the same format as CSV paste.</div>
-        <code>word,alternatives,meanings[,created_at,last_seen_at,parts_of_speech]</code>
-        <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
-      </div>
-      <label for="csvFile" data-i18n="csvFileLabel">CSV file</label>
-      <div class="file-picker">
-        <input id="csvFile" type="file" accept=".csv,.txt,text/csv,text/plain">
-        <button id="csvChooseFile" type="button" class="secondary" data-i18n="csvChooseFile">Choose file</button>
-        <span id="csvFileName" class="file-name">No file chosen</span>
-      </div>
-    </div>
+    <div id="sourcePanelHost"></div>
 
     <p class="help" style="margin-top:12px;margin-bottom:0" data-i18n="loadHelp">Leave the limit blank to keep every match. Randomize shuffles before applying the limit.</p>
     <div id="status" class="status"></div>
@@ -370,6 +325,7 @@
 <script src="sources/core/registry.js"></script>
 <script src="sources/core/loader.js"></script>
 <script src="sources/core/csv.js"></script>
+<script src="sources/core/source-ui.js"></script>
 <script src="sources/adapters/wanikani.js"></script>
 <script src="sources/adapters/csv-paste.js"></script>
 <script src="sources/adapters/file-upload.js"></script>
@@ -377,7 +333,6 @@
 (() => {
   "use strict";
 
-  const TOKEN_KEY = "wk_conversation_token";
   const LANG_KEY = "kanikai_lang";
   const SOURCE_KEY = "kanikai_source";
   const SUPPORTED_LANGS = ["en", "ja"];
@@ -388,15 +343,12 @@
   let currentLang = detectLang();
 
   const $ = id => document.getElementById(id);
-  const tokenInput = $("token");
-  const tokenCard = $("tokenCard");
   const status = $("status");
   const sourceSelect = $("source");
-  const csvPasteInput = $("csvPaste");
-  const csvFileInput = $("csvFile");
-  const csvFileName = $("csvFileName");
-  const panelCsvPaste = $("panel-csv-paste");
-  const panelFileUpload = $("panel-file-upload");
+  const sourceUIHost = KaniKai.createSourceUIHost({
+    setupHost: $("sourceSetupHost"),
+    panelHost: $("sourcePanelHost")
+  });
 
   function detectLang() {
     const saved = localStorage.getItem(LANG_KEY);
@@ -412,6 +364,16 @@
     );
   }
 
+  function applyI18n(root = document) {
+    root.querySelectorAll("[data-i18n]").forEach(el => {
+      const key = el.getAttribute("data-i18n");
+      const attr = el.getAttribute("data-i18n-attr");
+      const value = t(key);
+      if (attr) el.setAttribute(attr, value);
+      else el.textContent = value;
+    });
+  }
+
   function applyTranslations() {
     document.documentElement.lang = currentLang === "ja" ? "ja" : "en";
     document.title = t("title");
@@ -419,21 +381,15 @@
     const langGroup = document.querySelector(".lang-switch");
     if (langGroup) langGroup.setAttribute("aria-label", t("langGroup"));
 
-    document.querySelectorAll("[data-i18n]").forEach(el => {
-      const key = el.getAttribute("data-i18n");
-      const attr = el.getAttribute("data-i18n-attr");
-      const value = t(key);
-      if (attr) el.setAttribute(attr, value);
-      else el.textContent = value;
-    });
+    applyI18n(document);
 
     document.querySelectorAll(".lang-switch [data-lang]").forEach(btn => {
       btn.setAttribute("aria-pressed", String(btn.getAttribute("data-lang") === currentLang));
     });
 
     populateSourceSelect();
-    syncSourceUi();
-    updateCsvFileName();
+    if (!sourceUIHost.getActive()) mountSelectedSourceUi();
+    else refreshSourceUiTranslations();
 
     if (!$("wordsCard").hidden) renderWords();
     if (!$("practiceCard").hidden && recentWords.length) createPrompt({ scroll: false });
@@ -451,36 +407,8 @@
     status.className = "status " + type;
   }
 
-  function hasStoredToken() {
-    return Boolean(localStorage.getItem(TOKEN_KEY));
-  }
-
-  function setTokenCollapsed(collapsed) {
-    tokenCard.classList.toggle("collapsed", collapsed);
-    $("collapseToken").hidden = !hasStoredToken() || collapsed;
-  }
-
-  function getToken() {
-    return tokenInput.value.trim() || localStorage.getItem(TOKEN_KEY) || "";
-  }
-
-  function saveToken() {
-    const token = tokenInput.value.trim();
-    if (!token) {
-      setStatus(t("pasteTokenFirst"), "error");
-      return;
-    }
-    localStorage.setItem(TOKEN_KEY, token);
-    tokenInput.value = "";
-    setStatus(t("tokenSaved"), "success");
-    setTokenCollapsed(true);
-  }
-
-  function clearToken() {
-    localStorage.removeItem(TOKEN_KEY);
-    tokenInput.value = "";
-    setStatus(t("tokenForgotten"), "success");
-    setTokenCollapsed(false);
+  function uiContext() {
+    return { t, setStatus };
   }
 
   function populateSourceSelect() {
@@ -508,17 +436,19 @@
     }
   }
 
-  function syncSourceUi() {
-    const sourceId = sourceSelect.value;
-    const isWaniKani = sourceId === "wanikani";
-    tokenCard.hidden = !isWaniKani;
-    panelCsvPaste.hidden = sourceId !== "csv-paste";
-    panelFileUpload.hidden = sourceId !== "file-upload";
+  function mountSelectedSourceUi() {
+    const source = KaniKai.getSource(sourceSelect.value);
+    const ui = sourceUIHost.activate(source, uiContext());
+    applyI18n($("sourceSetupHost"));
+    applyI18n($("sourcePanelHost"));
+    if (ui && typeof ui.applyTranslations === "function") ui.applyTranslations();
   }
 
-  function updateCsvFileName() {
-    const file = csvFileInput.files && csvFileInput.files[0];
-    csvFileName.textContent = file ? file.name : t("csvNoFileChosen");
+  function refreshSourceUiTranslations() {
+    applyI18n($("sourceSetupHost"));
+    applyI18n($("sourcePanelHost"));
+    const ui = sourceUIHost.getActive();
+    if (ui && typeof ui.applyTranslations === "function") ui.applyTranslations();
   }
 
   function readSharedLoadOptions() {
@@ -529,25 +459,22 @@
     const options = {
       since,
       limit: Number.isFinite(limit) ? limit : null,
-      randomize: $("randomize").checked,
-      token: getToken()
+      randomize: $("randomize").checked
     };
 
-    if (sourceSelect.value === "csv-paste") {
-      options.csvText = csvPasteInput.value;
-    }
-    if (sourceSelect.value === "file-upload") {
-      options.file = csvFileInput.files && csvFileInput.files[0] ? csvFileInput.files[0] : null;
+    const ui = sourceUIHost.getActive();
+    if (ui && typeof ui.getLoadOptions === "function") {
+      Object.assign(options, ui.getLoadOptions() || {});
     }
 
     return options;
   }
 
   function messageForLoadError(error) {
-    if (error && error.code === "AUTH_REQUIRED") return t("enterTokenFirst");
-    if (error && error.code === "AUTH_REJECTED") return t("tokenRejected");
-    if (error && error.code === "CSV_EMPTY") {
-      return sourceSelect.value === "file-upload" ? t("csvFileEmpty") : t("csvPasteEmpty");
+    const ui = sourceUIHost.getActive();
+    if (ui && typeof ui.messageForError === "function") {
+      const mapped = ui.messageForError(error);
+      if (mapped) return mapped;
     }
     return error && error.message ? error.message : String(error);
   }
@@ -558,7 +485,8 @@
     $("wordsCard").hidden = false;
     $("practiceCard").hidden = true;
 
-    const compactStatus = !tokenCard.hidden && tokenCard.classList.contains("collapsed");
+    const ui = sourceUIHost.getActive();
+    const compactStatus = Boolean(ui && typeof ui.suppressStatus === "function" && ui.suppressStatus());
 
     if (!words.length) {
       setStatus(compactStatus ? "" : t("noVocabulary"), "success");
@@ -598,10 +526,8 @@
         return;
       }
 
-      const source = KaniKai.getSource(sourceId);
-      if (source?.requiresAuth && !getToken()) {
-        setTokenCollapsed(false);
-        setStatus(t("enterTokenFirst"), "error");
+      const ui = sourceUIHost.getActive();
+      if (ui && typeof ui.prepareLoad === "function" && ui.prepareLoad() === false) {
         return;
       }
 
@@ -697,18 +623,10 @@
     btn.addEventListener("click", () => setLang(btn.getAttribute("data-lang")));
   });
 
-  $("saveToken").addEventListener("click", saveToken);
-  $("clearToken").addEventListener("click", clearToken);
-  $("expandToken").addEventListener("click", () => setTokenCollapsed(false));
-  $("collapseToken").addEventListener("click", () => {
-    if (hasStoredToken()) setTokenCollapsed(true);
-  });
   sourceSelect.addEventListener("change", () => {
     if (sourceSelect.value) localStorage.setItem(SOURCE_KEY, sourceSelect.value);
-    syncSourceUi();
+    mountSelectedSourceUi();
   });
-  $("csvChooseFile").addEventListener("click", () => csvFileInput.click());
-  csvFileInput.addEventListener("change", updateCsvFileName);
   $("load").addEventListener("click", loadWords);
   $("practice").addEventListener("click", () => createPrompt());
 
@@ -725,11 +643,6 @@
   });
 
   applyTranslations();
-
-  // Don't populate the actual token into the page until the user chooses to.
-  if (hasStoredToken()) {
-    setTokenCollapsed(true);
-  }
 })();
 </script>
 </body>

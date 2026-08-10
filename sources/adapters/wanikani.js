@@ -193,12 +193,112 @@
     return words;
   }
 
+  function createUI(ctx) {
+    const t = ctx.t;
+    const setStatus = ctx.setStatus;
+
+    const panel = document.createElement("div");
+    panel.id = "tokenCard";
+    panel.className = "token-panel";
+    panel.innerHTML = `
+      <div class="token-compact">
+        <div>
+          <strong data-i18n="connectTitle">Connect WaniKani</strong>
+          <p class="help" data-i18n="tokenSavedCompact">Token saved on this device.</p>
+        </div>
+        <button id="expandToken" class="secondary" type="button" data-i18n="manageToken">Manage token</button>
+      </div>
+      <div class="token-body">
+        <p class="help" style="margin-top:0" data-i18n="tokenHelp">Your API token is stored only in this browser. It is never included in this project file.</p>
+        <label for="token" data-i18n="tokenLabel">WaniKani API token</label>
+        <input id="token" type="password" autocomplete="off" data-i18n="tokenPlaceholder" data-i18n-attr="placeholder" placeholder="Paste your API token here">
+        <div class="actions">
+          <button id="saveToken" type="button" data-i18n="saveToken">Save token</button>
+          <button id="clearToken" class="secondary" type="button" data-i18n="forgetToken">Forget token</button>
+          <button id="collapseToken" class="secondary" type="button" hidden data-i18n="done">Done</button>
+        </div>
+        <details>
+          <summary data-i18n="tokenFaqSummary">Where do I get my token?</summary>
+          <p data-i18n="tokenFaqBody">In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.</p>
+        </details>
+      </div>
+    `;
+
+    const tokenInput = panel.querySelector("#token");
+    const collapseToken = panel.querySelector("#collapseToken");
+
+    function hasStoredToken() {
+      return Boolean(getStoredToken());
+    }
+
+    function setTokenCollapsed(collapsed) {
+      panel.classList.toggle("collapsed", collapsed);
+      collapseToken.hidden = !hasStoredToken() || collapsed;
+    }
+
+    function getToken() {
+      return tokenInput.value.trim() || getStoredToken();
+    }
+
+    function saveToken() {
+      const token = tokenInput.value.trim();
+      if (!token) {
+        setStatus(t("pasteTokenFirst"), "error");
+        return;
+      }
+      localStorage.setItem(TOKEN_KEY, token);
+      tokenInput.value = "";
+      setStatus(t("tokenSaved"), "success");
+      setTokenCollapsed(true);
+    }
+
+    function clearToken() {
+      localStorage.removeItem(TOKEN_KEY);
+      tokenInput.value = "";
+      setStatus(t("tokenForgotten"), "success");
+      setTokenCollapsed(false);
+    }
+
+    panel.querySelector("#saveToken").addEventListener("click", saveToken);
+    panel.querySelector("#clearToken").addEventListener("click", clearToken);
+    panel.querySelector("#expandToken").addEventListener("click", () => setTokenCollapsed(false));
+    collapseToken.addEventListener("click", () => {
+      if (hasStoredToken()) setTokenCollapsed(true);
+    });
+
+    return {
+      panel,
+      getLoadOptions() {
+        return { token: getToken() };
+      },
+      prepareLoad() {
+        if (getToken()) return true;
+        setTokenCollapsed(false);
+        setStatus(t("enterTokenFirst"), "error");
+        return false;
+      },
+      messageForError(error) {
+        if (error && error.code === "AUTH_REQUIRED") return t("enterTokenFirst");
+        if (error && error.code === "AUTH_REJECTED") return t("tokenRejected");
+        return null;
+      },
+      suppressStatus() {
+        return panel.classList.contains("collapsed");
+      },
+      onActivate() {
+        if (hasStoredToken()) setTokenCollapsed(true);
+        else setTokenCollapsed(false);
+      }
+    };
+  }
+
   KaniKai.registerSource({
     id: "wanikani",
     label: "WaniKani",
     requiresAuth: true,
     tokenKey: TOKEN_KEY,
     getToken: getStoredToken,
+    createUI,
     load
   });
 })(window);

@@ -4,7 +4,7 @@ window.KaniKaiStrings = {
     subtitle:
       "Turn recently learned WaniKani vocabulary into words you actually use.",
     langGroup: "Language",
-    connectTitle: "1. Connect WaniKani",
+    connectTitle: "Connect WaniKani",
     tokenSavedCompact: "Token saved on this device.",
     manageToken: "Manage token",
     tokenHelp:
@@ -17,7 +17,7 @@ window.KaniKaiStrings = {
     tokenFaqSummary: "Where do I get my token?",
     tokenFaqBody:
       "In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.",
-    loadTitle: "2. Get recently learned words",
+    loadTitle: "Get recently learned words",
     dataSource: "Data source",
     lookBack: "Look back",
     range24: "Last 24 hours",
@@ -97,7 +97,7 @@ Please follow these rules:
     title: "KaniKai",
     subtitle: "最近覚えたWaniKaniの単語を、実際に使える言葉に変えましょう。",
     langGroup: "言語",
-    connectTitle: "1. WaniKaniに接続",
+    connectTitle: "WaniKaniに接続",
     tokenSavedCompact: "トークンはこの端末に保存されています。",
     manageToken: "トークンを管理",
     tokenHelp:
@@ -110,7 +110,7 @@ Please follow these rules:
     tokenFaqSummary: "トークンの取得方法は？",
     tokenFaqBody:
       "WaniKaniのアカウント設定を開き、API Tokensのセクションを見つけてください。読み取り権限のあるトークンを作成します。このアプリには課題と科目への読み取りアクセスだけが必要です。",
-    loadTitle: "2. 最近覚えた単語を取得",
+    loadTitle: "最近覚えた単語を取得",
     dataSource: "データソース",
     lookBack: "期間",
     range24: "過去24時間",

@@ -8,12 +8,12 @@
   const KaniKai = global.KaniKai;
   if (!KaniKai || typeof KaniKai.registerSource !== "function") {
     throw new Error(
-      "KaniKai source registry must be loaded before the CSV paste adapter.",
+      "KaniKai source registry must be loaded before the CSV paste adapter."
     );
   }
   if (typeof KaniKai.parseWordCsv !== "function") {
     throw new Error(
-      "KaniKai.parseWordCsv must be loaded before the CSV paste adapter.",
+      "KaniKai.parseWordCsv must be loaded before the CSV paste adapter."
     );
   }
 
@@ -23,10 +23,43 @@
     return error;
   }
 
+  function createUI(ctx) {
+    const t = ctx.t;
+    const panel = document.createElement("div");
+    panel.innerHTML = `
+      <div class="csv-format">
+        <div data-i18n="csvFormatIntro">Paste headerless CSV-like rows. Required columns:</div>
+        <code>word,alternatives,meanings</code>
+        <div data-i18n="csvFormatOptional">Optional columns:</div>
+        <code>word,alternatives,meanings,created_at,last_seen_at,parts_of_speech</code>
+        <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
+        <div class="csv-examples">
+          <code>本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun</code>
+        </div>
+      </div>
+      <label for="csvPaste" data-i18n="csvPasteLabel">Word list</label>
+      <textarea id="csvPaste" spellcheck="false" data-i18n="csvPastePlaceholder" data-i18n-attr="placeholder" placeholder="本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun"></textarea>
+    `;
+
+    const textarea = panel.querySelector("#csvPaste");
+
+    return {
+      panel,
+      getLoadOptions() {
+        return { csvText: textarea.value };
+      },
+      messageForError(error) {
+        if (error && error.code === "CSV_EMPTY") return t("csvPasteEmpty");
+        return null;
+      }
+    };
+  }
+
   KaniKai.registerSource({
     id: "csv-paste",
     label: "CSV Paste",
     requiresAuth: false,
+    createUI,
 
     /**
      * @param {object} [options]
@@ -37,7 +70,7 @@
       if (!text.trim()) {
         throw sourceError(
           "Paste at least one CSV word row first.",
-          "CSV_EMPTY",
+          "CSV_EMPTY"
         );
       }
 
@@ -46,6 +79,6 @@
         throw sourceError("No word rows found in the pasted CSV.", "CSV_EMPTY");
       }
       return words;
-    },
+    }
   });
 })(window);
