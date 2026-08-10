@@ -108,7 +108,7 @@
       background: var(--card);
       color: var(--text);
     }
-    .row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px; align-items: end; }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 14px; align-items: end; }
     .checkbox-field {
       display: flex;
       align-items: center;
@@ -168,6 +168,52 @@
       border-radius: 10px;
       background: var(--bg);
       color: var(--text);
+    }
+    #csvPaste {
+      min-height: 140px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: .88rem;
+      background: var(--card);
+    }
+    .source-panel { margin-top: 14px; }
+    .source-panel[hidden] { display: none !important; }
+    .csv-format {
+      margin: 0 0 10px;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: rgba(127,127,127,.06);
+      font-size: .9rem;
+      color: var(--muted);
+    }
+    .csv-format code {
+      display: inline-block;
+      margin: 4px 0;
+      white-space: pre-wrap;
+    }
+    .csv-format .csv-examples { margin-top: 8px; }
+    input[type="file"] {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+    .file-picker {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .file-name {
+      color: var(--muted);
+      font-size: .92rem;
+      min-width: 0;
+      word-break: break-all;
     }
     details { margin-top: 16px; }
     summary { cursor: pointer; color: var(--muted); }
@@ -230,12 +276,15 @@
         <p data-i18n="tokenFaqBody">In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.</p>
       </details>
     </div>
-    <div id="status" class="status"></div>
   </section>
 
   <section class="card">
     <h2 data-i18n="loadTitle">2. Get recently learned words</h2>
     <div class="row">
+      <div>
+        <label for="source" data-i18n="dataSource">Data source</label>
+        <select id="source"></select>
+      </div>
       <div>
         <label for="range" data-i18n="lookBack">Look back</label>
         <select id="range">
@@ -256,7 +305,38 @@
       </div>
       <button id="load" data-i18n="loadVocabulary">Load vocabulary</button>
     </div>
+
+    <div id="panel-csv-paste" class="source-panel" hidden>
+      <div class="csv-format">
+        <div data-i18n="csvFormatIntro">Paste headerless CSV-like rows. Required columns:</div>
+        <code>word,alternatives,meanings</code>
+        <div data-i18n="csvFormatOptional">Optional columns:</div>
+        <code>word,alternatives,meanings,created_at,last_seen_at,parts_of_speech</code>
+        <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
+        <div class="csv-examples">
+          <code>本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun</code>
+        </div>
+      </div>
+      <label for="csvPaste" data-i18n="csvPasteLabel">Word list</label>
+      <textarea id="csvPaste" spellcheck="false" data-i18n="csvPastePlaceholder" data-i18n-attr="placeholder" placeholder="本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun"></textarea>
+    </div>
+
+    <div id="panel-file-upload" class="source-panel" hidden>
+      <div class="csv-format">
+        <div data-i18n="csvFileIntro">Upload a .csv or .txt file using the same format as CSV paste.</div>
+        <code>word,alternatives,meanings[,created_at,last_seen_at,parts_of_speech]</code>
+        <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
+      </div>
+      <label for="csvFile" data-i18n="csvFileLabel">CSV file</label>
+      <div class="file-picker">
+        <input id="csvFile" type="file" accept=".csv,.txt,text/csv,text/plain">
+        <button id="csvChooseFile" type="button" class="secondary" data-i18n="csvChooseFile">Choose file</button>
+        <span id="csvFileName" class="file-name">No file chosen</span>
+      </div>
+    </div>
+
     <p class="help" style="margin-top:12px;margin-bottom:0" data-i18n="loadHelp">Leave the limit blank to keep every match. Randomize shuffles before applying the limit.</p>
+    <div id="status" class="status"></div>
   </section>
 
   <section id="wordsCard" class="card" hidden>
@@ -285,15 +365,24 @@
 </main>
 
 <script src="translations.js"></script>
+<script src="sources/core/parts-of-speech.js"></script>
+<script src="sources/core/types.js"></script>
+<script src="sources/core/registry.js"></script>
+<script src="sources/core/loader.js"></script>
+<script src="sources/core/csv.js"></script>
+<script src="sources/adapters/wanikani.js"></script>
+<script src="sources/adapters/csv-paste.js"></script>
+<script src="sources/adapters/file-upload.js"></script>
 <script>
 (() => {
   "use strict";
 
-  const API_BASE = "https://api.wanikani.com/v2";
   const TOKEN_KEY = "wk_conversation_token";
   const LANG_KEY = "kanikai_lang";
+  const SOURCE_KEY = "kanikai_source";
   const SUPPORTED_LANGS = ["en", "ja"];
   const STRINGS = window.KaniKaiStrings;
+  const KaniKai = window.KaniKai;
 
   let recentWords = [];
   let currentLang = detectLang();
@@ -302,6 +391,12 @@
   const tokenInput = $("token");
   const tokenCard = $("tokenCard");
   const status = $("status");
+  const sourceSelect = $("source");
+  const csvPasteInput = $("csvPaste");
+  const csvFileInput = $("csvFile");
+  const csvFileName = $("csvFileName");
+  const panelCsvPaste = $("panel-csv-paste");
+  const panelFileUpload = $("panel-file-upload");
 
   function detectLang() {
     const saved = localStorage.getItem(LANG_KEY);
@@ -335,6 +430,10 @@
     document.querySelectorAll(".lang-switch [data-lang]").forEach(btn => {
       btn.setAttribute("aria-pressed", String(btn.getAttribute("data-lang") === currentLang));
     });
+
+    populateSourceSelect();
+    syncSourceUi();
+    updateCsvFileName();
 
     if (!$("wordsCard").hidden) renderWords();
     if (!$("practiceCard").hidden && recentWords.length) createPrompt({ scroll: false });
@@ -384,157 +483,143 @@
     setTokenCollapsed(false);
   }
 
-  async function apiGet(path, token) {
-    const response = await fetch(API_BASE + path, {
-      headers: {
-        "Authorization": "Bearer " + token,
-        "Wanikani-Revision": "20170710"
-      }
-    });
+  function populateSourceSelect() {
+    const previous = sourceSelect.value || localStorage.getItem(SOURCE_KEY) || "";
+    const sources = typeof KaniKai.listSources === "function" ? KaniKai.listSources() : [];
+    sourceSelect.innerHTML = "";
 
-    if (!response.ok) {
-      let detail = "";
-      try {
-        const data = await response.json();
-        detail = data.error || data.message || "";
-      } catch {}
-      if (response.status === 401) throw new Error(t("tokenRejected"));
-      throw new Error(detail || t("apiError", { status: response.status }));
+    for (const source of sources) {
+      const option = document.createElement("option");
+      option.value = source.id;
+      option.textContent = source.label;
+      sourceSelect.appendChild(option);
     }
-    return response.json();
-  }
 
-  async function getAllPages(path, token) {
-    const results = [];
-    let url = path;
-
-    while (url) {
-      const data = await apiGet(url, token);
-      results.push(...data.data);
-      url = data.pages?.next
-        ? new URL(data.pages.next).pathname + new URL(data.pages.next).search
-        : null;
-    }
-    return results;
-  }
-
-  async function loadWords() {
-    const token = getToken();
-    if (!token) {
-      setTokenCollapsed(false);
-      setStatus(t("enterTokenFirst"), "error");
+    if (!sources.length) {
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = t("noSourcesRegistered");
+      sourceSelect.appendChild(option);
       return;
     }
 
+    if (previous && sources.some(s => s.id === previous)) {
+      sourceSelect.value = previous;
+    }
+  }
+
+  function syncSourceUi() {
+    const sourceId = sourceSelect.value;
+    const isWaniKani = sourceId === "wanikani";
+    tokenCard.hidden = !isWaniKani;
+    panelCsvPaste.hidden = sourceId !== "csv-paste";
+    panelFileUpload.hidden = sourceId !== "file-upload";
+  }
+
+  function updateCsvFileName() {
+    const file = csvFileInput.files && csvFileInput.files[0];
+    csvFileName.textContent = file ? file.name : t("csvNoFileChosen");
+  }
+
+  function readSharedLoadOptions() {
+    const hours = Number($("range").value);
+    const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    const limitRaw = $("limit").value.trim();
+    const limit = limitRaw === "" ? null : Math.max(1, Math.floor(Number(limitRaw)));
+    const options = {
+      since,
+      limit: Number.isFinite(limit) ? limit : null,
+      randomize: $("randomize").checked,
+      token: getToken()
+    };
+
+    if (sourceSelect.value === "csv-paste") {
+      options.csvText = csvPasteInput.value;
+    }
+    if (sourceSelect.value === "file-upload") {
+      options.file = csvFileInput.files && csvFileInput.files[0] ? csvFileInput.files[0] : null;
+    }
+
+    return options;
+  }
+
+  function messageForLoadError(error) {
+    if (error && error.code === "AUTH_REQUIRED") return t("enterTokenFirst");
+    if (error && error.code === "AUTH_REJECTED") return t("tokenRejected");
+    if (error && error.code === "CSV_EMPTY") {
+      return sourceSelect.value === "file-upload" ? t("csvFileEmpty") : t("csvPasteEmpty");
+    }
+    return error && error.message ? error.message : String(error);
+  }
+
+  function finishLoad({ words, totalMatched, randomize, limit }) {
+    recentWords = words;
+    renderWords();
+    $("wordsCard").hidden = false;
+    $("practiceCard").hidden = true;
+
+    const compactStatus = !tokenCard.hidden && tokenCard.classList.contains("collapsed");
+
+    if (!words.length) {
+      setStatus(compactStatus ? "" : t("noVocabulary"), "success");
+      return;
+    }
+
+    if (compactStatus) {
+      setStatus("");
+      return;
+    }
+
+    const details = [];
+    if (randomize) details.push(t("randomized"));
+    if (limit != null && words.length < totalMatched) {
+      details.push(t("showing", { count: words.length }));
+    }
+
+    let message;
+    if (details.length) {
+      message = t("foundWordsFiltered", { count: totalMatched, details: details.join(", ") });
+    } else {
+      message = t(totalMatched === 1 ? "foundWords" : "foundWordsPlural", { count: totalMatched });
+    }
+    setStatus(message, "success");
+  }
+
+  async function loadWords() {
     $("load").disabled = true;
     $("wordsCard").hidden = true;
     $("practiceCard").hidden = true;
     setStatus(t("loading"));
 
     try {
-      const hours = Number($("range").value);
-      const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
-
-      // Assignments are the authoritative source for when the user actually
-      // started learning an item. Restrict the initial query to vocabulary.
-      const query = "/assignments?subject_types=vocabulary&started=true&available_after="
-        + encodeURIComponent(since)
-        + "&per_page=100";
-
-      const assignments = await getAllPages(query, token);
-
-      if (!assignments.length) {
-        recentWords = [];
-        renderWords();
-        $("wordsCard").hidden = false;
-        setStatus(tokenCard.classList.contains("collapsed") ? "" : t("noVocabulary"), "success");
+      const sourceId = sourceSelect.value;
+      if (!sourceId) {
+        setStatus(t("noSourcesRegistered"), "error");
         return;
       }
 
-      const ids = [...new Set(assignments.map(a => a.data.subject_id))];
-
-      // Fetch subjects in batches to avoid huge URLs.
-      const subjects = [];
-      for (let i = 0; i < ids.length; i += 100) {
-        const batch = ids.slice(i, i + 100).join(",");
-        const data = await apiGet("/subjects?ids=" + encodeURIComponent(batch) + "&types=vocabulary&per_page=100", token);
-        subjects.push(...data.data);
+      const source = KaniKai.getSource(sourceId);
+      if (source?.requiresAuth && !getToken()) {
+        setTokenCollapsed(false);
+        setStatus(t("enterTokenFirst"), "error");
+        return;
       }
 
-      const byId = new Map(subjects.map(s => [s.id, s]));
+      localStorage.setItem(SOURCE_KEY, sourceId);
+      const options = readSharedLoadOptions();
+      const result = await KaniKai.loadFromSource(sourceId, options);
 
-      let words = assignments
-        .map(a => {
-          const subject = byId.get(a.data.subject_id);
-          if (!subject) return null;
-          const d = subject.data;
-          const meanings = (d.meanings || [])
-            .filter(m => m.meaning && !m.primary_meaning ? true : true)
-            .map(m => m.meaning)
-            .slice(0, 3);
-
-          return {
-            id: subject.id,
-            characters: d.characters || "",
-            reading: d.readings?.find(r => r.primary)?.reading || d.readings?.[0]?.reading || "",
-            meanings,
-            startedAt: a.data.started_at
-          };
-        })
-        .filter(Boolean)
-        .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
-
-      const totalFound = words.length;
-      const randomize = $("randomize").checked;
-      const limitRaw = $("limit").value.trim();
-      const limit = limitRaw === "" ? null : Math.max(1, Math.floor(Number(limitRaw)));
-
-      if (randomize) {
-        words = shuffle(words);
-      }
-
-      if (limit !== null && Number.isFinite(limit)) {
-        words = words.slice(0, limit);
-      }
-
-      recentWords = words;
-
-      renderWords();
-      $("wordsCard").hidden = false;
-      $("practiceCard").hidden = true;
-
-      // Keep the collapsed token bar compact; the words card already shows the count.
-      if (tokenCard.classList.contains("collapsed")) {
-        setStatus("");
-      } else {
-        const details = [];
-        if (randomize) details.push(t("randomized"));
-        if (limit !== null && Number.isFinite(limit) && words.length < totalFound) {
-          details.push(t("showing", { count: words.length }));
-        }
-
-        let message;
-        if (details.length) {
-          message = t("foundWordsFiltered", { count: totalFound, details: details.join(", ") });
-        } else {
-          message = t(totalFound === 1 ? "foundWords" : "foundWordsPlural", { count: totalFound });
-        }
-        setStatus(message, "success");
-      }
+      finishLoad({
+        words: result.words,
+        totalMatched: result.totalMatched,
+        randomize: options.randomize,
+        limit: options.limit
+      });
     } catch (error) {
-      setStatus(error.message, "error");
+      setStatus(messageForLoadError(error), "error");
     } finally {
       $("load").disabled = false;
     }
-  }
-
-  function shuffle(items) {
-    const copy = items.slice();
-    for (let i = copy.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [copy[i], copy[j]] = [copy[j], copy[i]];
-    }
-    return copy;
   }
 
   function formatTime(iso) {
@@ -542,6 +627,10 @@
       dateStyle: "short",
       timeStyle: "short"
     }).format(new Date(iso));
+  }
+
+  function primaryAlternative(word) {
+    return (word.alternatives && word.alternatives[0]) || "";
   }
 
   function renderWords() {
@@ -561,11 +650,11 @@
       el.className = "word";
       el.innerHTML = `
         <div>
-          <div class="japanese">${escapeHtml(word.characters)}</div>
-          <div class="reading">${escapeHtml(word.reading)}</div>
+          <div class="japanese">${escapeHtml(word.word)}</div>
+          <div class="reading">${escapeHtml(primaryAlternative(word))}</div>
         </div>
-        <div class="meaning">${escapeHtml(word.meanings.join("; "))}</div>
-        <div class="learned">${escapeHtml(formatTime(word.startedAt))}</div>
+        <div class="meaning">${escapeHtml((word.meanings || []).join("; "))}</div>
+        <div class="learned">${escapeHtml(formatTime(word.last_seen_at))}</div>
       `;
       $("words").appendChild(el);
     }
@@ -578,9 +667,11 @@
   }
 
   function wordListText() {
-    return recentWords.map(w =>
-      `${w.characters}（${w.reading}）— ${w.meanings.join("; ")}`
-    ).join("\n");
+    return recentWords.map(w => {
+      const alt = primaryAlternative(w);
+      const head = alt ? `${w.word}（${alt}）` : w.word;
+      return `${head}— ${(w.meanings || []).join("; ")}`;
+    }).join("\n");
   }
 
   function createPrompt({ scroll = true } = {}) {
@@ -612,6 +703,12 @@
   $("collapseToken").addEventListener("click", () => {
     if (hasStoredToken()) setTokenCollapsed(true);
   });
+  sourceSelect.addEventListener("change", () => {
+    if (sourceSelect.value) localStorage.setItem(SOURCE_KEY, sourceSelect.value);
+    syncSourceUi();
+  });
+  $("csvChooseFile").addEventListener("click", () => csvFileInput.click());
+  csvFileInput.addEventListener("change", updateCsvFileName);
   $("load").addEventListener("click", loadWords);
   $("practice").addEventListener("click", () => createPrompt());
 

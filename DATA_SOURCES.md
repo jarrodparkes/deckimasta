@@ -1,0 +1,287 @@
+# Data sources
+
+KaniKai loads vocabulary through a small abstraction layer so any backend (API, CSV, spreadsheet, static JSON, etc.) can feed the same UI.
+
+This document is the contract for that layer: the shared **word** shape, shared **load options**, the **source interface**, and how to add a new source.
+
+## Goals
+
+- One source at a time (no merging yet)
+- Sources own their own auth / credentials when needed
+- Sources return the shared word shape
+- The app applies shared post-processing (optional look-back, sort, randomize, limit)
+
+## Word shape
+
+Every source must produce objects that match this shape:
+
+```json
+{
+  "id": "uuid-or-source-id",
+  "word": "色",
+  "alternatives": ["いろ"],
+  "meanings": [
+    "the aspect of the appearance of objects that may be described in terms of hue",
+    "a phenomenon of light"
+  ],
+  "created_at": "2012-02-28T08:04:47.000000Z",
+  "last_seen_at": "2026-08-10T18:00:00.000000Z",
+  "parts_of_speech": ["noun"]
+}
+```
+
+| Field             | Type              | Required | Notes                                                                                                       |
+| ----------------- | ----------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
+| `id`              | string            | yes      | Use a stable id from the source when available. Otherwise generate a UUID (or equivalent) at load time.     |
+| `word`            | string            | yes      | Primary surface form. Language is inferred from the source for now (e.g. Japanese characters for WaniKani). |
+| `alternatives`    | string[]          | yes      | Alternate forms / spellings / readings. Use `[]` when there are none.                                       |
+| `meanings`        | string[]          | yes      | Gloss list. May be in a different language than `word`.                                                     |
+| `created_at`      | string (ISO 8601) | yes      | First time the learner encountered / started the item, when known.                                          |
+| `last_seen_at`    | string (ISO 8601) | yes      | Most recent study / exposure time. If the source only has one timestamp, set both fields to that value.     |
+| `parts_of_speech` | string[]          | yes      | Tags from the shared enum below when possible. Use `[]` if unknown.                                         |
+
+### Example (WaniKani vocabulary)
+
+For 色 / いろ / “color”:
+
+```json
+{
+  "id": "2467",
+  "word": "色",
+  "alternatives": ["いろ"],
+  "meanings": ["Color"],
+  "created_at": "2026-08-01T12:00:00.000Z",
+  "last_seen_at": "2026-08-10T09:30:00.000Z",
+  "parts_of_speech": ["noun"]
+}
+```
+
+WaniKani mapping used by `sources/adapters/wanikani.js`:
+
+- `id` ← subject id (stringified)
+- `word` ← subject `characters`
+- `alternatives` ← readings (primary first when available)
+- `meanings` ← subject meanings (up to 3)
+- `created_at` ← assignment `started_at` (first time learning started)
+- `last_seen_at` ← latest of assignment `data_updated_at`, `burned_at`, `passed_at`, `resurrected_at`, `started_at`
+- `parts_of_speech` ← subject `parts_of_speech`
+
+When `since` is provided, the adapter prefetches with `updated_after` for efficiency. Shared `applyLoadOptions` still enforces the final `last_seen_at` look-back.
+
+### Parts of speech
+
+Starting enum (from WaniKani’s vocabulary tags). Sources should prefer these strings; unknown tags may be passed through, but new sources should map into this set when a clear match exists:
+
+- `noun`
+- `proper_noun`
+- `numeral`
+- `pronoun`
+- `prefix`
+- `suffix`
+- `counter`
+- `expression`
+- `interjection`
+- `conjunction`
+- `adverb`
+- `adjective`
+- `i_adjective`
+- `na_adjective`
+- `no_adjective`
+- `godan_verb`
+- `ichidan_verb`
+- `suru_verb`
+- `transitive_verb`
+- `intransitive_verb`
+
+## Shared load options
+
+These options are source-agnostic. The app (not the source UI) owns them:
+
+```js
+{
+  // When set, keep words whose last_seen_at is on/after this instant.
+  // When null/undefined, do not filter by recency (full set / random sample use case).
+  since: Date | string | null,
+
+  // Max words to keep after filtering/sorting/shuffle. null = no limit.
+  limit: number | null,
+
+  // If true, shuffle before applying limit.
+  randomize: boolean
+}
+```
+
+### Look-back behavior
+
+- **Recently learned/seen:** set `since` (e.g. now − 24h / 7d / 14d). Filter on `last_seen_at`.
+- **Any words from my set:** omit `since` (or pass `null`). No recency filter; combine with `randomize` + `limit` as needed.
+
+Default ordering when `randomize` is false: newest `last_seen_at` first.
+
+Auth / tokens are **not** part of shared options. Each source that needs credentials reads them from its own config (for example WaniKani’s token in `localStorage`).
+
+## Source interface
+
+Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain object:
+
+```js
+/**
+ * @typedef {object} Word
+ * @property {string} id
+ * @property {string} word
+ * @property {string[]} alternatives
+ * @property {string[]} meanings
+ * @property {string} created_at
+ * @property {string} last_seen_at
+ * @property {string[]} parts_of_speech
+ */
+
+/**
+ * @typedef {object} WordSource
+ * @property {string} id            // stable machine id, e.g. "wanikani"
+ * @property {string} label         // UI label
+ * @property {boolean} requiresAuth // whether the source needs credentials
+ * @property {(options?: object) => Promise<Word[]>} load
+ */
+```
+
+`load(options)` should:
+
+1. Read any source-specific credentials / settings it needs.
+2. Fetch or parse raw data.
+3. Map each item with `KaniKai.createWord(...)` into the shared **Word** shape.
+4. Return the full mapped list for the source’s natural universe (or as much as the source can provide).
+
+The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency (for example WaniKani querying by date) as long as the returned words still satisfy the shared contract.
+
+### `window.KaniKai` API (Step 1)
+
+| Helper                                              | Role                                                          |
+| --------------------------------------------------- | ------------------------------------------------------------- |
+| `PARTS_OF_SPEECH`                                   | Frozen allow-list of starting tags                            |
+| `isKnownPartOfSpeech(tag)`                          | Whether a tag is in the shared enum                           |
+| `normalizePartsOfSpeech(tags)`                      | Dedupe / stringify; unknown tags kept                         |
+| `createWord(partial)`                               | Normalize a Word; generate `id` if missing; mirror timestamps |
+| `createLoadOptions(partial)`                        | Normalize `{ since, limit, randomize }`                       |
+| `matchWords(words, options)`                        | Look-back filter + sort (no shuffle/limit)                    |
+| `applyLoadOptions(words, options)`                  | Shared look-back → sort → shuffle → limit                     |
+| `applyLoadOptionsWithMeta(words, options)`          | Same, plus `totalMatched` before limit                        |
+| `loadFromSource(sourceId, options)`                 | Registry lookup → `source.load` → apply shared options        |
+| `parseWordCsv(text)`                                | Parse CSV-like paste/file text into Word[]                    |
+| `isWordSource(source)`                              | Structural check for the source interface                     |
+| `registerSource(source)`                            | Add a source to the registry                                  |
+| `getSource(id)` / `listSources()` / `hasSource(id)` | Registry lookup                                               |
+
+## File layout
+
+```text
+sources/
+  core/                 # system that loads / normalizes data sources
+    parts-of-speech.js  # enum / allow-list
+    types.js            # Word + LoadOptions helpers
+    registry.js         # registerSource / listSources
+    loader.js           # loadFromSource entry point
+    csv.js              # shared CSV-like parser (paste + file)
+  adapters/             # individual data sources
+    wanikani.js
+    csv-paste.js
+    file-upload.js
+    # your-source.js
+```
+
+`sources/core/` is the loading system. `sources/adapters/` is only concrete sources.
+
+Include scripts before the main app (order matters: core, then adapters):
+
+```html
+<script src="sources/core/parts-of-speech.js"></script>
+<script src="sources/core/types.js"></script>
+<script src="sources/core/registry.js"></script>
+<script src="sources/core/loader.js"></script>
+<script src="sources/core/csv.js"></script>
+<script src="sources/adapters/your-source.js"></script>
+```
+
+`index.html` should stay thin: source picker, shared options, render / copy / prompt. Fetch/map logic lives in adapters; shared filtering lives in core.
+
+## How to add a data source
+
+1. **Create** `sources/adapters/your-source.js` that implements the `WordSource` interface and calls `KaniKai.registerSource(...)`.
+2. **Map** every record with `KaniKai.createWord(...)`.
+3. **Handle auth** inside the adapter (no-op if none is required).
+4. **Include** the script from `index.html` after the `sources/core/*` scripts.
+5. **Smoke-test** both modes:
+   - with `since` set (recent `last_seen_at`)
+   - with `since` unset + `randomize` / `limit` (sample from the set)
+
+### Minimal skeleton
+
+```js
+// sources/adapters/example-csv.js
+(function (global) {
+  "use strict";
+  const KaniKai = global.KaniKai;
+
+  KaniKai.registerSource({
+    id: "example-csv",
+    label: "Example CSV",
+    requiresAuth: false,
+
+    async load(/* options */) {
+      const rows = []; // parse file / fetch remote CSV / etc.
+
+      return rows.map((row) =>
+        KaniKai.createWord({
+          id: row.id,
+          word: row.word,
+          alternatives: row.alternatives || [],
+          meanings: row.meanings || [],
+          created_at: row.created_at || row.last_seen_at,
+          last_seen_at: row.last_seen_at || row.created_at,
+          parts_of_speech: row.parts_of_speech || [],
+        }),
+      );
+    },
+  });
+})(window);
+```
+
+## Built-in adapters
+
+### WaniKani (`sources/adapters/wanikani.js`)
+
+See mapping above. Requires an API token.
+
+### CSV paste / CSV file (`csv-paste`, `file-upload`)
+
+Both use `KaniKai.parseWordCsv` from `sources/core/csv.js`. Headerless rows by default (a leading `word,...` header is skipped if present).
+
+Columns:
+
+```text
+word,alternatives,meanings[,created_at,last_seen_at,parts_of_speech]
+```
+
+- `alternatives`, `meanings`, and `parts_of_speech` are `|`-separated (empty → `[]`)
+- Dates accept `YYYY-MM-DD` or a full timestamp; blank → now
+- `id` is generated on load
+
+Examples:
+
+```text
+本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun
+```
+
+## Usage
+
+Words are loaded only through registered adapters under `sources/adapters/` via `KaniKai.loadFromSource`.
+
+## Checklist for a new source
+
+- [ ] Stable `id` when the backend provides one; otherwise generated per load
+- [ ] `word` + `alternatives` + `meanings` always present (arrays may be empty)
+- [ ] `created_at` and `last_seen_at` always ISO strings (duplicated when only one timestamp exists)
+- [ ] `parts_of_speech` mapped to the shared enum when possible
+- [ ] Credentials handled only inside the source
+- [ ] Works with and without the shared `since` look-back filter
+- [ ] Registered for one-at-a-time selection in the UI
