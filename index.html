@@ -1,0 +1,556 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#111827">
+  <title>KaniKai</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f5f7fb;
+      --card: #fff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #dbe1ea;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --danger: #b91c1c;
+      --success: #047857;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0b1020;
+        --card: #151b2d;
+        --text: #f3f4f6;
+        --muted: #9ca3af;
+        --border: #30384d;
+        --accent: #60a5fa;
+        --accent-hover: #93c5fd;
+        --danger: #f87171;
+        --success: #34d399;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    main { max-width: 960px; margin: 0 auto; padding: 24px 18px 60px; }
+    h1 { margin: 0 0 4px; font-size: clamp(1.7rem, 4vw, 2.35rem); }
+    h2 { margin: 0; font-size: 1.25rem; }
+    .subtitle { color: var(--muted); margin: 0 0 18px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px 20px;
+      margin: 12px 0;
+      box-shadow: 0 3px 12px rgba(0,0,0,.04);
+    }
+    #tokenCard.collapsed {
+      padding: 12px 16px;
+    }
+    .token-compact {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .token-compact .help { margin: 2px 0 0; }
+    #tokenCard.collapsed .token-compact { display: flex; }
+    #tokenCard.collapsed .token-body { display: none; }
+    #tokenCard.collapsed .status:empty { display: none; margin: 0; min-height: 0; }
+    #tokenCard.collapsed .status:not(:empty) { margin-top: 8px; }
+    label { display: block; font-weight: 650; margin-bottom: 7px; }
+    input, select, button, textarea {
+      font: inherit;
+    }
+    input[type="password"], input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      background: var(--card);
+      color: var(--text);
+    }
+    .row { display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px; align-items: end; }
+    .checkbox-field {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 42px;
+      padding-bottom: 2px;
+    }
+    .checkbox-field input { width: auto; margin: 0; }
+    .checkbox-field label { margin: 0; font-weight: 550; }
+    .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 14px; }
+    button {
+      border: 0;
+      border-radius: 9px;
+      padding: 10px 15px;
+      cursor: pointer;
+      background: var(--accent);
+      color: white;
+      font-weight: 650;
+    }
+    button:hover { background: var(--accent-hover); }
+    button.secondary {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    button.secondary:hover { background: rgba(127,127,127,.08); }
+    button:disabled { opacity: .55; cursor: not-allowed; }
+    .help, .status { color: var(--muted); font-size: .92rem; }
+    .status { margin-top: 12px; min-height: 1.4em; }
+    .status.error { color: var(--danger); }
+    .status.success { color: var(--success); }
+    .summary { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 10px; }
+    .word-list {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .word {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      border: 1px solid var(--border);
+      border-radius: 11px;
+      padding: 10px 11px;
+      min-width: 0;
+    }
+    .japanese { font-size: 1.2rem; font-weight: 700; line-height: 1.25; word-break: break-word; }
+    .reading { color: var(--muted); font-size: .85rem; word-break: break-word; }
+    .meaning { font-weight: 550; font-size: .92rem; line-height: 1.3; word-break: break-word; }
+    .learned { color: var(--muted); font-size: .78rem; margin-top: 4px; }
+    textarea {
+      width: 100%;
+      min-height: 250px;
+      resize: vertical;
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+    }
+    details { margin-top: 16px; }
+    summary { cursor: pointer; color: var(--muted); }
+    code {
+      background: rgba(127,127,127,.12);
+      padding: 1px 5px;
+      border-radius: 5px;
+    }
+    .empty { color: var(--muted); padding: 18px 0 5px; grid-column: 1 / -1; }
+    @media (max-width: 900px) {
+      .word-list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+    @media (max-width: 750px) {
+      .row { grid-template-columns: 1fr 1fr; }
+      .word-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 650px) {
+      .row { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 420px) {
+      .word-list { grid-template-columns: 1fr; }
+      .token-compact { flex-wrap: wrap; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <h1>KaniKai</h1>
+  <p class="subtitle">Turn recently learned WaniKani vocabulary into words you actually use.</p>
+
+  <section id="tokenCard" class="card">
+    <div class="token-compact">
+      <div>
+        <h2>1. Connect WaniKani</h2>
+        <p class="help">Token saved on this device.</p>
+      </div>
+      <button id="expandToken" class="secondary" type="button">Manage token</button>
+    </div>
+    <div class="token-body">
+      <h2>1. Connect WaniKani</h2>
+      <p class="help">Your API token is stored only in this browser. It is never included in this project file.</p>
+      <label for="token">WaniKani API token</label>
+      <input id="token" type="password" autocomplete="off" placeholder="Paste your API token here">
+      <div class="actions">
+        <button id="saveToken" type="button">Save token</button>
+        <button id="clearToken" class="secondary" type="button">Forget token</button>
+        <button id="collapseToken" class="secondary" type="button" hidden>Done</button>
+      </div>
+      <details>
+        <summary>Where do I get my token?</summary>
+        <p>In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.</p>
+      </details>
+    </div>
+    <div id="status" class="status"></div>
+  </section>
+
+  <section class="card">
+    <h2>2. Get recently learned words</h2>
+    <div class="row">
+      <div>
+        <label for="range">Look back</label>
+        <select id="range">
+          <option value="24">Last 24 hours</option>
+          <option value="48">Last 2 days</option>
+          <option value="72">Last 3 days</option>
+          <option value="168">Last 7 days</option>
+          <option value="336">Last 14 days</option>
+        </select>
+      </div>
+      <div>
+        <label for="limit">Limit results</label>
+        <input id="limit" type="number" min="1" step="1" placeholder="All" inputmode="numeric">
+      </div>
+      <div class="checkbox-field">
+        <input id="randomize" type="checkbox">
+        <label for="randomize">Randomize</label>
+      </div>
+      <button id="load">Load vocabulary</button>
+    </div>
+    <p class="help" style="margin-top:12px;margin-bottom:0">Leave the limit blank to keep every match. Randomize shuffles before applying the limit.</p>
+  </section>
+
+  <section id="wordsCard" class="card" hidden>
+    <div class="summary">
+      <h2>Recently learned</h2>
+      <strong id="count"></strong>
+    </div>
+    <div id="words" class="word-list"></div>
+    <div class="actions">
+      <button id="practice">Create conversation practice</button>
+      <button id="copyWords" class="secondary">Copy word list</button>
+    </div>
+  </section>
+
+  <section id="practiceCard" class="card" hidden>
+    <div class="summary">
+      <h2>Conversation practice prompt</h2>
+    </div>
+    <p class="help">Copy this into ChatGPT and start talking. The prompt deliberately asks for one question at a time.</p>
+    <textarea id="prompt" readonly></textarea>
+    <div class="actions">
+      <button id="copyPrompt">Copy prompt</button>
+      <button id="openChatGPT" class="secondary">Open ChatGPT</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+
+  const API_BASE = "https://api.wanikani.com/v2";
+  const TOKEN_KEY = "wk_conversation_token";
+  let recentWords = [];
+
+  const $ = id => document.getElementById(id);
+  const tokenInput = $("token");
+  const tokenCard = $("tokenCard");
+  const status = $("status");
+
+  function setStatus(message, type = "") {
+    status.textContent = message;
+    status.className = "status " + type;
+  }
+
+  function hasStoredToken() {
+    return Boolean(localStorage.getItem(TOKEN_KEY));
+  }
+
+  function setTokenCollapsed(collapsed) {
+    tokenCard.classList.toggle("collapsed", collapsed);
+    $("collapseToken").hidden = !hasStoredToken() || collapsed;
+  }
+
+  function getToken() {
+    return tokenInput.value.trim() || localStorage.getItem(TOKEN_KEY) || "";
+  }
+
+  function saveToken() {
+    const token = tokenInput.value.trim();
+    if (!token) {
+      setStatus("Please paste your WaniKani API token first.", "error");
+      return;
+    }
+    localStorage.setItem(TOKEN_KEY, token);
+    tokenInput.value = "";
+    setStatus("Token saved in this browser.", "success");
+    setTokenCollapsed(true);
+  }
+
+  function clearToken() {
+    localStorage.removeItem(TOKEN_KEY);
+    tokenInput.value = "";
+    setStatus("Token forgotten.", "success");
+    setTokenCollapsed(false);
+  }
+
+  async function apiGet(path, token) {
+    const response = await fetch(API_BASE + path, {
+      headers: {
+        "Authorization": "Bearer " + token,
+        "Wanikani-Revision": "20170710"
+      }
+    });
+
+    if (!response.ok) {
+      let detail = "";
+      try {
+        const data = await response.json();
+        detail = data.error || data.message || "";
+      } catch {}
+      if (response.status === 401) throw new Error("WaniKani rejected the token. Check that it is correct and has read access.");
+      throw new Error(detail || `WaniKani API error (${response.status}).`);
+    }
+    return response.json();
+  }
+
+  async function getAllPages(path, token) {
+    const results = [];
+    let url = path;
+
+    while (url) {
+      const data = await apiGet(url, token);
+      results.push(...data.data);
+      url = data.pages?.next
+        ? new URL(data.pages.next).pathname + new URL(data.pages.next).search
+        : null;
+    }
+    return results;
+  }
+
+  async function loadWords() {
+    const token = getToken();
+    if (!token) {
+      setTokenCollapsed(false);
+      setStatus("Enter and save your WaniKani API token first.", "error");
+      return;
+    }
+
+    $("load").disabled = true;
+    $("wordsCard").hidden = true;
+    $("practiceCard").hidden = true;
+    setStatus("Loading your recent lessons…");
+
+    try {
+      const hours = Number($("range").value);
+      const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+
+      // Assignments are the authoritative source for when the user actually
+      // started learning an item. Restrict the initial query to vocabulary.
+      const query = "/assignments?subject_types=vocabulary&started=true&available_after="
+        + encodeURIComponent(since)
+        + "&per_page=100";
+
+      const assignments = await getAllPages(query, token);
+
+      if (!assignments.length) {
+        recentWords = [];
+        renderWords();
+        $("wordsCard").hidden = false;
+        setStatus(tokenCard.classList.contains("collapsed") ? "" : "No vocabulary lessons found in that time range.", "success");
+        return;
+      }
+
+      const ids = [...new Set(assignments.map(a => a.data.subject_id))];
+
+      // Fetch subjects in batches to avoid huge URLs.
+      const subjects = [];
+      for (let i = 0; i < ids.length; i += 100) {
+        const batch = ids.slice(i, i + 100).join(",");
+        const data = await apiGet("/subjects?ids=" + encodeURIComponent(batch) + "&types=vocabulary&per_page=100", token);
+        subjects.push(...data.data);
+      }
+
+      const byId = new Map(subjects.map(s => [s.id, s]));
+
+      let words = assignments
+        .map(a => {
+          const subject = byId.get(a.data.subject_id);
+          if (!subject) return null;
+          const d = subject.data;
+          const meanings = (d.meanings || [])
+            .filter(m => m.meaning && !m.primary_meaning ? true : true)
+            .map(m => m.meaning)
+            .slice(0, 3);
+
+          return {
+            id: subject.id,
+            characters: d.characters || "",
+            reading: d.readings?.find(r => r.primary)?.reading || d.readings?.[0]?.reading || "",
+            meanings,
+            startedAt: a.data.started_at
+          };
+        })
+        .filter(Boolean)
+        .sort((a, b) => new Date(b.startedAt) - new Date(a.startedAt));
+
+      const totalFound = words.length;
+      const randomize = $("randomize").checked;
+      const limitRaw = $("limit").value.trim();
+      const limit = limitRaw === "" ? null : Math.max(1, Math.floor(Number(limitRaw)));
+
+      if (randomize) {
+        words = shuffle(words);
+      }
+
+      if (limit !== null && Number.isFinite(limit)) {
+        words = words.slice(0, limit);
+      }
+
+      recentWords = words;
+
+      renderWords();
+      $("wordsCard").hidden = false;
+      $("practiceCard").hidden = true;
+
+      // Keep the collapsed token bar compact; the words card already shows the count.
+      if (tokenCard.classList.contains("collapsed")) {
+        setStatus("");
+      } else {
+        let message = `Found ${totalFound} vocabulary word${totalFound === 1 ? "" : "s"}`;
+        if (randomize || (limit !== null && Number.isFinite(limit) && words.length < totalFound)) {
+          const parts = [];
+          if (randomize) parts.push("randomized");
+          if (limit !== null && Number.isFinite(limit) && words.length < totalFound) {
+            parts.push(`showing ${words.length}`);
+          }
+          message += ` (${parts.join(", ")})`;
+        }
+        setStatus(message + ".", "success");
+      }
+    } catch (error) {
+      setStatus(error.message, "error");
+    } finally {
+      $("load").disabled = false;
+    }
+  }
+
+  function shuffle(items) {
+    const copy = items.slice();
+    for (let i = copy.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [copy[i], copy[j]] = [copy[j], copy[i]];
+    }
+    return copy;
+  }
+
+  function formatTime(iso) {
+    return new Intl.DateTimeFormat(undefined, {
+      dateStyle: "short",
+      timeStyle: "short"
+    }).format(new Date(iso));
+  }
+
+  function renderWords() {
+    $("count").textContent = recentWords.length + (recentWords.length === 1 ? " word" : " words");
+    $("words").innerHTML = "";
+
+    if (!recentWords.length) {
+      $("words").innerHTML = '<div class="empty">Nothing here yet. Try a wider time range.</div>';
+      return;
+    }
+
+    for (const word of recentWords) {
+      const el = document.createElement("div");
+      el.className = "word";
+      el.innerHTML = `
+        <div>
+          <div class="japanese">${escapeHtml(word.characters)}</div>
+          <div class="reading">${escapeHtml(word.reading)}</div>
+        </div>
+        <div class="meaning">${escapeHtml(word.meanings.join("; "))}</div>
+        <div class="learned">${escapeHtml(formatTime(word.startedAt))}</div>
+      `;
+      $("words").appendChild(el);
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, ch => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;"
+    }[ch]));
+  }
+
+  function wordListText() {
+    return recentWords.map(w =>
+      `${w.characters}（${w.reading}）— ${w.meanings.join("; ")}`
+    ).join("\n");
+  }
+
+  function createPrompt() {
+    if (!recentWords.length) return;
+
+    const list = wordListText();
+
+    const prompt = `I'm studying Japanese and I just learned these vocabulary words in WaniKani:
+
+${list}
+
+Help me actively use these words in natural Japanese conversation.
+
+Please follow these rules:
+- Have a real conversation with me, one turn at a time.
+- Ask me questions that naturally encourage me to use the vocabulary above.
+- Start at an advanced-beginner/intermediate level, but adjust to my ability.
+- Prefer everyday situations rather than artificial example sentences.
+- Don't force a vocabulary word into every question. Let the conversation feel natural.
+- When I make a mistake, briefly correct it and then continue the conversation.
+- If I use one of the target words correctly, keep the conversation going rather than stopping to praise me.
+- Occasionally challenge me to use a specific target word if I haven't used it yet.
+- Keep explanations concise unless I ask for more detail.
+- Speak primarily in Japanese, using English only when necessary.
+- Start by asking me your first question now.`;
+
+    $("prompt").value = prompt;
+    $("practiceCard").hidden = false;
+    $("practiceCard").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  async function copyText(text, successMessage) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setStatus(successMessage, "success");
+    } catch {
+      setStatus("Clipboard access failed. You can select and copy the text manually.", "error");
+    }
+  }
+
+  $("saveToken").addEventListener("click", saveToken);
+  $("clearToken").addEventListener("click", clearToken);
+  $("expandToken").addEventListener("click", () => setTokenCollapsed(false));
+  $("collapseToken").addEventListener("click", () => {
+    if (hasStoredToken()) setTokenCollapsed(true);
+  });
+  $("load").addEventListener("click", loadWords);
+  $("practice").addEventListener("click", createPrompt);
+
+  $("copyWords").addEventListener("click", () => {
+    if (recentWords.length) copyText(wordListText(), "Word list copied.");
+  });
+
+  $("copyPrompt").addEventListener("click", () => {
+    if ($("prompt").value) copyText($("prompt").value, "Prompt copied.");
+  });
+
+  $("openChatGPT").addEventListener("click", () => {
+    window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
+  });
+
+  // Don't populate the actual token into the page until the user chooses to.
+  if (hasStoredToken()) {
+    setTokenCollapsed(true);
+  }
+})();
+</script>
+</body>
+</html>
