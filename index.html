@@ -74,6 +74,30 @@
       color: white;
     }
     .lang-switch button[aria-pressed="true"]:hover { background: var(--accent-hover); }
+    .mode-field { margin-bottom: 12px; }
+    .mode-switch {
+      display: inline-flex;
+      flex-wrap: wrap;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      overflow: hidden;
+      background: var(--card);
+    }
+    .mode-switch button {
+      border: 0;
+      border-radius: 0;
+      padding: 8px 12px;
+      background: transparent;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: .88rem;
+    }
+    .mode-switch button:hover { background: rgba(127,127,127,.08); }
+    .mode-switch button[aria-pressed="true"] {
+      background: var(--accent);
+      color: white;
+    }
+    .mode-switch button[aria-pressed="true"]:hover { background: var(--accent-hover); }
     .card {
       background: var(--card);
       border: 1px solid var(--border);
@@ -249,7 +273,7 @@
 <main>
   <div class="header">
     <div class="header-copy">
-      <h1>KaniKai</h1>
+      <h1 data-i18n="title">KaniKai</h1>
       <p class="subtitle" data-i18n="subtitle">Turn recently learned WaniKani vocabulary into words you actually use.</p>
     </div>
     <div class="lang-switch" role="group" aria-label="Language">
@@ -310,7 +334,15 @@
     <div class="summary">
       <h2 data-i18n="practiceTitle">Conversation practice prompt</h2>
     </div>
-    <p class="help" data-i18n="practiceHelp">Copy this into ChatGPT and start talking. The prompt deliberately asks for one question at a time.</p>
+    <div class="mode-field">
+      <label id="practiceModeLabel" data-i18n="practiceMode">Practice mode</label>
+      <div class="mode-switch" role="group" aria-labelledby="practiceModeLabel">
+        <button type="button" data-mode="speaking" data-i18n="modeSpeaking" aria-pressed="true">Speaking</button>
+        <button type="button" data-mode="listening" data-i18n="modeListening" aria-pressed="false">Listening</button>
+        <button type="button" data-mode="legacy" data-i18n="modeLegacy" aria-pressed="false">Legacy</button>
+      </div>
+    </div>
+    <p class="help" id="practiceHelp">Copy this into ChatGPT. The AI waits for your questions and can suggest starter words one at a time.</p>
     <textarea id="prompt" readonly></textarea>
     <div class="actions">
       <button id="copyPrompt" data-i18n="copyPrompt">Copy prompt</button>
@@ -335,12 +367,25 @@
 
   const LANG_KEY = "kanikai_lang";
   const SOURCE_KEY = "kanikai_source";
+  const PRACTICE_MODE_KEY = "kanikai_practice_mode";
   const SUPPORTED_LANGS = ["en", "ja"];
+  const PRACTICE_MODES = ["speaking", "listening", "legacy"];
+  const PRACTICE_TEMPLATE_KEYS = {
+    speaking: "promptTemplateSpeaking",
+    listening: "promptTemplateListening",
+    legacy: "promptTemplateLegacy"
+  };
+  const PRACTICE_HELP_KEYS = {
+    speaking: "practiceHelpSpeaking",
+    listening: "practiceHelpListening",
+    legacy: "practiceHelpLegacy"
+  };
   const STRINGS = window.KaniKaiStrings;
   const KaniKai = window.KaniKai;
 
   let recentWords = [];
   let currentLang = detectLang();
+  let practiceMode = detectPracticeMode();
 
   const $ = id => document.getElementById(id);
   const status = $("status");
@@ -354,6 +399,11 @@
     const saved = localStorage.getItem(LANG_KEY);
     if (SUPPORTED_LANGS.includes(saved)) return saved;
     return (navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
+  }
+
+  function detectPracticeMode() {
+    const saved = localStorage.getItem(PRACTICE_MODE_KEY);
+    return PRACTICE_MODES.includes(saved) ? saved : "speaking";
   }
 
   function t(key, vars = {}) {
@@ -387,12 +437,36 @@
       btn.setAttribute("aria-pressed", String(btn.getAttribute("data-lang") === currentLang));
     });
 
+    syncPracticeModeUI();
+    updatePracticeHelp();
+
     populateSourceSelect();
     if (!sourceUIHost.getActive()) mountSelectedSourceUi();
     else refreshSourceUiTranslations();
 
     if (!$("wordsCard").hidden) renderWords();
     if (!$("practiceCard").hidden && recentWords.length) createPrompt({ scroll: false });
+  }
+
+  function syncPracticeModeUI() {
+    document.querySelectorAll(".mode-switch [data-mode]").forEach(btn => {
+      btn.setAttribute("aria-pressed", String(btn.getAttribute("data-mode") === practiceMode));
+    });
+  }
+
+  function updatePracticeHelp() {
+    $("practiceHelp").textContent = t(PRACTICE_HELP_KEYS[practiceMode]);
+  }
+
+  function setPracticeMode(mode) {
+    if (!PRACTICE_MODES.includes(mode) || mode === practiceMode) return;
+    practiceMode = mode;
+    localStorage.setItem(PRACTICE_MODE_KEY, mode);
+    syncPracticeModeUI();
+    updatePracticeHelp();
+    if (!$("practiceCard").hidden && recentWords.length) {
+      createPrompt({ scroll: false });
+    }
   }
 
   function setLang(lang) {
@@ -603,7 +677,10 @@
   function createPrompt({ scroll = true } = {}) {
     if (!recentWords.length) return;
 
-    $("prompt").value = t("promptTemplate", { list: wordListText() });
+    const templateKey = PRACTICE_TEMPLATE_KEYS[practiceMode] || PRACTICE_TEMPLATE_KEYS.speaking;
+    $("prompt").value = t(templateKey, { list: wordListText() });
+    updatePracticeHelp();
+    syncPracticeModeUI();
     $("practiceCard").hidden = false;
     if (scroll) {
       $("practiceCard").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -629,6 +706,10 @@
   });
   $("load").addEventListener("click", loadWords);
   $("practice").addEventListener("click", () => createPrompt());
+
+  document.querySelectorAll(".mode-switch [data-mode]").forEach(btn => {
+    btn.addEventListener("click", () => setPracticeMode(btn.getAttribute("data-mode")));
+  });
 
   $("copyWords").addEventListener("click", () => {
     if (recentWords.length) copyText(wordListText(), t("wordListCopied"));

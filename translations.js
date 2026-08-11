@@ -49,7 +49,15 @@ window.KaniKaiStrings = {
     createPractice: "Create conversation practice",
     copyWordList: "Copy word list",
     practiceTitle: "Conversation practice prompt",
-    practiceHelp:
+    practiceMode: "Practice mode",
+    modeSpeaking: "Speaking",
+    modeListening: "Listening",
+    modeLegacy: "Legacy",
+    practiceHelpSpeaking:
+      "Copy this into ChatGPT. The AI waits for your questions and can suggest starter words one at a time.",
+    practiceHelpListening:
+      "Copy this into ChatGPT. The AI uses the target words and asks you questions about them.",
+    practiceHelpLegacy:
       "Copy this into ChatGPT and start talking. The prompt deliberately asks for one question at a time.",
     copyPrompt: "Copy prompt",
     openChatGPT: "Open ChatGPT",
@@ -74,7 +82,41 @@ window.KaniKaiStrings = {
     promptCopied: "Prompt copied.",
     clipboardFailed:
       "Clipboard access failed. You can select and copy the text manually.",
-    promptTemplate: `I'm studying Japanese and I just learned these vocabulary words in WaniKani:
+    promptTemplateSpeaking: `I'm studying Japanese and I just learned these vocabulary words:
+
+{list}
+
+Help me practice speaking about these words in natural Japanese conversation.
+
+Please follow these rules:
+- Wait for me to ask questions about the words. Do not start by quizzing me.
+- Answer my questions clearly and keep the conversation going one turn at a time.
+- When I am ready to speak, or when I ask what to practice, introduce one target word at a time as a conversation starter and invite me to begin using it.
+- After I use a suggested word, you may offer the next unused target word one by one.
+- Start at an advanced-beginner/intermediate level, but adjust to my ability.
+- Prefer everyday situations rather than artificial example sentences.
+- When I make a mistake, briefly correct it and then continue the conversation.
+- Keep explanations concise unless I ask for more detail.
+- Speak primarily in Japanese, using English only when necessary.
+- Begin by briefly acknowledging the word list and inviting me to ask my first question.`,
+    promptTemplateListening: `I'm studying Japanese and I just learned these vocabulary words:
+
+{list}
+
+Help me practice listening comprehension with these words.
+
+Please follow these rules:
+- Use the target words naturally in Japanese as you speak.
+- Ask me questions about the words (meaning, usage, nuance, or context) so I demonstrate that I understand them.
+- Have a real exchange with me, one turn at a time.
+- Start at an advanced-beginner/intermediate level, but adjust to my ability.
+- Prefer everyday situations rather than artificial example sentences.
+- Don't force a vocabulary word into every sentence. Let the conversation feel natural.
+- When I make a mistake, briefly correct it and then continue.
+- Keep explanations concise unless I ask for more detail.
+- Speak primarily in Japanese, using English only when necessary.
+- Start by asking me your first question about one of the words now.`,
+    promptTemplateLegacy: `I'm studying Japanese and I just learned these vocabulary words in WaniKani:
 
 {list}
 
@@ -94,7 +136,7 @@ Please follow these rules:
 - Start by asking me your first question now.`,
   },
   ja: {
-    title: "KaniKai",
+    title: "カニ会",
     subtitle: "最近覚えたWaniKaniの単語を、実際に使える言葉に変えましょう。",
     langGroup: "言語",
     connectTitle: "WaniKaniに接続",
@@ -142,7 +184,15 @@ Please follow these rules:
     createPractice: "会話練習を作成",
     copyWordList: "単語リストをコピー",
     practiceTitle: "会話練習プロンプト",
-    practiceHelp:
+    practiceMode: "練習モード",
+    modeSpeaking: "スピーキング",
+    modeListening: "リスニング",
+    modeLegacy: "レガシー",
+    practiceHelpSpeaking:
+      "これをChatGPTに貼り付けてください。AIはあなたの質問を待ち、練習する単語を一つずつ提案できます。",
+    practiceHelpListening:
+      "これをChatGPTに貼り付けてください。AIが目標の単語を使い、その単語についての質問をします。",
+    practiceHelpLegacy:
       "これをChatGPTに貼り付けて会話を始めましょう。プロンプトは一度に一つの質問をするよう指示しています。",
     copyPrompt: "プロンプトをコピー",
     openChatGPT: "ChatGPTを開く",
@@ -167,7 +217,41 @@ Please follow these rules:
     promptCopied: "プロンプトをコピーしました。",
     clipboardFailed:
       "クリップボードへのアクセスに失敗しました。手動で選択してコピーしてください。",
-    promptTemplate: `日本語を勉強していて、WaniKaniで次の単語を覚えたところです：
+    promptTemplateSpeaking: `日本語を勉強していて、次の単語を覚えたところです：
+
+{list}
+
+これらの単語について、自然な日本語の会話でスピーキング練習できるよう手伝ってください。
+
+次のルールに従ってください：
+- 私が単語について質問するのを待ってください。いきなりクイズを始めないでください。
+- 質問には分かりやすく答え、一度に一往復ずつ会話を続けてください。
+- 私が話し始める準備ができたとき、または何を練習するか聞かれたときは、目標の単語を一つずつ会話のきっかけとして提示し、それを使って話し始めるよう促してください。
+- 提案した単語を使ったあとは、まだ使っていない目標の単語を一つずつ次に提案して構いません。
+- 初級後半〜中級レベルから始め、私の実力に合わせて調整してください。
+- 作り物の例文より、日常的な場面を優先してください。
+- 間違えたら簡潔に訂正し、そのまま会話を続けてください。
+- 詳しい説明を求めない限り、説明は簡潔にしてください。
+- 主に日本語で話し、必要なときだけ英語を使ってください。
+- まず単語リストを短く確認し、最初の質問をするよう促して始めてください。`,
+    promptTemplateListening: `日本語を勉強していて、次の単語を覚えたところです：
+
+{list}
+
+これらの単語でリスニング理解の練習ができるよう手伝ってください。
+
+次のルールに従ってください：
+- 話すとき、目標の単語を自然な日本語の中で使ってください。
+- 単語の意味・使い方・ニュアンス・文脈などについて質問し、理解できているか確認してください。
+- 一度に一往復ずつ、実際のやり取りをしてください。
+- 初級後半〜中級レベルから始め、私の実力に合わせて調整してください。
+- 作り物の例文より、日常的な場面を優先してください。
+- すべての文に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
+- 間違えたら簡潔に訂正し、そのまま続けてください。
+- 詳しい説明を求めない限り、説明は簡潔にしてください。
+- 主に日本語で話し、必要なときだけ英語を使ってください。
+- 今すぐ、単語の一つについての最初の質問をして始めてください。`,
+    promptTemplateLegacy: `日本語を勉強していて、WaniKaniで次の単語を覚えたところです：
 
 {list}
 
