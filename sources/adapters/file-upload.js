@@ -46,6 +46,8 @@
         <div data-i18n="csvFileIntro">Upload a .csv or .txt file using the same format as CSV paste.</div>
         <code>word,alternatives,meanings[,created_at,last_seen_at,parts_of_speech]</code>
         <div class="csv-examples" data-i18n="csvFormatRules">Use | inside alternatives, meanings, and parts_of_speech. Dates may be YYYY-MM-DD or a full timestamp; blank dates default to now.</div>
+        <div class="csv-examples" data-i18n="csvPartsOfSpeech">Accepted parts of speech:</div>
+        <code class="csv-pos-list"></code>
       </div>
       <label for="csvFile" data-i18n="csvFileLabel">CSV file</label>
       <div class="file-picker">
@@ -54,6 +56,11 @@
         <span id="csvFileName" class="file-name">No file chosen</span>
       </div>
     `;
+
+    const posList = panel.querySelector(".csv-pos-list");
+    if (posList && Array.isArray(KaniKai.PARTS_OF_SPEECH)) {
+      posList.textContent = KaniKai.PARTS_OF_SPEECH.join(", ");
+    }
 
     const fileInput = panel.querySelector("#csvFile");
     const fileName = panel.querySelector("#csvFileName");

@@ -10,7 +10,9 @@
 
   const KaniKai = global.KaniKai;
   if (!KaniKai || typeof KaniKai.registerSource !== "function") {
-    throw new Error("KaniKai source registry must be loaded before the WaniKani adapter.");
+    throw new Error(
+      "KaniKai source registry must be loaded before the WaniKani adapter.",
+    );
   }
 
   const API_BASE = "https://api.wanikani.com/v2";
@@ -33,7 +35,8 @@
   }
 
   function resolveToken(options = {}) {
-    const fromOptions = options.token != null ? String(options.token).trim() : "";
+    const fromOptions =
+      options.token != null ? String(options.token).trim() : "";
     return fromOptions || getStoredToken();
   }
 
@@ -41,8 +44,8 @@
     const response = await fetch(API_BASE + path, {
       headers: {
         Authorization: "Bearer " + token,
-        "Wanikani-Revision": REVISION
-      }
+        "Wanikani-Revision": REVISION,
+      },
     });
 
     if (!response.ok) {
@@ -56,7 +59,7 @@
       }
       throw sourceError(
         detail || "WaniKani API error (" + response.status + ").",
-        "API_ERROR"
+        "API_ERROR",
       );
     }
 
@@ -89,7 +92,7 @@
       d.burned_at,
       d.passed_at,
       d.resurrected_at,
-      d.started_at
+      d.started_at,
     ];
 
     let latest = null;
@@ -108,16 +111,16 @@
 
   function readingsAsAlternatives(subjectData) {
     const readings = subjectData.readings || [];
-    const primary = readings.find(r => r.primary)?.reading;
+    const primary = readings.find((r) => r.primary)?.reading;
     const rest = readings
-      .map(r => r.reading)
-      .filter(reading => reading && reading !== primary);
+      .map((r) => r.reading)
+      .filter((reading) => reading && reading !== primary);
     return [primary, ...rest].filter(Boolean);
   }
 
   function meaningsFromSubject(subjectData) {
     return (subjectData.meanings || [])
-      .map(m => m.meaning)
+      .map((m) => m.meaning)
       .filter(Boolean)
       .slice(0, 3);
   }
@@ -134,7 +137,7 @@
       meanings: meaningsFromSubject(d),
       created_at: startedAt,
       last_seen_at: lastSeenAt,
-      parts_of_speech: d.parts_of_speech || []
+      parts_of_speech: d.parts_of_speech || [],
     });
   }
 
@@ -143,8 +146,10 @@
     for (let i = 0; i < ids.length; i += 100) {
       const batch = ids.slice(i, i + 100).join(",");
       const data = await apiGet(
-        "/subjects?ids=" + encodeURIComponent(batch) + "&types=vocabulary&per_page=100",
-        token
+        "/subjects?ids=" +
+          encodeURIComponent(batch) +
+          "&types=vocabulary&per_page=100",
+        token,
       );
       subjects.push(...data.data);
     }
@@ -179,9 +184,9 @@
     const assignments = await getAllPages(query, token);
     if (!assignments.length) return [];
 
-    const ids = [...new Set(assignments.map(a => a.data.subject_id))];
+    const ids = [...new Set(assignments.map((a) => a.data.subject_id))];
     const subjects = await fetchSubjectsByIds(ids, token);
-    const byId = new Map(subjects.map(s => [s.id, s]));
+    const byId = new Map(subjects.map((s) => [s.id, s]));
 
     const words = [];
     for (const assignment of assignments) {
@@ -261,7 +266,9 @@
 
     panel.querySelector("#saveToken").addEventListener("click", saveToken);
     panel.querySelector("#clearToken").addEventListener("click", clearToken);
-    panel.querySelector("#expandToken").addEventListener("click", () => setTokenCollapsed(false));
+    panel
+      .querySelector("#expandToken")
+      .addEventListener("click", () => setTokenCollapsed(false));
     collapseToken.addEventListener("click", () => {
       if (hasStoredToken()) setTokenCollapsed(true);
     });
@@ -278,7 +285,8 @@
         return false;
       },
       messageForError(error) {
-        if (error && error.code === "AUTH_REQUIRED") return t("enterTokenFirst");
+        if (error && error.code === "AUTH_REQUIRED")
+          return t("enterTokenFirst");
         if (error && error.code === "AUTH_REJECTED") return t("tokenRejected");
         return null;
       },
@@ -288,7 +296,7 @@
       onActivate() {
         if (hasStoredToken()) setTokenCollapsed(true);
         else setTokenCollapsed(false);
-      }
+      },
     };
   }
 
@@ -299,6 +307,6 @@
     tokenKey: TOKEN_KEY,
     getToken: getStoredToken,
     createUI,
-    load
+    load,
   });
 })(window);

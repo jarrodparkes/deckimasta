@@ -67,7 +67,6 @@ Every source must produce objects that match this shape:
             "type": "string",
             "enum": [
               "noun",
-              "proper_noun",
               "numeral",
               "pronoun",
               "prefix",
@@ -78,34 +77,27 @@ Every source must produce objects that match this shape:
               "conjunction",
               "adverb",
               "adjective",
-              "i_adjective",
-              "na_adjective",
-              "no_adjective",
-              "godan_verb",
-              "ichidan_verb",
-              "suru_verb",
-              "transitive_verb",
-              "intransitive_verb"
+              "verb"
             ]
           },
           { "type": "string", "minLength": 1 }
         ]
       },
-      "description": "Part of speech tags when possible; unknown source tags may be passed through as free strings. Empty array if unknown."
+      "description": "Language-agnostic part of speech tags when possible; unknown source tags may be passed through as free strings. Empty array if unknown."
     }
   }
 }
 ```
 
-| Field             | Type              | Required | Notes                                                                                                   |
-| ----------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------- |
-| `id`              | string            | yes      | Use a stable id from the source when available. Otherwise generate a UUID (or equivalent) at load time. |
-| `word`            | string            | yes      | Primary surface form. Language is inferred from the source for now.                                     |
-| `alternatives`    | string[]          | yes      | Alternate forms / spellings / readings. Use `[]` when there are none.                                   |
-| `meanings`        | string[]          | yes      | Gloss list. May be in a different language than `word`.                                                 |
-| `created_at`      | string (ISO 8601) | yes      | First time the learner encountered / started the item, when known.                                      |
-| `last_seen_at`    | string (ISO 8601) | yes      | Most recent study / exposure time. If the source only has one timestamp, set both fields to that value. |
-| `parts_of_speech` | string[]          | yes      | Prefer the shared enum below; free strings are allowed (schema `anyOf`). Use `[]` if unknown.           |
+| Field             | Type              | Required | Notes                                                                                                     |
+| ----------------- | ----------------- | -------- | --------------------------------------------------------------------------------------------------------- |
+| `id`              | string            | yes      | Use a stable id from the source when available. Otherwise generate a UUID (or equivalent) at load time.   |
+| `word`            | string            | yes      | Primary surface form. Language is inferred from the source for now.                                       |
+| `alternatives`    | string[]          | yes      | Alternate forms / spellings / readings. Use `[]` when there are none.                                     |
+| `meanings`        | string[]          | yes      | Gloss list. May be in a different language than `word`.                                                   |
+| `created_at`      | string (ISO 8601) | yes      | First time the learner encountered / started the item, when known.                                        |
+| `last_seen_at`    | string (ISO 8601) | yes      | Most recent study / exposure time. If the source only has one timestamp, set both fields to that value.   |
+| `parts_of_speech` | string[]          | yes      | Prefer the shared language-agnostic enum; free strings are allowed (schema `anyOf`). Use `[]` if unknown. |
 
 ### Word Shape Example
 
@@ -210,9 +202,11 @@ The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filte
 
 | Helper                                              | Role                                                          |
 | --------------------------------------------------- | ------------------------------------------------------------- |
-| `PARTS_OF_SPEECH`                                   | Frozen allow-list of starting tags                            |
-| `isKnownPartOfSpeech(tag)`                          | Whether a tag is in the shared enum                           |
-| `normalizePartsOfSpeech(tags)`                      | Dedupe / stringify; unknown tags kept                         |
+| `PARTS_OF_SPEECH`                                   | Frozen preferred POS enum (language-agnostic)                 |
+| `PARTS_OF_SPEECH_ALIASES`                           | Map of source/legacy tags → preferred enum                    |
+| `isKnownPartOfSpeech(tag)`                          | Whether a tag is in the preferred enum                        |
+| `canonicalizePartOfSpeech(tag)`                     | Apply alias collapse for one tag                              |
+| `normalizePartsOfSpeech(tags)`                      | Trim, alias-collapse, dedupe; unknown tags kept               |
 | `createWord(partial)`                               | Normalize a Word; generate `id` if missing; mirror timestamps |
 | `createLoadOptions(partial)`                        | Normalize `{ since, limit, randomize }`                       |
 | `matchWords(words, options)`                        | Look-back filter + sort (no shuffle/limit)                    |
@@ -307,7 +301,7 @@ Words are loaded only through registered adapters under `sources/adapters/` via 
 - [ ] Stable `id` when the backend provides one; otherwise generated per load
 - [ ] `word` + `alternatives` + `meanings` always present (arrays may be empty)
 - [ ] `created_at` and `last_seen_at` always ISO strings (duplicated when only one timestamp exists)
-- [ ] `parts_of_speech` mapped to the shared enum when possible
+- [ ] `parts_of_speech` mapped to the shared language-agnostic enum when possible (or left for `normalizePartsOfSpeech` aliases)
 - [ ] Credentials handled only inside the source
 - [ ] Works with and without the shared `since` look-back filter
 - [ ] Registered for one-at-a-time selection in the UI

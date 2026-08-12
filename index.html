@@ -125,6 +125,12 @@
     #tokenCard.collapsed .token-compact { display: flex; }
     #tokenCard.collapsed .token-body { display: none; }
     label { display: block; font-weight: 650; margin-bottom: 7px; }
+    .label-with-help {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      position: relative;
+    }
     input, select, button, textarea {
       font: inherit;
     }
@@ -164,6 +170,58 @@
     }
     button.secondary:hover { background: rgba(127,127,127,.08); }
     button:disabled { opacity: .55; cursor: not-allowed; }
+    button.help-tip {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 700;
+      line-height: 1;
+      cursor: help;
+      flex-shrink: 0;
+    }
+    button.help-tip:hover,
+    button.help-tip:focus-visible {
+      background: rgba(127,127,127,.1);
+      color: var(--text);
+    }
+    button.help-tip:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+    .help-tooltip {
+      position: absolute;
+      left: 0;
+      top: calc(100% + 6px);
+      z-index: 5;
+      width: min(260px, 70vw);
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--card);
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 450;
+      line-height: 1.4;
+      box-shadow: 0 6px 18px rgba(0,0,0,.12);
+      pointer-events: none;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity .12s ease, visibility .12s ease;
+    }
+    .label-with-help:hover .help-tooltip,
+    .label-with-help:focus-within .help-tooltip,
+    button.help-tip[aria-expanded="true"] + .help-tooltip {
+      opacity: 1;
+      visibility: visible;
+    }
     .help, .status { color: var(--muted); font-size: .92rem; }
     .status { margin-top: 12px; min-height: 1.4em; }
     .status.error { color: var(--danger); }
@@ -287,14 +345,14 @@
   <div id="sourceSetupHost"></div>
 
   <section class="card">
-    <h2 data-i18n="loadTitle">Get recently learned words</h2>
+    <h2 data-i18n="loadTitle">Step 1: Load Words</h2>
     <div class="row">
       <div>
-        <label for="source" data-i18n="dataSource">Data source</label>
+        <label for="source" data-i18n="dataSource">Source</label>
         <select id="source"></select>
       </div>
       <div>
-        <label for="range" data-i18n="lookBack">Look back</label>
+        <label for="range" data-i18n="lookBack">Recency</label>
         <select id="range">
           <option value="24" data-i18n="range24">Last 24 hours</option>
           <option value="48" data-i18n="range48">Last 2 days</option>
@@ -304,25 +362,37 @@
         </select>
       </div>
       <div>
-        <label for="limit" data-i18n="limitResults">Limit results</label>
+        <label for="limit" class="label-with-help">
+          <span data-i18n="limitResults">Limit</span>
+          <button
+            type="button"
+            class="help-tip"
+            id="limitHelpTip"
+            data-i18n="loadHelpAria"
+            data-i18n-attr="aria-label"
+            aria-label="About Limit"
+            aria-describedby="limitHelp"
+            aria-expanded="false"
+          >?</button>
+          <span id="limitHelp" role="tooltip" class="help-tooltip" data-i18n="loadHelp">Leave the limit blank to keep every match. Randomize shuffles before applying the limit.</span>
+        </label>
         <input id="limit" type="number" min="1" step="1" data-i18n="limitPlaceholder" data-i18n-attr="placeholder" placeholder="All" inputmode="numeric">
       </div>
       <div class="checkbox-field">
         <input id="randomize" type="checkbox">
         <label for="randomize" data-i18n="randomize">Randomize</label>
       </div>
-      <button id="load" data-i18n="loadVocabulary">Load vocabulary</button>
+      <button id="load" data-i18n="loadVocabulary">Load</button>
     </div>
 
     <div id="sourcePanelHost"></div>
 
-    <p class="help" style="margin-top:12px;margin-bottom:0" data-i18n="loadHelp">Leave the limit blank to keep every match. Randomize shuffles before applying the limit.</p>
     <div id="status" class="status"></div>
   </section>
 
   <section id="wordsCard" class="card" hidden>
     <div class="summary">
-      <h2 data-i18n="recentlyLearned">Recently learned</h2>
+      <h2 data-i18n="recentlyLearned">Step 2: Confirm Words</h2>
       <strong id="count"></strong>
     </div>
     <div id="words" class="word-list"></div>
@@ -335,7 +405,7 @@
 
   <section id="practiceCard" class="card" hidden>
     <div class="summary">
-      <h2 data-i18n="practiceTitle">Conversation practice prompt</h2>
+      <h2 data-i18n="practiceTitle">Step 3: Practice Words</h2>
     </div>
     <div class="mode-field">
       <label id="practiceModeLabel" data-i18n="practiceMode">Practice mode</label>
@@ -734,6 +804,23 @@
   $("openChatGPT").addEventListener("click", () => {
     window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
   });
+
+  const limitHelpTip = $("limitHelpTip");
+  if (limitHelpTip) {
+    limitHelpTip.addEventListener("click", event => {
+      event.preventDefault();
+      const open = limitHelpTip.getAttribute("aria-expanded") !== "true";
+      limitHelpTip.setAttribute("aria-expanded", String(open));
+    });
+    document.addEventListener("click", event => {
+      if (!limitHelpTip.contains(event.target) && !$("limitHelp")?.contains(event.target)) {
+        limitHelpTip.setAttribute("aria-expanded", "false");
+      }
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape") limitHelpTip.setAttribute("aria-expanded", "false");
+    });
+  }
 
   applyTranslations();
 })();
