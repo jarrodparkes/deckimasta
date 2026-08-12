@@ -1,4 +1,4 @@
-# Data sources
+# Data Sources
 
 KaniKai loads vocabulary through a small abstraction layer so any backend (API, CSV, spreadsheet, static JSON, etc.) can feed the same UI.
 
@@ -11,36 +11,103 @@ This document is the contract for that layer: the shared **word** shape, shared 
 - Sources return the shared word shape
 - The app applies shared post-processing (optional look-back, sort, randomize, limit)
 
-## Word shape
+## Word Shape
 
 Every source must produce objects that match this shape:
 
 ```json
 {
-  "id": "uuid-or-source-id",
-  "word": "色",
-  "alternatives": ["いろ"],
-  "meanings": [
-    "the aspect of the appearance of objects that may be described in terms of hue",
-    "a phenomenon of light"
+  "type": "object",
+  "required": [
+    "id",
+    "word",
+    "alternatives",
+    "meanings",
+    "created_at",
+    "last_seen_at",
+    "parts_of_speech"
   ],
-  "created_at": "2012-02-28T08:04:47.000000Z",
-  "last_seen_at": "2026-08-10T18:00:00.000000Z",
-  "parts_of_speech": ["noun"]
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Stable uuid from the source when available; otherwise a UUID generated at load time."
+    },
+    "word": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Primary surface form. The language is inferred from the source."
+    },
+    "alternatives": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Alternate forms / spellings / readings. Empty array when none."
+    },
+    "meanings": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Definitions list. The language used here may be different from the word."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime when the learner first encountered / started the item."
+    },
+    "last_seen_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 datetime of the most recent study / exposure. If the source has only one timestamp, set both created_at and last_seen_at to that value."
+    },
+    "parts_of_speech": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "string",
+            "enum": [
+              "noun",
+              "proper_noun",
+              "numeral",
+              "pronoun",
+              "prefix",
+              "suffix",
+              "counter",
+              "expression",
+              "interjection",
+              "conjunction",
+              "adverb",
+              "adjective",
+              "i_adjective",
+              "na_adjective",
+              "no_adjective",
+              "godan_verb",
+              "ichidan_verb",
+              "suru_verb",
+              "transitive_verb",
+              "intransitive_verb"
+            ]
+          },
+          { "type": "string", "minLength": 1 }
+        ]
+      },
+      "description": "Part of speech tags when possible; unknown source tags may be passed through as free strings. Empty array if unknown."
+    }
+  }
 }
 ```
 
-| Field             | Type              | Required | Notes                                                                                                       |
-| ----------------- | ----------------- | -------- | ----------------------------------------------------------------------------------------------------------- |
-| `id`              | string            | yes      | Use a stable id from the source when available. Otherwise generate a UUID (or equivalent) at load time.     |
-| `word`            | string            | yes      | Primary surface form. Language is inferred from the source for now (e.g. Japanese characters for WaniKani). |
-| `alternatives`    | string[]          | yes      | Alternate forms / spellings / readings. Use `[]` when there are none.                                       |
-| `meanings`        | string[]          | yes      | Gloss list. May be in a different language than `word`.                                                     |
-| `created_at`      | string (ISO 8601) | yes      | First time the learner encountered / started the item, when known.                                          |
-| `last_seen_at`    | string (ISO 8601) | yes      | Most recent study / exposure time. If the source only has one timestamp, set both fields to that value.     |
-| `parts_of_speech` | string[]          | yes      | Tags from the shared enum below when possible. Use `[]` if unknown.                                         |
+| Field             | Type              | Required | Notes                                                                                                   |
+| ----------------- | ----------------- | -------- | ------------------------------------------------------------------------------------------------------- |
+| `id`              | string            | yes      | Use a stable id from the source when available. Otherwise generate a UUID (or equivalent) at load time. |
+| `word`            | string            | yes      | Primary surface form. Language is inferred from the source for now.                                     |
+| `alternatives`    | string[]          | yes      | Alternate forms / spellings / readings. Use `[]` when there are none.                                   |
+| `meanings`        | string[]          | yes      | Gloss list. May be in a different language than `word`.                                                 |
+| `created_at`      | string (ISO 8601) | yes      | First time the learner encountered / started the item, when known.                                      |
+| `last_seen_at`    | string (ISO 8601) | yes      | Most recent study / exposure time. If the source only has one timestamp, set both fields to that value. |
+| `parts_of_speech` | string[]          | yes      | Prefer the shared enum below; free strings are allowed (schema `anyOf`). Use `[]` if unknown.           |
 
-### Example (WaniKani vocabulary)
+### Word Shape Example
 
 For 色 / いろ / “color”:
 
@@ -56,7 +123,9 @@ For 色 / いろ / “color”:
 }
 ```
 
-WaniKani mapping used by `sources/adapters/wanikani.js`:
+### Mapping Example
+
+For words loaded from WaniKani API, the following mapping is used (see `sources/adapters/wanikani.js`):
 
 - `id` ← subject id (stringified)
 - `word` ← subject `characters`
@@ -68,32 +137,7 @@ WaniKani mapping used by `sources/adapters/wanikani.js`:
 
 When `since` is provided, the adapter prefetches with `updated_after` for efficiency. Shared `applyLoadOptions` still enforces the final `last_seen_at` look-back.
 
-### Parts of speech
-
-Starting enum (from WaniKani’s vocabulary tags). Sources should prefer these strings; unknown tags may be passed through, but new sources should map into this set when a clear match exists:
-
-- `noun`
-- `proper_noun`
-- `numeral`
-- `pronoun`
-- `prefix`
-- `suffix`
-- `counter`
-- `expression`
-- `interjection`
-- `conjunction`
-- `adverb`
-- `adjective`
-- `i_adjective`
-- `na_adjective`
-- `no_adjective`
-- `godan_verb`
-- `ichidan_verb`
-- `suru_verb`
-- `transitive_verb`
-- `intransitive_verb`
-
-## Shared load options
+## Shared Load Options
 
 These options are source-agnostic. The app (not the source UI) owns them:
 
@@ -111,16 +155,7 @@ These options are source-agnostic. The app (not the source UI) owns them:
 }
 ```
 
-### Look-back behavior
-
-- **Recently learned/seen:** set `since` (e.g. now − 24h / 7d / 14d). Filter on `last_seen_at`.
-- **Any words from my set:** omit `since` (or pass `null`). No recency filter; combine with `randomize` + `limit` as needed.
-
-Default ordering when `randomize` is false: newest `last_seen_at` first.
-
-Auth / tokens are **not** part of shared options. Each source that needs credentials reads them from its own config (for example WaniKani’s token in `localStorage`).
-
-## Source interface
+## Important Interfaces (Word and WordSource)
 
 Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain object:
 
@@ -133,12 +168,12 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
  * @property {string[]} meanings
  * @property {string} created_at
  * @property {string} last_seen_at
- * @property {string[]} parts_of_speech
+ * @property {string[]} parts_of_speech // preferred enum or free string (anyOf)
  */
 
 /**
  * @typedef {object} WordSource
- * @property {string} id            // stable machine id, e.g. "wanikani"
+ * @property {string} id            // source identifier, e.g. "csv-paste"
  * @property {string} label         // UI label
  * @property {boolean} requiresAuth // whether the source needs credentials
  * @property {(options?: object) => Promise<Word[]>} load
@@ -157,21 +192,21 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
 
 Adapters may provide their own setup/panel UI. Return an object with any of:
 
-| Field | Role |
-| --- | --- |
-| `setup` | `HTMLElement` rendered above the shared load card (optional; unused by built-in adapters) |
-| `panel` | `HTMLElement` rendered inside the load card (WaniKani token, CSV textarea/file picker) |
-| `getLoadOptions()` | Extra fields merged into `load` options (`token`, `csvText`, `file`, …) |
-| `prepareLoad()` | Return `false` to abort before loading |
-| `messageForError(error)` | Map error codes to user-facing strings |
-| `suppressStatus()` | When true, keep the status line quiet after a successful load |
-| `applyTranslations()` | Extra refresh after i18n (e.g. file name label) |
+| Field                    | Role                                                                                      |
+| ------------------------ | ----------------------------------------------------------------------------------------- |
+| `setup`                  | `HTMLElement` rendered above the shared load card (optional; unused by built-in adapters) |
+| `panel`                  | `HTMLElement` rendered inside the load card (tokens, CSV textarea/file picker)            |
+| `getLoadOptions()`       | Extra fields merged into `load` options (`token`, `csvText`, `file`, …)                   |
+| `prepareLoad()`          | Return `false` to abort before loading                                                    |
+| `messageForError(error)` | Map error codes to user-facing strings                                                    |
+| `suppressStatus()`       | When true, keep the status line quiet after a successful load                             |
+| `applyTranslations()`    | Extra refresh after i18n (e.g. file name label)                                           |
 
 The app mounts UI into `#sourceSetupHost` / `#sourcePanelHost` via `KaniKai.createSourceUIHost`. Only the selected source’s UI is shown.
 
-The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency (for example WaniKani querying by date) as long as the returned words still satisfy the shared contract.
+The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency as long as the returned words still satisfy the shared contract.
 
-### `window.KaniKai` API (Step 1)
+### `window.KaniKai` API
 
 | Helper                                              | Role                                                          |
 | --------------------------------------------------- | ------------------------------------------------------------- |
@@ -190,7 +225,7 @@ The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filte
 | `registerSource(source)`                            | Add a source to the registry                                  |
 | `getSource(id)` / `listSources()` / `hasSource(id)` | Registry lookup                                               |
 
-## File layout
+## File Layout
 
 ```text
 sources/
@@ -202,9 +237,6 @@ sources/
     csv.js              # shared CSV-like parser (paste + file)
     source-ui.js        # adapter UI host (setup + panel slots)
   adapters/             # individual data sources
-    wanikani.js
-    csv-paste.js
-    file-upload.js
     # your-source.js
 ```
 
@@ -224,7 +256,7 @@ Include scripts before the main app (order matters: core, then adapters):
 
 `index.html` should stay thin: source picker, shared options, render / copy / prompt. Fetch/map logic lives in adapters; shared filtering lives in core.
 
-## How to add a data source
+## How to Add a Data Source
 
 1. **Create** `sources/adapters/your-source.js` that implements the `WordSource` interface and calls `KaniKai.registerSource(...)`.
 2. **Map** every record with `KaniKai.createWord(...)`.
@@ -234,7 +266,7 @@ Include scripts before the main app (order matters: core, then adapters):
    - with `since` set (recent `last_seen_at`)
    - with `since` unset + `randomize` / `limit` (sample from the set)
 
-### Minimal skeleton
+### Minimal Skeleton
 
 ```js
 // sources/adapters/example-csv.js
@@ -266,37 +298,11 @@ Include scripts before the main app (order matters: core, then adapters):
 })(window);
 ```
 
-## Built-in adapters
-
-### WaniKani (`sources/adapters/wanikani.js`)
-
-See mapping above. Requires an API token.
-
-### CSV paste / CSV file (`csv-paste`, `file-upload`)
-
-Both use `KaniKai.parseWordCsv` from `sources/core/csv.js`. Headerless rows by default (a leading `word,...` header is skipped if present).
-
-Columns:
-
-```text
-word,alternatives,meanings[,created_at,last_seen_at,parts_of_speech]
-```
-
-- `alternatives`, `meanings`, and `parts_of_speech` are `|`-separated (empty → `[]`)
-- Dates accept `YYYY-MM-DD` or a full timestamp; blank → now
-- `id` is generated on load
-
-Examples:
-
-```text
-本,ほん|ホン,book|volume,2026-08-10,2026-08-10,noun
-```
-
 ## Usage
 
 Words are loaded only through registered adapters under `sources/adapters/` via `KaniKai.loadFromSource`.
 
-## Checklist for a new source
+## Checklist for a New Source
 
 - [ ] Stable `id` when the backend provides one; otherwise generated per load
 - [ ] `word` + `alternatives` + `meanings` always present (arrays may be empty)

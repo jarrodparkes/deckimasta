@@ -168,6 +168,8 @@
     .status { margin-top: 12px; min-height: 1.4em; }
     .status.error { color: var(--danger); }
     .status.success { color: var(--success); }
+    #wordsStatus, #practiceStatus { margin-top: 10px; }
+    #wordsStatus:empty, #practiceStatus:empty { display: none; }
     .summary { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 10px; }
     .word-list {
       display: grid;
@@ -274,7 +276,7 @@
   <div class="header">
     <div class="header-copy">
       <h1 data-i18n="title">KaniKai</h1>
-      <p class="subtitle" data-i18n="subtitle">Turn recently learned WaniKani vocabulary into words you actually use.</p>
+      <p class="subtitle" data-i18n="subtitle">Turn recently learned vocabulary into words you actually use.</p>
     </div>
     <div class="lang-switch" role="group" aria-label="Language">
       <button type="button" data-lang="en" aria-pressed="true">EN</button>
@@ -328,6 +330,7 @@
       <button id="practice" data-i18n="createPractice">Create conversation practice</button>
       <button id="copyWords" class="secondary" data-i18n="copyWordList">Copy word list</button>
     </div>
+    <div id="wordsStatus" class="status" role="status" aria-live="polite"></div>
   </section>
 
   <section id="practiceCard" class="card" hidden>
@@ -348,6 +351,7 @@
       <button id="copyPrompt" data-i18n="copyPrompt">Copy prompt</button>
       <button id="openChatGPT" class="secondary" data-i18n="openChatGPT">Open ChatGPT</button>
     </div>
+    <div id="practiceStatus" class="status" role="status" aria-live="polite"></div>
   </section>
 </main>
 
@@ -389,6 +393,8 @@
 
   const $ = id => document.getElementById(id);
   const status = $("status");
+  const wordsStatus = $("wordsStatus");
+  const practiceStatus = $("practiceStatus");
   const sourceSelect = $("source");
   const sourceUIHost = KaniKai.createSourceUIHost({
     setupHost: $("sourceSetupHost"),
@@ -476,9 +482,13 @@
     applyTranslations();
   }
 
+  function setStatusOn(target, message, type = "") {
+    target.textContent = message;
+    target.className = "status " + type;
+  }
+
   function setStatus(message, type = "") {
-    status.textContent = message;
-    status.className = "status " + type;
+    setStatusOn(status, message, type);
   }
 
   function uiContext() {
@@ -634,6 +644,7 @@
   }
 
   function renderWords() {
+    setStatusOn(wordsStatus, "");
     $("count").textContent = t(
       recentWords.length === 1 ? "wordCount" : "wordCountPlural",
       { count: recentWords.length }
@@ -679,6 +690,7 @@
 
     const templateKey = PRACTICE_TEMPLATE_KEYS[practiceMode] || PRACTICE_TEMPLATE_KEYS.speaking;
     $("prompt").value = t(templateKey, { list: wordListText() });
+    setStatusOn(practiceStatus, "");
     updatePracticeHelp();
     syncPracticeModeUI();
     $("practiceCard").hidden = false;
@@ -687,12 +699,12 @@
     }
   }
 
-  async function copyText(text, successMessage) {
+  async function copyText(text, successMessage, statusTarget = status) {
     try {
       await navigator.clipboard.writeText(text);
-      setStatus(successMessage, "success");
+      setStatusOn(statusTarget, successMessage, "success");
     } catch {
-      setStatus(t("clipboardFailed"), "error");
+      setStatusOn(statusTarget, t("clipboardFailed"), "error");
     }
   }
 
@@ -712,11 +724,11 @@
   });
 
   $("copyWords").addEventListener("click", () => {
-    if (recentWords.length) copyText(wordListText(), t("wordListCopied"));
+    if (recentWords.length) copyText(wordListText(), t("wordListCopied"), wordsStatus);
   });
 
   $("copyPrompt").addEventListener("click", () => {
-    if ($("prompt").value) copyText($("prompt").value, t("promptCopied"));
+    if ($("prompt").value) copyText($("prompt").value, t("promptCopied"), practiceStatus);
   });
 
   $("openChatGPT").addEventListener("click", () => {

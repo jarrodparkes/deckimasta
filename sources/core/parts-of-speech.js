@@ -1,12 +1,16 @@
 /**
  * Shared parts-of-speech tags for KaniKai word sources.
- * Starting set mirrors WaniKani vocabulary tags.
+ *
+ * Matches Word.parts_of_speech items in DATA_SOURCES.md:
+ * anyOf [ preferred enum, free non-empty string ].
+ * Preferred set mirrors WaniKani vocabulary tags.
  */
 (function (global) {
   "use strict";
 
   const KaniKai = (global.KaniKai = global.KaniKai || {});
 
+  /** @type {readonly string[]} Preferred enum branch (not exhaustive of allowed values). */
   const PARTS_OF_SPEECH = Object.freeze([
     "noun",
     "proper_noun",
@@ -34,15 +38,15 @@
 
   /**
    * @param {string} tag
-   * @returns {boolean}
+   * @returns {boolean} true when tag is in the preferred enum set
    */
   function isKnownPartOfSpeech(tag) {
     return PARTS_OF_SPEECH_SET.has(tag);
   }
 
   /**
-   * Keep known tags first; unknown tags are preserved so sources can pass
-   * through values that are not yet in the shared enum.
+   * Normalize POS tags: trim, drop empties/non-strings, dedupe.
+   * Preferred enum values and free strings are both kept (schema anyOf).
    * @param {string[]} tags
    * @returns {string[]}
    */

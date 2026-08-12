@@ -1,15 +1,15 @@
 /**
  * Shared Word shape, LoadOptions, and post-processing helpers.
  *
- * Word:
+ * Word (see DATA_SOURCES.md OpenAPI schema):
  *   {
  *     id: string,
  *     word: string,
  *     alternatives: string[],
  *     meanings: string[],
- *     created_at: string,   // ISO 8601
- *     last_seen_at: string, // ISO 8601
- *     parts_of_speech: string[]
+ *     created_at: string,   // ISO 8601 date-time
+ *     last_seen_at: string, // ISO 8601 date-time
+ *     parts_of_speech: string[] // preferred enum or free string (anyOf)
  *   }
  *
  * LoadOptions:

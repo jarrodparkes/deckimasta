@@ -1,8 +1,7 @@
 window.KaniKaiStrings = {
   en: {
     title: "KaniKai",
-    subtitle:
-      "Turn recently learned WaniKani vocabulary into words you actually use.",
+    subtitle: "Turn recently learned vocabulary into words you actually use.",
     langGroup: "Language",
     connectTitle: "Connect WaniKani",
     tokenSavedCompact: "Token saved on this device.",
@@ -116,7 +115,7 @@ Please follow these rules:
 - Keep explanations concise unless I ask for more detail.
 - Speak primarily in Japanese, using English only when necessary.
 - Start by asking me your first question about one of the words now.`,
-    promptTemplateLegacy: `I'm studying Japanese and I just learned these vocabulary words in WaniKani:
+    promptTemplateLegacy: `I'm studying Japanese and I just learned these vocabulary words:
 
 {list}
 
@@ -137,7 +136,7 @@ Please follow these rules:
   },
   ja: {
     title: "カニ会",
-    subtitle: "最近覚えたWaniKaniの単語を、実際に使える言葉に変えましょう。",
+    subtitle: "最近覚えた単語を、実際に使える言葉に変えましょう。",
     langGroup: "言語",
     connectTitle: "WaniKaniに接続",
     tokenSavedCompact: "トークンはこの端末に保存されています。",
@@ -251,7 +250,7 @@ Please follow these rules:
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
 - 主に日本語で話し、必要なときだけ英語を使ってください。
 - 今すぐ、単語の一つについての最初の質問をして始めてください。`,
-    promptTemplateLegacy: `日本語を勉強していて、WaniKaniで次の単語を覚えたところです：
+    promptTemplateLegacy: `日本語を勉強していて、次の単語を覚えたところです：
 
 {list}
 

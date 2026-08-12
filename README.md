@@ -14,21 +14,16 @@ KaniKai is a single-page browser app. Load words from a data source (WaniKani to
 - Choose a practice mode (**Speaking**, **Listening**, or **Legacy**) before copying the prompt
 - Open ChatGPT in a new tab when you are ready to practice
 
-Built-in source today: [WaniKani](https://www.wanikani.com/) (API token stored only in this browser). Also supports pasting or uploading a simple CSV-like word list.
-
-To add another source, see [DATA_SOURCES.md](./DATA_SOURCES.md). Adapters live in `sources/adapters/`; the shared loading system lives in `sources/core/`.
+To add a data source, see [DATA_SOURCES.md](./DATA_SOURCES.md). Adapters live in `sources/adapters/`; the shared loading system lives in `sources/core/`.
 
 ## Setup
 
 1. Open `index.html` in a modern browser (no build step or server required).
-2. Choose a data source. For WaniKani:
-   - Open account settings → API Tokens and create a token with **read** access.
-   - Paste the token into KaniKai and click **Save token**.
-   - Your token stays in `localStorage` on that device only.
+2. Choose a data source.
 
 ## Usage
 
-1. Choose a **Data source** (WaniKani is built in).
+1. Choose a **Data source**.
 2. Choose a **Look back** range to keep words whose `last_seen_at` falls in that window.
 3. Optionally set **Limit results** (leave blank for all matches).
 4. Optionally check **Randomize** so the selection is shuffled before the limit is applied.
@@ -44,14 +39,13 @@ Without randomization, results stay ordered by most recently seen (`last_seen_at
 
 ## Privacy
 
-- For WaniKani, API calls go directly from your browser to `https://api.wanikani.com/v2`.
-- Source credentials (such as a WaniKani token) are stored only in browser `localStorage` when that source needs them.
+- Source credentials are stored only in browser `localStorage` when that source needs them.
 - Use **Forget token** (or the source’s equivalent) to remove credentials from the device.
 
 ## Requirements
 
 - A modern browser with `fetch`, `localStorage`, and clipboard support
-- Whatever credentials the selected data source requires (WaniKani needs a read API token)
+- Whatever credentials the selected data source requires
 
 ## Project docs
 
