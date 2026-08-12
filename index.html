@@ -76,7 +76,12 @@
   </div>
 
   <section class="card">
-    <h2 data-i18n="languagesTitle">Step 1: Choose Languages</h2>
+    <div class="card-head">
+      <h2 data-i18n="languagesTitle">Step 1: Choose Languages</h2>
+      <p class="card-intro" data-i18n="languagesIntro">
+        Tell us the language you already speak and the one you are learning. This pair decides which word sources you can use and how your practice prompt is written, so the two must be different.
+      </p>
+    </div>
     <div class="lang-pair-row">
       <div>
         <label for="nativeLang" data-i18n="nativeLanguage">Native language</label>
@@ -104,16 +109,18 @@
         </select>
       </div>
     </div>
-    <p class="help" data-i18n="languagesHelp" style="margin: 12px 0 0;">
-      Your native and target languages control which data sources are available and how practice prompts are written. They must be different.
-    </p>
     <div id="languageStatus" class="status" role="status" aria-live="polite"></div>
   </section>
 
   <div id="sourceSetupHost"></div>
 
   <section id="loadCard" class="card" hidden>
-    <h2 data-i18n="loadTitle">Step 2: Load Words</h2>
+    <div class="card-head">
+      <h2 data-i18n="loadTitle">Step 2: Load Words</h2>
+      <p class="card-intro" data-i18n="loadIntro">
+        Pick where your vocabulary comes from, then pull in a batch of words.
+      </p>
+    </div>
     <div class="row">
       <div>
         <label for="source" class="label-with-help">
@@ -172,9 +179,14 @@
   </section>
 
   <section id="wordsCard" class="card" hidden>
-    <div class="summary">
-      <h2 data-i18n="recentlyLearned">Step 3: Confirm Words</h2>
-      <strong id="count"></strong>
+    <div class="card-head">
+      <div class="summary">
+        <h2 data-i18n="recentlyLearned">Step 3: Confirm Words</h2>
+        <strong id="count"></strong>
+      </div>
+      <p class="card-intro" data-i18n="wordsIntro">
+        These are the words you just loaded. Check that the list looks right, then turn it into a practice prompt.
+      </p>
     </div>
     <div id="words" class="word-list"></div>
     <div class="actions">
@@ -185,15 +197,19 @@
   </section>
 
   <section id="practiceCard" class="card" hidden>
-    <div class="summary">
-      <h2 data-i18n="practiceTitle">Step 4: Practice Words</h2>
+    <div class="card-head">
+      <div class="summary">
+        <h2 data-i18n="practiceTitle">Step 4: Practice Words</h2>
+      </div>
+      <p class="card-intro" data-i18n="practiceIntro">
+        Choose how you want to practice. The prompt below is rewritten as you change these settings — copy it into ChatGPT to start the conversation.
+      </p>
     </div>
     <div class="mode-field">
       <label id="practiceModeLabel" data-i18n="practiceMode">Practice mode</label>
       <div class="mode-switch" role="group" aria-labelledby="practiceModeLabel">
         <button type="button" data-mode="speaking" data-i18n="modeSpeaking" aria-pressed="true">Speaking</button>
         <button type="button" data-mode="listening" data-i18n="modeListening" aria-pressed="false">Listening</button>
-        <button type="button" data-mode="legacy" data-i18n="modeLegacy" aria-pressed="false">Legacy</button>
       </div>
     </div>
     <div class="practice-options">
@@ -277,7 +293,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   const THEMES = ["system", "light", "dark"];
   const SUPPORTED_LANGS = ["en", "ja"];
   const LEARNING_LANGS = ["en", "ja"];
-  const PRACTICE_MODES = ["speaking", "listening", "legacy"];
+  const PRACTICE_MODES = ["speaking", "listening"];
   const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
   const CEFR_LABEL_KEYS = {
     A1: "cefrA1",
@@ -297,13 +313,11 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   };
   const PRACTICE_TEMPLATE_KEYS = {
     speaking: "promptTemplateSpeaking",
-    listening: "promptTemplateListening",
-    legacy: "promptTemplateLegacy"
+    listening: "promptTemplateListening"
   };
   const PRACTICE_HELP_KEYS = {
     speaking: "practiceHelpSpeaking",
-    listening: "practiceHelpListening",
-    legacy: "practiceHelpLegacy"
+    listening: "practiceHelpListening"
   };
   const LANG_NAME_KEYS = {
     en: "langEnglish",

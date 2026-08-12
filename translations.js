@@ -21,16 +21,18 @@ window.KaniKaiStrings = {
     tokenFaqBody:
       "In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.",
     languagesTitle: "Step 1: Choose Languages",
+    languagesIntro:
+      "Tell us the language you already speak and the one you are learning. This pair decides which word sources you can use and how your practice prompt is written, so the two must be different.",
     nativeLanguage: "Native language",
     targetLanguage: "Target language",
     selectLanguage: "Select a language",
     langEnglish: "English",
     langJapanese: "Japanese",
     swapLanguages: "Swap native and target languages",
-    languagesHelp:
-      "Your native and target languages control which data sources are available and how practice prompts are written. They must be different.",
     languagesSameError: "Native and target languages must be different.",
     loadTitle: "Step 2: Load Words",
+    loadIntro:
+      "Pick where your vocabulary comes from, then pull in a batch of words.",
     dataSource: "Source",
     sourceHelpAria: "About this source",
     sourceHelpFallback: "Choose a data source to see what it provides.",
@@ -81,13 +83,16 @@ window.KaniKaiStrings = {
     csvNoFileChosen: "No file chosen",
     csvFileEmpty: "Choose a CSV file to upload first.",
     recentlyLearned: "Step 3: Confirm Words",
+    wordsIntro:
+      "These are the words you just loaded. Check that the list looks right, and start practicing. You can practice with friends in person or create a conversation prompt to practice with ChatGPT.",
     createPractice: "Create conversation practice",
     copyWordList: "Copy word list",
     practiceTitle: "Step 4: Practice Words",
+    practiceIntro:
+      "Choose how you want to practice. The prompt will change based on your settings.",
     practiceMode: "Practice mode",
     modeSpeaking: "Speaking",
     modeListening: "Listening",
-    modeLegacy: "Legacy",
     cefrLevel: "Difficulty (CEFR)",
     cefrHelpAria: "About CEFR levels",
     cefrTooltip:
@@ -126,8 +131,6 @@ window.KaniKaiStrings = {
       "Copy this into ChatGPT. The AI waits for your questions and can suggest starter words one at a time.",
     practiceHelpListening:
       "Copy this into ChatGPT. The AI uses the target words and asks you questions about them.",
-    practiceHelpLegacy:
-      "Copy this into ChatGPT and start talking. The prompt deliberately asks for one question at a time.",
     copyPrompt: "Copy prompt",
     openChatGPT: "Open ChatGPT",
     pasteTokenFirst: "Please paste your WaniKani API token first.",
@@ -185,24 +188,6 @@ Please follow these rules:
 - Keep explanations concise unless I ask for more detail.
 - Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
 - Start by asking me your first question about one of the words now.`,
-    promptTemplateLegacy: `I'm studying {targetLanguage} and I just learned these vocabulary words:
-
-{list}
-
-Help me actively use these words in natural {targetLanguage} conversation.
-
-Please follow these rules:
-- Have a real conversation with me, one turn at a time.
-- Ask me questions that naturally encourage me to use the vocabulary above.
-- {difficultyRule}
-- Prefer everyday situations rather than artificial example sentences.
-- Don't force a vocabulary word into every question. Let the conversation feel natural.
-- {correctionRule}
-- If I use one of the target words correctly, keep the conversation going rather than stopping to praise me.
-- Occasionally challenge me to use a specific target word if I haven't used it yet.
-- Keep explanations concise unless I ask for more detail.
-- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
-- Start by asking me your first question now.`,
   },
   ja: {
     title: "KaniKai",
@@ -226,16 +211,17 @@ Please follow these rules:
     tokenFaqBody:
       "WaniKaniのアカウント設定を開き、API Tokensのセクションを見つけてください。読み取り権限のあるトークンを作成します。このアプリには課題と科目への読み取りアクセスだけが必要です。",
     languagesTitle: "ステップ1: 言語を選ぶ",
+    languagesIntro:
+      "あなたがすでに話せる言語と、これから学ぶ言語を選んでください。この組み合わせで、使えるデータソースと練習プロンプトの書かれ方が決まります。同じ言語は選べません。",
     nativeLanguage: "母語",
     targetLanguage: "学習言語",
     selectLanguage: "言語を選択",
     langEnglish: "英語",
     langJapanese: "日本語",
     swapLanguages: "母語と学習言語を入れ替える",
-    languagesHelp:
-      "母語と学習言語により、使えるデータソースと練習プロンプトの内容が決まります。同じ言語は選べません。",
     languagesSameError: "母語と学習言語は別の言語にしてください。",
     loadTitle: "ステップ2: 単語を読み込む",
+    loadIntro: "単語をどこから取り込むかを選び、まとめて読み込みます。",
     dataSource: "ソース",
     sourceHelpAria: "このソースについて",
     sourceHelpFallback: "データソースを選ぶと、内容の説明が表示されます。",
@@ -286,13 +272,16 @@ Please follow these rules:
     csvNoFileChosen: "選択されていません",
     csvFileEmpty: "先にCSVファイルを選んでください。",
     recentlyLearned: "ステップ3: 単語を確認",
+    wordsIntro:
+      "読み込んだ単語の一覧です。内容を確認して、問題なければ練習を始めましょう。友達と実際に話したり、ChatGPTに会話プロンプトを作成して練習したりできます。",
     createPractice: "会話練習を作成",
     copyWordList: "単語リストをコピー",
     practiceTitle: "ステップ4: 単語を練習",
+    practiceIntro:
+      "練習のしかたを選んでください。プロンプトは設定を変えるたびに書き換わります。",
     practiceMode: "練習モード",
     modeSpeaking: "スピーキング",
     modeListening: "リスニング",
-    modeLegacy: "レガシー",
     cefrLevel: "難易度（CEFR）",
     cefrHelpAria: "CEFRレベルについて",
     cefrTooltip:
@@ -330,8 +319,6 @@ Please follow these rules:
       "これをChatGPTに貼り付けてください。AIはあなたの質問を待ち、練習する単語を一つずつ提案できます。",
     practiceHelpListening:
       "これをChatGPTに貼り付けてください。AIが目標の単語を使い、その単語についての質問をします。",
-    practiceHelpLegacy:
-      "これをChatGPTに貼り付けて会話を始めましょう。プロンプトは一度に一つの質問をするよう指示しています。",
     copyPrompt: "プロンプトをコピー",
     openChatGPT: "ChatGPTを開く",
     pasteTokenFirst: "先にWaniKani APIトークンを貼り付けてください。",
@@ -389,23 +376,5 @@ Please follow these rules:
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
 - 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
 - 今すぐ、単語の一つについての最初の質問をして始めてください。`,
-    promptTemplateLegacy: `{targetLanguage}を勉強していて、次の単語を覚えたところです：
-
-{list}
-
-これらの単語を自然な{targetLanguage}の会話の中で積極的に使えるよう手伝ってください。
-
-次のルールに従ってください：
-- 一度に一往復ずつ、実際の会話をしてください。
-- 上記の単語を自然に使いたくなるような質問をしてください。
-- {difficultyRule}
-- 作り物の例文より、日常的な場面を優先してください。
-- すべての質問に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
-- {correctionRule}
-- 目標の単語を正しく使えたら、褒めて止まらずに会話を続けてください。
-- まだ使っていない目標の単語があれば、ときどきそれを使うよう促してください。
-- 詳しい説明を求めない限り、説明は簡潔にしてください。
-- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
-- 今すぐ最初の質問をして始めてください。`,
   },
 };

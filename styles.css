@@ -238,10 +238,16 @@ h2 {
   margin: 12px 0;
   box-shadow: var(--shadow);
 }
-.card > h2:first-child {
+.card-head {
   margin-bottom: 16px;
-  padding-bottom: 10px;
+  padding-bottom: 12px;
   border-bottom: 1px solid var(--border);
+}
+.card-intro {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  max-width: 68ch;
 }
 .token-panel {
   padding: 12px;
@@ -477,9 +483,6 @@ button.help-tip[aria-expanded="true"] + .help-tooltip {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  margin-bottom: 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border);
 }
 #count {
   flex-shrink: 0;

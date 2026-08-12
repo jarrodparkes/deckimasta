@@ -17,7 +17,7 @@ KaniKai is a single-page browser app. Load words from a data source (WaniKani, J
 - Limit how many words to keep
 - Randomize the list before applying the limit
 - Copy a formatted word list or a full conversation-practice prompt
-- Choose a practice mode (**Speaking**, **Listening**, or **Legacy**) before copying the prompt
+- Choose a practice mode (**Speaking** or **Listening**) before copying the prompt
 - Open ChatGPT in a new tab when you are ready to practice
 - Switch the interface between **light** and **dark**, or follow your system appearance
 
@@ -40,7 +40,6 @@ To add a data source, see [DATA_SOURCES.md](./DATA_SOURCES.md). Adapters live in
 8. On the practice card, choose a mode (**Speaking** is the default):
    - **Speaking** — the AI waits for your questions and can suggest starter words one at a time
    - **Listening** — the AI uses the target words and asks you questions about them
-   - **Legacy** — the previous AI-led prompt that encourages you to use the words in conversation
 9. Copy the prompt into ChatGPT and start talking. Practice prompts are written in your **native** language and name your **target** language (using your native language only when necessary).
 
 Without randomization, results stay ordered by most recently seen (`last_seen_at`). With randomization on and a limit set, you get a random subset of the matches.
