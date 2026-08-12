@@ -98,7 +98,10 @@
   KaniKai.registerSource({
     id: "file-upload",
     label: "CSV File",
+    labelKey: "sourceLabelCsvFile",
+    descriptionKey: "sourceDescCsvFile",
     requiresAuth: false,
+    supportsLookBack: true,
     // Works for any native/target pair (omit supportsLanguages = universal).
     createUI,
 

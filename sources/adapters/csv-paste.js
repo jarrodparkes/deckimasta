@@ -65,7 +65,10 @@
   KaniKai.registerSource({
     id: "csv-paste",
     label: "CSV Paste",
+    labelKey: "sourceLabelCsvPaste",
+    descriptionKey: "sourceDescCsvPaste",
     requiresAuth: false,
+    supportsLookBack: true,
     // Works for any native/target pair (omit supportsLanguages = universal).
     createUI,
 

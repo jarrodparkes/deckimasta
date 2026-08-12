@@ -116,10 +116,23 @@
     <h2 data-i18n="loadTitle">Step 2: Load Words</h2>
     <div class="row">
       <div>
-        <label for="source" data-i18n="dataSource">Source</label>
+        <label for="source" class="label-with-help">
+          <span data-i18n="dataSource">Source</span>
+          <button
+            type="button"
+            class="help-tip"
+            id="sourceHelpTip"
+            data-i18n="sourceHelpAria"
+            data-i18n-attr="aria-label"
+            aria-label="About this source"
+            aria-describedby="sourceHelp"
+            aria-expanded="false"
+          >?</button>
+          <span id="sourceHelp" role="tooltip" class="help-tooltip"></span>
+        </label>
         <select id="source"></select>
       </div>
-      <div>
+      <div id="rangeField">
         <label for="range" data-i18n="lookBack">Recency</label>
         <select id="range">
           <option value="24" data-i18n="range24">Last 24 hours</option>
@@ -241,6 +254,10 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 <script src="sources/core/csv.js"></script>
 <script src="sources/core/source-ui.js"></script>
 <script src="sources/adapters/wanikani.js"></script>
+<script src="sources/data/jlpt-n5.js"></script>
+<script src="sources/adapters/jlpt-n5.js"></script>
+<script src="sources/data/top-1000-english.js"></script>
+<script src="sources/adapters/top-1000-english.js"></script>
 <script src="sources/adapters/csv-paste.js"></script>
 <script src="sources/adapters/file-upload.js"></script>
 <script>
@@ -614,7 +631,11 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   function populateSourceSelect() {
     const previous = sourceSelect.value || localStorage.getItem(SOURCE_KEY) || "";
     sourceSelect.innerHTML = "";
-    if (!languagePairSelected()) return;
+    if (!languagePairSelected()) {
+      updateSourceHelp();
+      syncLookBackUi();
+      return;
+    }
 
     const sources =
       typeof KaniKai.listSources === "function"
@@ -624,7 +645,10 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     for (const source of sources) {
       const option = document.createElement("option");
       option.value = source.id;
-      option.textContent = source.label;
+      option.textContent =
+        typeof KaniKai.sourceLabel === "function"
+          ? KaniKai.sourceLabel(source, t)
+          : source.label;
       sourceSelect.appendChild(option);
     }
 
@@ -637,6 +661,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
         all.length ? "noSourcesForLanguages" : "noSourcesRegistered"
       );
       sourceSelect.appendChild(option);
+      updateSourceHelp();
+      syncLookBackUi();
       return;
     }
 
@@ -646,6 +672,47 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
       sourceSelect.value = sources[0].id;
       localStorage.setItem(SOURCE_KEY, sourceSelect.value);
     }
+
+    updateSourceHelp();
+    syncLookBackUi();
+  }
+
+  function selectedSource() {
+    const sourceId = languagePairSelected() ? sourceSelect.value : "";
+    if (!sourceId || typeof KaniKai.getSource !== "function") return null;
+    return KaniKai.getSource(sourceId);
+  }
+
+  /**
+   * Tooltip text for the Source picker: description of the currently selected
+   * source among those available for the active language pair.
+   */
+  function updateSourceHelp() {
+    const tip = $("sourceHelpTip");
+    const tooltip = $("sourceHelp");
+    if (!tip || !tooltip) return;
+
+    const source = selectedSource();
+    const description =
+      source && typeof KaniKai.sourceDescription === "function"
+        ? KaniKai.sourceDescription(source, t)
+        : "";
+
+    tooltip.textContent = description || t("sourceHelpFallback");
+    tip.hidden = !source;
+    tip.setAttribute("aria-expanded", "false");
+  }
+
+  function syncLookBackUi() {
+    const field = $("rangeField");
+    if (!field) return;
+    const source = selectedSource();
+    const enabled =
+      !source ||
+      typeof KaniKai.sourceSupportsLookBack !== "function" ||
+      KaniKai.sourceSupportsLookBack(source);
+    field.hidden = !enabled;
+    $("range").disabled = !enabled;
   }
 
   function mountSelectedSourceUi() {
@@ -669,8 +736,18 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   }
 
   function readSharedLoadOptions() {
-    const hours = Number($("range").value);
-    const since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    const source = selectedSource();
+    const lookBack =
+      !source ||
+      typeof KaniKai.sourceSupportsLookBack !== "function" ||
+      KaniKai.sourceSupportsLookBack(source);
+
+    let since = null;
+    if (lookBack) {
+      const hours = Number($("range").value);
+      since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+    }
+
     const limitRaw = $("limit").value.trim();
     const limit = limitRaw === "" ? null : Math.max(1, Math.floor(Number(limitRaw)));
     const options = {
@@ -810,6 +887,10 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
       return;
     }
 
+    const showSeenAt =
+      typeof KaniKai.sourceSupportsLookBack !== "function" ||
+      KaniKai.sourceSupportsLookBack(selectedSource());
+
     for (const word of recentWords) {
       const el = document.createElement("div");
       el.className = "word";
@@ -819,7 +900,11 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
           <div class="reading">${escapeHtml(displayAlternative(word))}</div>
         </div>
         <div class="meaning">${escapeHtml((word.meanings || []).join("; "))}</div>
-        <div class="learned">${escapeHtml(formatTime(word.last_seen_at))}</div>
+        ${
+          showSeenAt
+            ? `<div class="learned">${escapeHtml(formatTime(word.last_seen_at))}</div>`
+            : ""
+        }
       `;
       $("words").appendChild(el);
     }
@@ -895,6 +980,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
   sourceSelect.addEventListener("change", () => {
     if (sourceSelect.value) localStorage.setItem(SOURCE_KEY, sourceSelect.value);
+    updateSourceHelp();
+    syncLookBackUi();
     mountSelectedSourceUi();
   });
   $("load").addEventListener("click", loadWords);
@@ -944,6 +1031,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
   bindHelpTip("limitHelpTip", "limitHelp");
   bindHelpTip("cefrHelpTip", "cefrHelp");
+  bindHelpTip("sourceHelpTip", "sourceHelp");
 
   applyTheme();
   syncLanguagePairUI();

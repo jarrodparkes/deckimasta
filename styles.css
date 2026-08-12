@@ -314,6 +314,9 @@ textarea:focus {
   gap: 14px;
   align-items: end;
 }
+.row:has(#rangeField[hidden]) {
+  grid-template-columns: 1fr 1fr 1fr auto;
+}
 .checkbox-field {
   display: flex;
   align-items: center;

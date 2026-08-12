@@ -2,13 +2,18 @@
 
 Turn vocabulary from any word list into conversation practice.
 
-KaniKai is a single-page browser app. Load words from a data source (WaniKani today; CSV, other APIs, and custom sources later), optionally focus on recently seen items or sample from your full set, then generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
+KaniKai is a single-page browser app. Load words from a data source (WaniKani, JLPT N5, top 1000 English, CSV, and more), optionally focus on recently seen items or sample from your full set, then generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
 
 ## Features
 
 - Choose **native** and **target** languages (English ↔ Japanese) so data sources and practice prompts match the learner
-- Pluggable **data sources** that all normalize to one shared word shape
-- Optional **look-back** filter on `last_seen_at` (recently learned/seen), or skip it to sample from the full set
+- Pluggable **data sources** that all normalize to one shared word shape, including:
+  - **WaniKani** (English → Japanese, API token)
+  - **JLPT N5** static vocabulary (English → Japanese)
+  - **Top 1000 English** static frequency list with Japanese glosses (Japanese → English)
+  - **CSV Paste** / **CSV File** (any pair)
+- Source picker **tooltips** that explain the selected source for the current language pair
+- Optional **look-back** filter on `last_seen_at` when the source has learner progress (hidden for static lists)
 - Limit how many words to keep
 - Randomize the list before applying the limit
 - Copy a formatted word list or a full conversation-practice prompt
@@ -55,3 +60,4 @@ Sample CSV lists for both directions live in `fixtures/` (`en-ja.csv` for Englis
 ## Project docs
 
 - [DATA_SOURCES.md](./DATA_SOURCES.md) — word contract, shared load options, and how to implement a new data source
+- [ATTRIBUTION.md](./ATTRIBUTION.md) — licenses for bundled vocabulary lists

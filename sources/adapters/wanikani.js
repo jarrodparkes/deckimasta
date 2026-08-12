@@ -303,7 +303,10 @@
   KaniKai.registerSource({
     id: "wanikani",
     label: "WaniKani",
+    labelKey: "sourceLabelWanikani",
+    descriptionKey: "sourceDescWanikani",
     requiresAuth: true,
+    supportsLookBack: true,
     tokenKey: TOKEN_KEY,
     getToken: getStoredToken,
     supportsLanguages({ native, target }) {

@@ -32,6 +32,23 @@ window.KaniKaiStrings = {
     languagesSameError: "Native and target languages must be different.",
     loadTitle: "Step 2: Load Words",
     dataSource: "Source",
+    sourceHelpAria: "About this source",
+    sourceHelpFallback: "Choose a data source to see what it provides.",
+    sourceLabelWanikani: "WaniKani",
+    sourceDescWanikani:
+      "Your WaniKani vocabulary assignments. Uses your API token to load words you have started, with recency based on when you last studied them.",
+    sourceLabelCsvPaste: "CSV Paste",
+    sourceDescCsvPaste:
+      "Paste your own word list as CSV-like rows. Works for any language pair; optional dates enable the Recency filter.",
+    sourceLabelCsvFile: "CSV File",
+    sourceDescCsvFile:
+      "Upload a .csv or .txt word list in the same format as CSV Paste. Works for any language pair.",
+    sourceLabelTop1000English: "Top 1000 English Words",
+    sourceDescTop1000English:
+      "A static list of the 1,000 most common English words with Japanese glosses. Built for Japanese speakers learning English. No API key; Recency does not apply.",
+    sourceLabelJlptN5: "JLPT N5",
+    sourceDescJlptN5:
+      "A static JLPT N5 vocabulary list (Japanese words with English meanings). Built for English speakers learning Japanese. No API key; Recency does not apply.",
     lookBack: "Recency",
     range24: "Last 24 hours",
     range48: "Last 2 days",
@@ -220,6 +237,23 @@ Please follow these rules:
     languagesSameError: "母語と学習言語は別の言語にしてください。",
     loadTitle: "ステップ2: 単語を読み込む",
     dataSource: "ソース",
+    sourceHelpAria: "このソースについて",
+    sourceHelpFallback: "データソースを選ぶと、内容の説明が表示されます。",
+    sourceLabelWanikani: "WaniKani",
+    sourceDescWanikani:
+      "WaniKaniの語彙課題です。APIトークンで学習開始済みの単語を読み込み、直近の学習時期で絞り込めます。",
+    sourceLabelCsvPaste: "CSV貼り付け",
+    sourceDescCsvPaste:
+      "CSV風の行として自分の単語リストを貼り付けます。どの言語ペアでも使え、日付があれば直近フィルタが効きます。",
+    sourceLabelCsvFile: "CSVファイル",
+    sourceDescCsvFile:
+      "CSV貼り付けと同じ形式の .csv / .txt をアップロードします。どの言語ペアでも使えます。",
+    sourceLabelTop1000English: "英語頻出1000語リスト",
+    sourceDescTop1000English:
+      "英語の頻出単語1000語と日本語訳の静的リストです。日本語話者が英語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
+    sourceLabelJlptN5: "JLPT N5",
+    sourceDescJlptN5:
+      "JLPT N5語彙の静的リスト（日本語の語と英語の意味）です。英語話者が日本語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
     lookBack: "直近",
     range24: "過去24時間",
     range48: "過去2日間",
@@ -291,8 +325,7 @@ Please follow these rules:
       "発音の誤りは簡潔に訂正してから続けてください。文法は求めない限り訂正しないでください。",
     correctionGrammarOnly:
       "文法の誤りは簡潔に訂正してから続けてください。発音は求めない限り訂正しないでください。",
-    correctionNeither:
-      "求めない限り、発音も文法も訂正しないでください。",
+    correctionNeither: "求めない限り、発音も文法も訂正しないでください。",
     practiceHelpSpeaking:
       "これをChatGPTに貼り付けてください。AIはあなたの質問を待ち、練習する単語を一つずつ提案できます。",
     practiceHelpListening:

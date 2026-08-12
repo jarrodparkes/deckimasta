@@ -5,7 +5,10 @@
  *   {
  *     id: string,
  *     label: string,
+ *     labelKey?: string,           // optional i18n key for the picker label
+ *     descriptionKey?: string,     // optional i18n key for the source tooltip
  *     requiresAuth: boolean,
+ *     supportsLookBack?: boolean,  // default true; false for static curated lists
  *     load: (options?) => Promise<Word[]>,
  *     createUI?: (ctx) => SourceUI,  // optional adapter-owned UI
  *     // Optional: qualify which native/target pairs this source supports.
@@ -75,6 +78,48 @@
   }
 
   /**
+   * Whether a source has learner-progress timestamps for the shared look-back filter.
+   * Defaults to true when omitted.
+   * @param {object} source
+   * @returns {boolean}
+   */
+  function sourceSupportsLookBack(source) {
+    if (!source) return false;
+    return source.supportsLookBack !== false;
+  }
+
+  /**
+   * Localized label for a source, falling back to source.label.
+   * @param {object} source
+   * @param {(key: string) => string} [t]
+   * @returns {string}
+   */
+  function sourceLabel(source, t) {
+    if (!source) return "";
+    if (
+      source.labelKey &&
+      typeof t === "function"
+    ) {
+      const translated = t(source.labelKey);
+      if (translated && translated !== source.labelKey) return translated;
+    }
+    return source.label || "";
+  }
+
+  /**
+   * Localized description for a source tooltip, or empty string when none.
+   * @param {object} source
+   * @param {(key: string) => string} [t]
+   * @returns {string}
+   */
+  function sourceDescription(source, t) {
+    if (!source || !source.descriptionKey || typeof t !== "function") return "";
+    const translated = t(source.descriptionKey);
+    if (!translated || translated === source.descriptionKey) return "";
+    return translated;
+  }
+
+  /**
    * @param {{ native?: string, target?: string }} [filter]
    *   When native and target are both set, only sources that support that pair.
    * @returns {object[]}
@@ -106,4 +151,7 @@
   KaniKai.listSources = listSources;
   KaniKai.hasSource = hasSource;
   KaniKai.sourceSupportsLanguages = sourceSupportsLanguages;
+  KaniKai.sourceSupportsLookBack = sourceSupportsLookBack;
+  KaniKai.sourceLabel = sourceLabel;
+  KaniKai.sourceDescription = sourceDescription;
 })(window);

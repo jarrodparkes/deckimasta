@@ -166,8 +166,11 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
 /**
  * @typedef {object} WordSource
  * @property {string} id            // source identifier, e.g. "csv-paste"
- * @property {string} label         // UI label
+ * @property {string} label         // UI label (fallback)
+ * @property {string} [labelKey]    // optional i18n key for the picker label
+ * @property {string} [descriptionKey] // optional i18n key for the source tooltip
  * @property {boolean} requiresAuth // whether the source needs credentials
+ * @property {boolean} [supportsLookBack] // default true; false for static curated lists (no learner timestamps)
  * @property {(options?: object) => Promise<Word[]>} load
  * @property {(ctx: { t: Function, setStatus: Function }) => object} [createUI]
  * @property {(pair: { native: string, target: string }) => boolean} [supportsLanguages]
@@ -175,6 +178,10 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
 ```
 
 `supportsLanguages({ native, target })` is optional. When present, the source only appears in the Step 2 picker for pairs that return `true`. When omitted, the source is treated as universal (any native/target pair).
+
+`supportsLookBack` is optional and defaults to `true`. Set it to `false` for static curated lists with no learner-progress timestamps. The UI hides Recency for those sources and passes `since: null` so the shared look-back filter does not empty the list.
+
+`labelKey` / `descriptionKey` are optional i18n keys. The Source picker shows a `?` tooltip whose text is taken from `descriptionKey` for the currently selected source (among sources available for the active language pair).
 
 `load(options)` should:
 
@@ -223,6 +230,9 @@ The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filte
 | `getSource(id)` / `hasSource(id)`                     | Registry lookup                                               |
 | `listSources({ native, target }?)`                    | All sources, or only those supporting the language pair       |
 | `sourceSupportsLanguages(source, { native, target })` | Whether a source accepts the given pair                       |
+| `sourceSupportsLookBack(source)`                      | Whether Recency / `since` applies (default true)              |
+| `sourceLabel(source, t)`                              | Localized picker label                                        |
+| `sourceDescription(source, t)`                        | Localized tooltip text for the selected source                |
 
 ## File Layout
 
@@ -237,6 +247,8 @@ sources/
     source-ui.js        # adapter UI host (setup + panel slots)
   adapters/             # individual data sources
     # your-source.js
+  data/                 # static curated lists loaded as JS globals (file:// safe)
+    # top-1000-english.js, jlpt-n5.js, …
 ```
 
 `sources/core/` is the loading system. `sources/adapters/` is only concrete sources.
@@ -314,5 +326,16 @@ Words are loaded only through registered adapters under `sources/adapters/` via 
 - [ ] `parts_of_speech` mapped to the shared language-agnostic enum when possible (or left for `normalizePartsOfSpeech` aliases)
 - [ ] Credentials handled only inside the source
 - [ ] `supportsLanguages({ native, target })` declared when the source only fits certain language pairs (omit for universal)
+- [ ] `supportsLookBack: false` when the source has no learner-progress timestamps (static lists)
+- [ ] `descriptionKey` (and optional `labelKey`) so the Source tooltip can explain the source
 - [ ] Works with and without the shared `since` look-back filter
 - [ ] Registered for one-at-a-time selection in the UI
+
+## Built-in curated lists
+
+| Source id           | Pair     | Data file                         | Upstream                                      | License     |
+| ------------------- | -------- | --------------------------------- | --------------------------------------------- | ----------- |
+| `top-1000-english`  | ja → en  | `sources/data/top-1000-english.js` | [SMenigat/thousand-most-common-words](https://github.com/SMenigat/thousand-most-common-words) | MIT |
+| `jlpt-n5`           | en → ja  | `sources/data/jlpt-n5.js`          | [evanclan/OpenJLPT](https://github.com/evanclan/OpenJLPT) N5 vocab | CC BY-SA 4.0 |
+
+See [ATTRIBUTION.md](./ATTRIBUTION.md) for license notices.
