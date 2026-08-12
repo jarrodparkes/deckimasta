@@ -74,6 +74,17 @@
       color: white;
     }
     .lang-switch button[aria-pressed="true"]:hover { background: var(--accent-hover); }
+    .lang-pair-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      gap: 14px;
+      align-items: end;
+    }
+    .swap-languages {
+      min-width: 44px;
+      padding: 10px 12px;
+      align-self: end;
+    }
     .mode-field { margin-bottom: 12px; }
     .mode-switch {
       display: inline-flex;
@@ -226,8 +237,8 @@
     .status { margin-top: 12px; min-height: 1.4em; }
     .status.error { color: var(--danger); }
     .status.success { color: var(--success); }
-    #wordsStatus, #practiceStatus { margin-top: 10px; }
-    #wordsStatus:empty, #practiceStatus:empty { display: none; }
+    #languageStatus, #wordsStatus, #practiceStatus { margin-top: 10px; }
+    #languageStatus:empty, #wordsStatus:empty, #practiceStatus:empty { display: none; }
     .summary { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; margin-bottom: 10px; }
     .word-list {
       display: grid;
@@ -243,7 +254,7 @@
       padding: 10px 11px;
       min-width: 0;
     }
-    .japanese { font-size: 1.2rem; font-weight: 700; line-height: 1.25; word-break: break-word; }
+    .lemma { font-size: 1.2rem; font-weight: 700; line-height: 1.25; word-break: break-word; }
     .reading { color: var(--muted); font-size: .85rem; word-break: break-word; }
     .meaning { font-weight: 550; font-size: .92rem; line-height: 1.3; word-break: break-word; }
     .learned { color: var(--muted); font-size: .78rem; margin-top: 4px; }
@@ -321,6 +332,7 @@
     }
     @media (max-width: 650px) {
       .row { grid-template-columns: 1fr; }
+      .lang-pair-row { grid-template-columns: 1fr auto 1fr; gap: 8px; }
       .header { flex-wrap: wrap; }
     }
     @media (max-width: 420px) {
@@ -342,10 +354,45 @@
     </div>
   </div>
 
+  <section class="card">
+    <h2 data-i18n="languagesTitle">Step 1: Choose Languages</h2>
+    <div class="lang-pair-row">
+      <div>
+        <label for="nativeLang" data-i18n="nativeLanguage">Native language</label>
+        <select id="nativeLang">
+          <option value="" data-i18n="selectLanguage">Select a language</option>
+          <option value="en" data-i18n="langEnglish">English</option>
+          <option value="ja" data-i18n="langJapanese">Japanese</option>
+        </select>
+      </div>
+      <button
+        id="swapLanguages"
+        class="swap-languages"
+        type="button"
+        data-i18n="swapLanguages"
+        data-i18n-attr="aria-label"
+        aria-label="Swap languages"
+        disabled
+      >⇄</button>
+      <div>
+        <label for="targetLang" data-i18n="targetLanguage">Target language</label>
+        <select id="targetLang">
+          <option value="" data-i18n="selectLanguage">Select a language</option>
+          <option value="en" data-i18n="langEnglish">English</option>
+          <option value="ja" data-i18n="langJapanese">Japanese</option>
+        </select>
+      </div>
+    </div>
+    <p class="help" data-i18n="languagesHelp" style="margin: 12px 0 0;">
+      Your native and target languages control which data sources are available and how practice prompts are written. They must be different.
+    </p>
+    <div id="languageStatus" class="status" role="status" aria-live="polite"></div>
+  </section>
+
   <div id="sourceSetupHost"></div>
 
-  <section class="card">
-    <h2 data-i18n="loadTitle">Step 1: Load Words</h2>
+  <section id="loadCard" class="card" hidden>
+    <h2 data-i18n="loadTitle">Step 2: Load Words</h2>
     <div class="row">
       <div>
         <label for="source" data-i18n="dataSource">Source</label>
@@ -392,7 +439,7 @@
 
   <section id="wordsCard" class="card" hidden>
     <div class="summary">
-      <h2 data-i18n="recentlyLearned">Step 2: Confirm Words</h2>
+      <h2 data-i18n="recentlyLearned">Step 3: Confirm Words</h2>
       <strong id="count"></strong>
     </div>
     <div id="words" class="word-list"></div>
@@ -405,7 +452,7 @@
 
   <section id="practiceCard" class="card" hidden>
     <div class="summary">
-      <h2 data-i18n="practiceTitle">Step 3: Practice Words</h2>
+      <h2 data-i18n="practiceTitle">Step 4: Practice Words</h2>
     </div>
     <div class="mode-field">
       <label id="practiceModeLabel" data-i18n="practiceMode">Practice mode</label>
@@ -441,8 +488,11 @@
 
   const LANG_KEY = "kanikai_lang";
   const SOURCE_KEY = "kanikai_source";
+  const NATIVE_LANG_KEY = "kanikai_native_lang";
+  const TARGET_LANG_KEY = "kanikai_target_lang";
   const PRACTICE_MODE_KEY = "kanikai_practice_mode";
   const SUPPORTED_LANGS = ["en", "ja"];
+  const LEARNING_LANGS = ["en", "ja"];
   const PRACTICE_MODES = ["speaking", "listening", "legacy"];
   const PRACTICE_TEMPLATE_KEYS = {
     speaking: "promptTemplateSpeaking",
@@ -454,18 +504,27 @@
     listening: "practiceHelpListening",
     legacy: "practiceHelpLegacy"
   };
+  const LANG_NAME_KEYS = {
+    en: "langEnglish",
+    ja: "langJapanese"
+  };
   const STRINGS = window.KaniKaiStrings;
   const KaniKai = window.KaniKai;
 
   let recentWords = [];
   let currentLang = detectLang();
+  let nativeLang = detectLearningLang(NATIVE_LANG_KEY);
+  let targetLang = detectLearningLang(TARGET_LANG_KEY);
   let practiceMode = detectPracticeMode();
 
   const $ = id => document.getElementById(id);
   const status = $("status");
+  const languageStatus = $("languageStatus");
   const wordsStatus = $("wordsStatus");
   const practiceStatus = $("practiceStatus");
   const sourceSelect = $("source");
+  const nativeLangSelect = $("nativeLang");
+  const targetLangSelect = $("targetLang");
   const sourceUIHost = KaniKai.createSourceUIHost({
     setupHost: $("sourceSetupHost"),
     panelHost: $("sourcePanelHost")
@@ -477,15 +536,49 @@
     return (navigator.language || "").toLowerCase().startsWith("ja") ? "ja" : "en";
   }
 
+  function detectLearningLang(key) {
+    const saved = localStorage.getItem(key);
+    return LEARNING_LANGS.includes(saved) ? saved : "";
+  }
+
+  function languagePairSelected() {
+    return Boolean(nativeLang && targetLang && nativeLang !== targetLang);
+  }
+
+  function languagePairConflict() {
+    return Boolean(nativeLang && targetLang && nativeLang === targetLang);
+  }
+
   function detectPracticeMode() {
     const saved = localStorage.getItem(PRACTICE_MODE_KEY);
     return PRACTICE_MODES.includes(saved) ? saved : "speaking";
   }
 
+  function languageDisplayName(code, lang = currentLang) {
+    const key = LANG_NAME_KEYS[code];
+    if (!key) return code;
+    const dict = STRINGS[lang] || STRINGS.en;
+    return dict[key] ?? STRINGS.en[key] ?? code;
+  }
+
   function t(key, vars = {}) {
-    const dict = STRINGS[currentLang] || STRINGS.en;
-    let text = dict[key] ?? STRINGS.en[key] ?? key;
-    return text.replace(/\{(\w+)\}/g, (_, name) =>
+    return formatString(
+      (STRINGS[currentLang] || STRINGS.en)[key] ?? STRINGS.en[key] ?? key,
+      vars
+    );
+  }
+
+  /** Practice prompts follow the learner's native language, not the UI chrome language. */
+  function tPrompt(key, vars = {}) {
+    const lang = LEARNING_LANGS.includes(nativeLang) ? nativeLang : currentLang;
+    return formatString(
+      (STRINGS[lang] || STRINGS.en)[key] ?? STRINGS.en[key] ?? key,
+      vars
+    );
+  }
+
+  function formatString(text, vars = {}) {
+    return String(text).replace(/\{(\w+)\}/g, (_, name) =>
       Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : `{${name}}`
     );
   }
@@ -498,6 +591,12 @@
       if (attr) el.setAttribute(attr, value);
       else el.textContent = value;
     });
+  }
+
+  function syncLanguagePairUI() {
+    if (nativeLangSelect) nativeLangSelect.value = nativeLang;
+    if (targetLangSelect) targetLangSelect.value = targetLang;
+    $("swapLanguages").disabled = !(nativeLang && targetLang);
   }
 
   function applyTranslations() {
@@ -513,6 +612,8 @@
       btn.setAttribute("aria-pressed", String(btn.getAttribute("data-lang") === currentLang));
     });
 
+    syncLanguagePairUI();
+    updateStepVisibility();
     syncPracticeModeUI();
     updatePracticeHelp();
 
@@ -552,6 +653,54 @@
     applyTranslations();
   }
 
+  function clearLoadedWords() {
+    recentWords = [];
+    $("wordsCard").hidden = true;
+    $("practiceCard").hidden = true;
+    setStatus("");
+    setStatusOn(wordsStatus, "");
+    setStatusOn(practiceStatus, "");
+  }
+
+  function setLanguagePair({ native, target }) {
+    const nextNative = normalizeLearningLang(native, nativeLang);
+    const nextTarget = normalizeLearningLang(target, targetLang);
+    if (nextNative === nativeLang && nextTarget === targetLang) return;
+
+    nativeLang = nextNative;
+    targetLang = nextTarget;
+    persistLearningLang(NATIVE_LANG_KEY, nativeLang);
+    persistLearningLang(TARGET_LANG_KEY, targetLang);
+    syncLanguagePairUI();
+    clearLoadedWords();
+    updateStepVisibility();
+    populateSourceSelect();
+    mountSelectedSourceUi();
+  }
+
+  function normalizeLearningLang(value, fallback) {
+    if (value === "") return "";
+    return LEARNING_LANGS.includes(value) ? value : fallback;
+  }
+
+  function persistLearningLang(key, value) {
+    if (value) localStorage.setItem(key, value);
+    else localStorage.removeItem(key);
+  }
+
+  function updateStepVisibility() {
+    const ready = languagePairSelected();
+    $("loadCard").hidden = !ready;
+    setStatusOn(
+      languageStatus,
+      languagePairConflict() ? t("languagesSameError") : "",
+      languagePairConflict() ? "error" : ""
+    );
+    if (!ready) {
+      sourceUIHost.deactivate();
+    }
+  }
+
   function setStatusOn(target, message, type = "") {
     target.textContent = message;
     target.className = "status " + type;
@@ -565,10 +714,19 @@
     return { t, setStatus };
   }
 
+  function currentLanguagePair() {
+    return { native: nativeLang, target: targetLang };
+  }
+
   function populateSourceSelect() {
     const previous = sourceSelect.value || localStorage.getItem(SOURCE_KEY) || "";
-    const sources = typeof KaniKai.listSources === "function" ? KaniKai.listSources() : [];
     sourceSelect.innerHTML = "";
+    if (!languagePairSelected()) return;
+
+    const sources =
+      typeof KaniKai.listSources === "function"
+        ? KaniKai.listSources(currentLanguagePair())
+        : [];
 
     for (const source of sources) {
       const option = document.createElement("option");
@@ -578,20 +736,32 @@
     }
 
     if (!sources.length) {
+      const all =
+        typeof KaniKai.listSources === "function" ? KaniKai.listSources() : [];
       const option = document.createElement("option");
       option.value = "";
-      option.textContent = t("noSourcesRegistered");
+      option.textContent = t(
+        all.length ? "noSourcesForLanguages" : "noSourcesRegistered"
+      );
       sourceSelect.appendChild(option);
       return;
     }
 
     if (previous && sources.some(s => s.id === previous)) {
       sourceSelect.value = previous;
+    } else {
+      sourceSelect.value = sources[0].id;
+      localStorage.setItem(SOURCE_KEY, sourceSelect.value);
     }
   }
 
   function mountSelectedSourceUi() {
-    const source = KaniKai.getSource(sourceSelect.value);
+    const sourceId = languagePairSelected() ? sourceSelect.value : "";
+    if (!sourceId) {
+      sourceUIHost.deactivate();
+      return;
+    }
+    const source = KaniKai.getSource(sourceId);
     const ui = sourceUIHost.activate(source, uiContext());
     applyI18n($("sourceSetupHost"));
     applyI18n($("sourcePanelHost"));
@@ -676,7 +846,22 @@
     try {
       const sourceId = sourceSelect.value;
       if (!sourceId) {
-        setStatus(t("noSourcesRegistered"), "error");
+        const all =
+          typeof KaniKai.listSources === "function" ? KaniKai.listSources() : [];
+        setStatus(
+          t(all.length ? "noSourcesForLanguages" : "noSourcesRegistered"),
+          "error"
+        );
+        return;
+      }
+
+      const source = KaniKai.getSource(sourceId);
+      if (
+        source &&
+        typeof KaniKai.sourceSupportsLanguages === "function" &&
+        !KaniKai.sourceSupportsLanguages(source, currentLanguagePair())
+      ) {
+        setStatus(t("noSourcesForLanguages"), "error");
         return;
       }
 
@@ -713,6 +898,12 @@
     return (word.alternatives && word.alternatives[0]) || "";
   }
 
+  /** Skip alternatives that only repeat the primary word (common in reversed gloss CSVs). */
+  function displayAlternative(word) {
+    const alt = primaryAlternative(word);
+    return alt && alt !== word.word ? alt : "";
+  }
+
   function renderWords() {
     setStatusOn(wordsStatus, "");
     $("count").textContent = t(
@@ -731,8 +922,8 @@
       el.className = "word";
       el.innerHTML = `
         <div>
-          <div class="japanese">${escapeHtml(word.word)}</div>
-          <div class="reading">${escapeHtml(primaryAlternative(word))}</div>
+          <div class="lemma">${escapeHtml(word.word)}</div>
+          <div class="reading">${escapeHtml(displayAlternative(word))}</div>
         </div>
         <div class="meaning">${escapeHtml((word.meanings || []).join("; "))}</div>
         <div class="learned">${escapeHtml(formatTime(word.last_seen_at))}</div>
@@ -749,17 +940,22 @@
 
   function wordListText() {
     return recentWords.map(w => {
-      const alt = primaryAlternative(w);
+      const alt = displayAlternative(w);
       const head = alt ? `${w.word}（${alt}）` : w.word;
       return `${head}— ${(w.meanings || []).join("; ")}`;
     }).join("\n");
   }
 
   function createPrompt({ scroll = true } = {}) {
-    if (!recentWords.length) return;
+    if (!recentWords.length || !languagePairSelected()) return;
 
+    const promptLang = LEARNING_LANGS.includes(nativeLang) ? nativeLang : currentLang;
     const templateKey = PRACTICE_TEMPLATE_KEYS[practiceMode] || PRACTICE_TEMPLATE_KEYS.speaking;
-    $("prompt").value = t(templateKey, { list: wordListText() });
+    $("prompt").value = tPrompt(templateKey, {
+      list: wordListText(),
+      targetLanguage: languageDisplayName(targetLang, promptLang),
+      nativeLanguage: languageDisplayName(nativeLang, promptLang)
+    });
     setStatusOn(practiceStatus, "");
     updatePracticeHelp();
     syncPracticeModeUI();
@@ -780,6 +976,17 @@
 
   document.querySelectorAll(".lang-switch [data-lang]").forEach(btn => {
     btn.addEventListener("click", () => setLang(btn.getAttribute("data-lang")));
+  });
+
+  nativeLangSelect.addEventListener("change", () => {
+    setLanguagePair({ native: nativeLangSelect.value, target: targetLang });
+  });
+  targetLangSelect.addEventListener("change", () => {
+    setLanguagePair({ native: nativeLang, target: targetLangSelect.value });
+  });
+  $("swapLanguages").addEventListener("click", () => {
+    if (!nativeLang || !targetLang) return;
+    setLanguagePair({ native: targetLang, target: nativeLang });
   });
 
   sourceSelect.addEventListener("change", () => {
@@ -822,6 +1029,8 @@
     });
   }
 
+  syncLanguagePairUI();
+  updateStepVisibility();
   applyTranslations();
 })();
 </script>

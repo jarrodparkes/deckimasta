@@ -2,7 +2,7 @@ window.KaniKaiStrings = {
   en: {
     title: "KaniKai",
     subtitle: "Turn recently learned vocabulary into words you actually use.",
-    langGroup: "Language",
+    langGroup: "Interface language",
     connectTitle: "Connect WaniKani",
     tokenSavedCompact: "Token saved on this device.",
     manageToken: "Manage token",
@@ -16,7 +16,17 @@ window.KaniKaiStrings = {
     tokenFaqSummary: "Where do I get my token?",
     tokenFaqBody:
       "In WaniKani, open your account settings and find the API Tokens section. Create a token with read access. This app only needs read access to your assignments and subjects.",
-    loadTitle: "Step 1: Load Words",
+    languagesTitle: "Step 1: Choose Languages",
+    nativeLanguage: "Native language",
+    targetLanguage: "Target language",
+    selectLanguage: "Select a language",
+    langEnglish: "English",
+    langJapanese: "Japanese",
+    swapLanguages: "Swap native and target languages",
+    languagesHelp:
+      "Your native and target languages control which data sources are available and how practice prompts are written. They must be different.",
+    languagesSameError: "Native and target languages must be different.",
+    loadTitle: "Step 2: Load Words",
     dataSource: "Source",
     lookBack: "Recency",
     range24: "Last 24 hours",
@@ -32,6 +42,8 @@ window.KaniKaiStrings = {
       "Leave the limit blank to keep every match. Randomize shuffles before applying the limit.",
     loadHelpAria: "About Limit",
     noSourcesRegistered: "No data sources are registered.",
+    noSourcesForLanguages:
+      "No data sources support this native and target language pair.",
     csvFormatIntro: "Paste headerless CSV-like rows. Required columns:",
     csvFormatOptional: "Optional columns:",
     csvFormatRules:
@@ -47,10 +59,10 @@ window.KaniKaiStrings = {
     csvChooseFile: "Choose file",
     csvNoFileChosen: "No file chosen",
     csvFileEmpty: "Choose a CSV file to upload first.",
-    recentlyLearned: "Step 2: Confirm Words",
+    recentlyLearned: "Step 3: Confirm Words",
     createPractice: "Create conversation practice",
     copyWordList: "Copy word list",
-    practiceTitle: "Step 3: Practice Words",
+    practiceTitle: "Step 4: Practice Words",
     practiceMode: "Practice mode",
     modeSpeaking: "Speaking",
     modeListening: "Listening",
@@ -70,8 +82,8 @@ window.KaniKaiStrings = {
       "WaniKani rejected the token. Check that it is correct and has read access.",
     apiError: "WaniKani API error ({status}).",
     enterTokenFirst: "Enter and save your WaniKani API token first.",
-    loading: "Loading your recent lessons…",
-    noVocabulary: "No vocabulary lessons found in that time range.",
+    loading: "Loading your recent vocabulary...",
+    noVocabulary: "No vocabulary found in that time range.",
     foundWords: "Found {count} vocabulary word.",
     foundWordsPlural: "Found {count} vocabulary words.",
     foundWordsFiltered: "Found {count} vocabulary words ({details}).",
@@ -84,11 +96,11 @@ window.KaniKaiStrings = {
     promptCopied: "Prompt copied.",
     clipboardFailed:
       "Clipboard access failed. You can select and copy the text manually.",
-    promptTemplateSpeaking: `I'm studying Japanese and I just learned these vocabulary words:
+    promptTemplateSpeaking: `I'm studying {targetLanguage} and I just learned these vocabulary words:
 
 {list}
 
-Help me practice speaking about these words in natural Japanese conversation.
+Help me practice speaking about these words in natural {targetLanguage} conversation.
 
 Please follow these rules:
 - Wait for me to ask questions about the words. Do not start by quizzing me.
@@ -99,16 +111,16 @@ Please follow these rules:
 - Prefer everyday situations rather than artificial example sentences.
 - When I make a mistake, briefly correct it and then continue the conversation.
 - Keep explanations concise unless I ask for more detail.
-- Speak primarily in Japanese, using English only when necessary.
+- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
 - Begin by briefly acknowledging the word list and inviting me to ask my first question.`,
-    promptTemplateListening: `I'm studying Japanese and I just learned these vocabulary words:
+    promptTemplateListening: `I'm studying {targetLanguage} and I just learned these vocabulary words:
 
 {list}
 
 Help me practice listening comprehension with these words.
 
 Please follow these rules:
-- Use the target words naturally in Japanese as you speak.
+- Use the target words naturally in {targetLanguage} as you speak.
 - Ask me questions about the words (meaning, usage, nuance, or context) so I demonstrate that I understand them.
 - Have a real exchange with me, one turn at a time.
 - Start at an advanced-beginner/intermediate level, but adjust to my ability.
@@ -116,13 +128,13 @@ Please follow these rules:
 - Don't force a vocabulary word into every sentence. Let the conversation feel natural.
 - When I make a mistake, briefly correct it and then continue.
 - Keep explanations concise unless I ask for more detail.
-- Speak primarily in Japanese, using English only when necessary.
+- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
 - Start by asking me your first question about one of the words now.`,
-    promptTemplateLegacy: `I'm studying Japanese and I just learned these vocabulary words:
+    promptTemplateLegacy: `I'm studying {targetLanguage} and I just learned these vocabulary words:
 
 {list}
 
-Help me actively use these words in natural Japanese conversation.
+Help me actively use these words in natural {targetLanguage} conversation.
 
 Please follow these rules:
 - Have a real conversation with me, one turn at a time.
@@ -134,13 +146,13 @@ Please follow these rules:
 - If I use one of the target words correctly, keep the conversation going rather than stopping to praise me.
 - Occasionally challenge me to use a specific target word if I haven't used it yet.
 - Keep explanations concise unless I ask for more detail.
-- Speak primarily in Japanese, using English only when necessary.
+- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
 - Start by asking me your first question now.`,
   },
   ja: {
     title: "KaniKai",
     subtitle: "最近覚えた単語を、実際に使える言葉に変えましょう。",
-    langGroup: "言語",
+    langGroup: "表示言語",
     connectTitle: "WaniKaniに接続",
     tokenSavedCompact: "トークンはこの端末に保存されています。",
     manageToken: "トークンを管理",
@@ -154,7 +166,17 @@ Please follow these rules:
     tokenFaqSummary: "トークンの取得方法は？",
     tokenFaqBody:
       "WaniKaniのアカウント設定を開き、API Tokensのセクションを見つけてください。読み取り権限のあるトークンを作成します。このアプリには課題と科目への読み取りアクセスだけが必要です。",
-    loadTitle: "ステップ1: 単語を読み込む",
+    languagesTitle: "ステップ1: 言語を選ぶ",
+    nativeLanguage: "母語",
+    targetLanguage: "学習言語",
+    selectLanguage: "言語を選択",
+    langEnglish: "英語",
+    langJapanese: "日本語",
+    swapLanguages: "母語と学習言語を入れ替える",
+    languagesHelp:
+      "母語と学習言語により、使えるデータソースと練習プロンプトの内容が決まります。同じ言語は選べません。",
+    languagesSameError: "母語と学習言語は別の言語にしてください。",
+    loadTitle: "ステップ2: 単語を読み込む",
     dataSource: "ソース",
     lookBack: "直近",
     range24: "過去24時間",
@@ -170,6 +192,8 @@ Please follow these rules:
       "件数を空欄にすると、該当するすべてを表示します。ランダムをオンにすると、制限を適用する前にシャッフルします。",
     loadHelpAria: "件数について",
     noSourcesRegistered: "登録されたデータソースがありません。",
+    noSourcesForLanguages:
+      "この母語と学習言語の組み合わせに対応するデータソースはありません。",
     csvFormatIntro: "ヘッダーなしのCSV風の行を貼り付けてください。必須列：",
     csvFormatOptional: "任意列：",
     csvFormatRules:
@@ -185,10 +209,10 @@ Please follow these rules:
     csvChooseFile: "ファイルを選択",
     csvNoFileChosen: "選択されていません",
     csvFileEmpty: "先にCSVファイルを選んでください。",
-    recentlyLearned: "ステップ2: 単語を確認",
+    recentlyLearned: "ステップ3: 単語を確認",
     createPractice: "会話練習を作成",
     copyWordList: "単語リストをコピー",
-    practiceTitle: "ステップ3: 単語を練習",
+    practiceTitle: "ステップ4: 単語を練習",
     practiceMode: "練習モード",
     modeSpeaking: "スピーキング",
     modeListening: "リスニング",
@@ -208,8 +232,8 @@ Please follow these rules:
       "WaniKaniがトークンを拒否しました。正しいトークンか、読み取り権限があるか確認してください。",
     apiError: "WaniKani APIエラー（{status}）。",
     enterTokenFirst: "先にWaniKani APIトークンを入力して保存してください。",
-    loading: "最近のレッスンを読み込み中…",
-    noVocabulary: "その期間に該当する単語のレッスンが見つかりませんでした。",
+    loading: "最近の単語を読み込み中…",
+    noVocabulary: "その期間に該当する単語が見つかりませんでした。",
     foundWords: "{count}語の単語が見つかりました。",
     foundWordsPlural: "{count}語の単語が見つかりました。",
     foundWordsFiltered: "{count}語の単語が見つかりました（{details}）。",
@@ -222,11 +246,11 @@ Please follow these rules:
     promptCopied: "プロンプトをコピーしました。",
     clipboardFailed:
       "クリップボードへのアクセスに失敗しました。手動で選択してコピーしてください。",
-    promptTemplateSpeaking: `日本語を勉強していて、次の単語を覚えたところです：
+    promptTemplateSpeaking: `{targetLanguage}を勉強していて、次の単語を覚えたところです：
 
 {list}
 
-これらの単語について、自然な日本語の会話でスピーキング練習できるよう手伝ってください。
+これらの単語について、自然な{targetLanguage}の会話でスピーキング練習できるよう手伝ってください。
 
 次のルールに従ってください：
 - 私が単語について質問するのを待ってください。いきなりクイズを始めないでください。
@@ -237,16 +261,16 @@ Please follow these rules:
 - 作り物の例文より、日常的な場面を優先してください。
 - 間違えたら簡潔に訂正し、そのまま会話を続けてください。
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
-- 主に日本語で話し、必要なときだけ英語を使ってください。
+- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
 - まず単語リストを短く確認し、最初の質問をするよう促して始めてください。`,
-    promptTemplateListening: `日本語を勉強していて、次の単語を覚えたところです：
+    promptTemplateListening: `{targetLanguage}を勉強していて、次の単語を覚えたところです：
 
 {list}
 
 これらの単語でリスニング理解の練習ができるよう手伝ってください。
 
 次のルールに従ってください：
-- 話すとき、目標の単語を自然な日本語の中で使ってください。
+- 話すとき、目標の単語を自然な{targetLanguage}の中で使ってください。
 - 単語の意味・使い方・ニュアンス・文脈などについて質問し、理解できているか確認してください。
 - 一度に一往復ずつ、実際のやり取りをしてください。
 - 初級後半〜中級レベルから始め、私の実力に合わせて調整してください。
@@ -254,13 +278,13 @@ Please follow these rules:
 - すべての文に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
 - 間違えたら簡潔に訂正し、そのまま続けてください。
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
-- 主に日本語で話し、必要なときだけ英語を使ってください。
+- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
 - 今すぐ、単語の一つについての最初の質問をして始めてください。`,
-    promptTemplateLegacy: `日本語を勉強していて、次の単語を覚えたところです：
+    promptTemplateLegacy: `{targetLanguage}を勉強していて、次の単語を覚えたところです：
 
 {list}
 
-これらの単語を自然な日本語の会話の中で積極的に使えるよう手伝ってください。
+これらの単語を自然な{targetLanguage}の会話の中で積極的に使えるよう手伝ってください。
 
 次のルールに従ってください：
 - 一度に一往復ずつ、実際の会話をしてください。
@@ -272,7 +296,7 @@ Please follow these rules:
 - 目標の単語を正しく使えたら、褒めて止まらずに会話を続けてください。
 - まだ使っていない目標の単語があれば、ときどきそれを使うよう促してください。
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
-- 主に日本語で話し、必要なときだけ英語を使ってください。
+- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
 - 今すぐ最初の質問をして始めてください。`,
   },
 };

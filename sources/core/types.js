@@ -179,6 +179,7 @@
 
   /**
    * Minimal structural check for the WordSource interface.
+   * Optional: supportsLanguages({ native, target }) => boolean
    * @param {object} source
    * @returns {boolean}
    */
@@ -189,7 +190,9 @@
         source.id &&
         typeof source.label === "string" &&
         typeof source.requiresAuth === "boolean" &&
-        typeof source.load === "function"
+        typeof source.load === "function" &&
+        (source.supportsLanguages == null ||
+          typeof source.supportsLanguages === "function")
     );
   }
 

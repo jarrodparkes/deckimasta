@@ -306,6 +306,9 @@
     requiresAuth: true,
     tokenKey: TOKEN_KEY,
     getToken: getStoredToken,
+    supportsLanguages({ native, target }) {
+      return native === "en" && target === "ja";
+    },
     createUI,
     load,
   });

@@ -170,8 +170,11 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
  * @property {boolean} requiresAuth // whether the source needs credentials
  * @property {(options?: object) => Promise<Word[]>} load
  * @property {(ctx: { t: Function, setStatus: Function }) => object} [createUI]
+ * @property {(pair: { native: string, target: string }) => boolean} [supportsLanguages]
  */
 ```
+
+`supportsLanguages({ native, target })` is optional. When present, the source only appears in the Step 2 picker for pairs that return `true`. When omitted, the source is treated as universal (any native/target pair).
 
 `load(options)` should:
 
@@ -200,24 +203,26 @@ The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filte
 
 ### `window.KaniKai` API
 
-| Helper                                              | Role                                                          |
-| --------------------------------------------------- | ------------------------------------------------------------- |
-| `PARTS_OF_SPEECH`                                   | Frozen preferred POS enum (language-agnostic)                 |
-| `PARTS_OF_SPEECH_ALIASES`                           | Map of source/legacy tags → preferred enum                    |
-| `isKnownPartOfSpeech(tag)`                          | Whether a tag is in the preferred enum                        |
-| `canonicalizePartOfSpeech(tag)`                     | Apply alias collapse for one tag                              |
-| `normalizePartsOfSpeech(tags)`                      | Trim, alias-collapse, dedupe; unknown tags kept               |
-| `createWord(partial)`                               | Normalize a Word; generate `id` if missing; mirror timestamps |
-| `createLoadOptions(partial)`                        | Normalize `{ since, limit, randomize }`                       |
-| `matchWords(words, options)`                        | Look-back filter + sort (no shuffle/limit)                    |
-| `applyLoadOptions(words, options)`                  | Shared look-back → sort → shuffle → limit                     |
-| `applyLoadOptionsWithMeta(words, options)`          | Same, plus `totalMatched` before limit                        |
-| `loadFromSource(sourceId, options)`                 | Registry lookup → `source.load` → apply shared options        |
-| `parseWordCsv(text)`                                | Parse CSV-like paste/file text into Word[]                    |
-| `createSourceUIHost({ setupHost, panelHost })`      | Mount/teardown adapter `createUI` into page slots             |
-| `isWordSource(source)`                              | Structural check for the source interface                     |
-| `registerSource(source)`                            | Add a source to the registry                                  |
-| `getSource(id)` / `listSources()` / `hasSource(id)` | Registry lookup                                               |
+| Helper                                                | Role                                                          |
+| ----------------------------------------------------- | ------------------------------------------------------------- |
+| `PARTS_OF_SPEECH`                                     | Frozen preferred POS enum (language-agnostic)                 |
+| `PARTS_OF_SPEECH_ALIASES`                             | Map of source/legacy tags → preferred enum                    |
+| `isKnownPartOfSpeech(tag)`                            | Whether a tag is in the preferred enum                        |
+| `canonicalizePartOfSpeech(tag)`                       | Apply alias collapse for one tag                              |
+| `normalizePartsOfSpeech(tags)`                        | Trim, alias-collapse, dedupe; unknown tags kept               |
+| `createWord(partial)`                                 | Normalize a Word; generate `id` if missing; mirror timestamps |
+| `createLoadOptions(partial)`                          | Normalize `{ since, limit, randomize }`                       |
+| `matchWords(words, options)`                          | Look-back filter + sort (no shuffle/limit)                    |
+| `applyLoadOptions(words, options)`                    | Shared look-back → sort → shuffle → limit                     |
+| `applyLoadOptionsWithMeta(words, options)`            | Same, plus `totalMatched` before limit                        |
+| `loadFromSource(sourceId, options)`                   | Registry lookup → `source.load` → apply shared options        |
+| `parseWordCsv(text)`                                  | Parse CSV-like paste/file text into Word[]                    |
+| `createSourceUIHost({ setupHost, panelHost })`        | Mount/teardown adapter `createUI` into page slots             |
+| `isWordSource(source)`                                | Structural check for the source interface                     |
+| `registerSource(source)`                              | Add a source to the registry                                  |
+| `getSource(id)` / `hasSource(id)`                     | Registry lookup                                               |
+| `listSources({ native, target }?)`                    | All sources, or only those supporting the language pair       |
+| `sourceSupportsLanguages(source, { native, target })` | Whether a source accepts the given pair                       |
 
 ## File Layout
 
@@ -272,6 +277,11 @@ Include scripts before the main app (order matters: core, then adapters):
     id: "example-csv",
     label: "Example CSV",
     requiresAuth: false,
+    // Optional: limit which Step 1 language pairs show this source.
+    // Omit to support every native/target combination.
+    // supportsLanguages({ native, target }) {
+    //   return native === "en" && target === "ja";
+    // },
 
     async load(/* options */) {
       const rows = []; // parse file / fetch remote CSV / etc.
@@ -303,5 +313,6 @@ Words are loaded only through registered adapters under `sources/adapters/` via 
 - [ ] `created_at` and `last_seen_at` always ISO strings (duplicated when only one timestamp exists)
 - [ ] `parts_of_speech` mapped to the shared language-agnostic enum when possible (or left for `normalizePartsOfSpeech` aliases)
 - [ ] Credentials handled only inside the source
+- [ ] `supportsLanguages({ native, target })` declared when the source only fits certain language pairs (omit for universal)
 - [ ] Works with and without the shared `since` look-back filter
 - [ ] Registered for one-at-a-time selection in the UI

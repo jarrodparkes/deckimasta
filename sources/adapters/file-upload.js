@@ -99,6 +99,7 @@
     id: "file-upload",
     label: "CSV File",
     requiresAuth: false,
+    // Works for any native/target pair (omit supportsLanguages = universal).
     createUI,
 
     /**
