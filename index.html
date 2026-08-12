@@ -183,6 +183,46 @@
         <button type="button" data-mode="legacy" data-i18n="modeLegacy" aria-pressed="false">Legacy</button>
       </div>
     </div>
+    <div class="practice-options">
+      <div>
+        <label for="cefrLevel" class="label-with-help">
+          <span data-i18n="cefrLevel">Difficulty (CEFR)</span>
+          <button
+            type="button"
+            class="help-tip"
+            id="cefrHelpTip"
+            data-i18n="cefrHelpAria"
+            data-i18n-attr="aria-label"
+            aria-label="About CEFR levels"
+            aria-describedby="cefrHelp"
+            aria-expanded="false"
+          >?</button>
+          <span id="cefrHelp" role="tooltip" class="help-tooltip help-tooltip-wide" data-i18n="cefrTooltip">CEFR Scale (Global Standard)
+A1 (Beginner): Uses basic phrases and everyday expressions; can introduce themselves and ask simple questions.
+A2 (Elementary): Understands direct sentences on familiar, routine topics and immediate needs.
+B1 (Intermediate): Handles most travel or everyday situations; links simple sentences to describe experiences.
+B2 (Upper-Intermediate): Interacts with native speakers fluently and naturally; understands complex technical or abstract texts.
+C1 (Advanced): Expresses ideas smoothly and implicitly; uses the language effectively for social, academic, or professional work.
+C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning precisely and spontaneously.</span>
+        </label>
+        <select id="cefrLevel">
+          <option value="A1" data-i18n="cefrA1">A1 (Beginner)</option>
+          <option value="A2" data-i18n="cefrA2">A2 (Elementary)</option>
+          <option value="B1" data-i18n="cefrB1" selected>B1 (Intermediate)</option>
+          <option value="B2" data-i18n="cefrB2">B2 (Upper-Intermediate)</option>
+          <option value="C1" data-i18n="cefrC1">C1 (Advanced)</option>
+          <option value="C2" data-i18n="cefrC2">C2 (Proficient)</option>
+        </select>
+      </div>
+      <div class="checkbox-field">
+        <input id="correctPronunciation" type="checkbox" checked>
+        <label for="correctPronunciation" data-i18n="correctPronunciation">Correct pronunciation</label>
+      </div>
+      <div class="checkbox-field">
+        <input id="correctGrammar" type="checkbox" checked>
+        <label for="correctGrammar" data-i18n="correctGrammar">Correct grammar</label>
+      </div>
+    </div>
     <p class="help" id="practiceHelp">Copy this into ChatGPT. The AI waits for your questions and can suggest starter words one at a time.</p>
     <textarea id="prompt" readonly></textarea>
     <div class="actions">
@@ -212,12 +252,32 @@
   const NATIVE_LANG_KEY = "kanikai_native_lang";
   const TARGET_LANG_KEY = "kanikai_target_lang";
   const PRACTICE_MODE_KEY = "kanikai_practice_mode";
+  const CEFR_LEVEL_KEY = "kanikai_cefr_level";
+  const CORRECT_PRONUNCIATION_KEY = "kanikai_correct_pronunciation";
+  const CORRECT_GRAMMAR_KEY = "kanikai_correct_grammar";
   /** Keep in sync with the pre-paint theme script in <head>. */
   const THEME_KEY = "kanikai_theme";
   const THEMES = ["system", "light", "dark"];
   const SUPPORTED_LANGS = ["en", "ja"];
   const LEARNING_LANGS = ["en", "ja"];
   const PRACTICE_MODES = ["speaking", "listening", "legacy"];
+  const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
+  const CEFR_LABEL_KEYS = {
+    A1: "cefrA1",
+    A2: "cefrA2",
+    B1: "cefrB1",
+    B2: "cefrB2",
+    C1: "cefrC1",
+    C2: "cefrC2"
+  };
+  const CEFR_DESC_KEYS = {
+    A1: "cefrDescA1",
+    A2: "cefrDescA2",
+    B1: "cefrDescB1",
+    B2: "cefrDescB2",
+    C1: "cefrDescC1",
+    C2: "cefrDescC2"
+  };
   const PRACTICE_TEMPLATE_KEYS = {
     speaking: "promptTemplateSpeaking",
     listening: "promptTemplateListening",
@@ -243,6 +303,9 @@
   let nativeLang = detectLearningLang(NATIVE_LANG_KEY);
   let targetLang = detectLearningLang(TARGET_LANG_KEY);
   let practiceMode = detectPracticeMode();
+  let cefrLevel = detectCefrLevel();
+  let correctPronunciation = detectBoolPref(CORRECT_PRONUNCIATION_KEY, true);
+  let correctGrammar = detectBoolPref(CORRECT_GRAMMAR_KEY, true);
 
   const $ = id => document.getElementById(id);
   const status = $("status");
@@ -279,6 +342,18 @@
   function detectPracticeMode() {
     const saved = localStorage.getItem(PRACTICE_MODE_KEY);
     return PRACTICE_MODES.includes(saved) ? saved : "speaking";
+  }
+
+  function detectCefrLevel() {
+    const saved = localStorage.getItem(CEFR_LEVEL_KEY);
+    return CEFR_LEVELS.includes(saved) ? saved : "B1";
+  }
+
+  function detectBoolPref(key, fallback) {
+    const saved = localStorage.getItem(key);
+    if (saved === "true") return true;
+    if (saved === "false") return false;
+    return fallback;
   }
 
   function detectTheme() {
@@ -376,6 +451,7 @@
     syncLanguagePairUI();
     updateStepVisibility();
     syncPracticeModeUI();
+    syncPracticeOptionsUI();
     updatePracticeHelp();
 
     populateSourceSelect();
@@ -392,6 +468,15 @@
     });
   }
 
+  function syncPracticeOptionsUI() {
+    const cefrSelect = $("cefrLevel");
+    if (cefrSelect) cefrSelect.value = cefrLevel;
+    const pronunciation = $("correctPronunciation");
+    if (pronunciation) pronunciation.checked = correctPronunciation;
+    const grammar = $("correctGrammar");
+    if (grammar) grammar.checked = correctGrammar;
+  }
+
   function updatePracticeHelp() {
     $("practiceHelp").textContent = t(PRACTICE_HELP_KEYS[practiceMode]);
   }
@@ -405,6 +490,53 @@
     if (!$("practiceCard").hidden && recentWords.length) {
       createPrompt({ scroll: false });
     }
+  }
+
+  function refreshPracticePrompt() {
+    if (!$("practiceCard").hidden && recentWords.length) {
+      createPrompt({ scroll: false });
+    }
+  }
+
+  function setCefrLevel(level) {
+    if (!CEFR_LEVELS.includes(level) || level === cefrLevel) return;
+    cefrLevel = level;
+    localStorage.setItem(CEFR_LEVEL_KEY, level);
+    syncPracticeOptionsUI();
+    refreshPracticePrompt();
+  }
+
+  function setCorrectPronunciation(value) {
+    const next = Boolean(value);
+    if (next === correctPronunciation) return;
+    correctPronunciation = next;
+    localStorage.setItem(CORRECT_PRONUNCIATION_KEY, String(next));
+    syncPracticeOptionsUI();
+    refreshPracticePrompt();
+  }
+
+  function setCorrectGrammar(value) {
+    const next = Boolean(value);
+    if (next === correctGrammar) return;
+    correctGrammar = next;
+    localStorage.setItem(CORRECT_GRAMMAR_KEY, String(next));
+    syncPracticeOptionsUI();
+    refreshPracticePrompt();
+  }
+
+  function buildDifficultyRule() {
+    const level = CEFR_LEVELS.includes(cefrLevel) ? cefrLevel : "B1";
+    return tPrompt("difficultyRule", {
+      cefrLevel: tPrompt(CEFR_LABEL_KEYS[level]),
+      description: tPrompt(CEFR_DESC_KEYS[level])
+    });
+  }
+
+  function buildCorrectionRule() {
+    if (correctPronunciation && correctGrammar) return tPrompt("correctionBoth");
+    if (correctPronunciation) return tPrompt("correctionPronunciationOnly");
+    if (correctGrammar) return tPrompt("correctionGrammarOnly");
+    return tPrompt("correctionNeither");
   }
 
   function setLang(lang) {
@@ -715,11 +847,14 @@
     $("prompt").value = tPrompt(templateKey, {
       list: wordListText(),
       targetLanguage: languageDisplayName(targetLang, promptLang),
-      nativeLanguage: languageDisplayName(nativeLang, promptLang)
+      nativeLanguage: languageDisplayName(nativeLang, promptLang),
+      difficultyRule: buildDifficultyRule(),
+      correctionRule: buildCorrectionRule()
     });
     setStatusOn(practiceStatus, "");
     updatePracticeHelp();
     syncPracticeModeUI();
+    syncPracticeOptionsUI();
     $("practiceCard").hidden = false;
     if (scroll) {
       $("practiceCard").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -769,6 +904,14 @@
     btn.addEventListener("click", () => setPracticeMode(btn.getAttribute("data-mode")));
   });
 
+  $("cefrLevel").addEventListener("change", () => setCefrLevel($("cefrLevel").value));
+  $("correctPronunciation").addEventListener("change", () => {
+    setCorrectPronunciation($("correctPronunciation").checked);
+  });
+  $("correctGrammar").addEventListener("change", () => {
+    setCorrectGrammar($("correctGrammar").checked);
+  });
+
   $("copyWords").addEventListener("click", () => {
     if (recentWords.length) copyText(wordListText(), t("wordListCopied"), wordsStatus);
   });
@@ -781,25 +924,30 @@
     window.open("https://chatgpt.com/", "_blank", "noopener,noreferrer");
   });
 
-  const limitHelpTip = $("limitHelpTip");
-  if (limitHelpTip) {
-    limitHelpTip.addEventListener("click", event => {
+  function bindHelpTip(tipId, tooltipId) {
+    const tip = $(tipId);
+    if (!tip) return;
+    tip.addEventListener("click", event => {
       event.preventDefault();
-      const open = limitHelpTip.getAttribute("aria-expanded") !== "true";
-      limitHelpTip.setAttribute("aria-expanded", String(open));
+      const open = tip.getAttribute("aria-expanded") !== "true";
+      tip.setAttribute("aria-expanded", String(open));
     });
     document.addEventListener("click", event => {
-      if (!limitHelpTip.contains(event.target) && !$("limitHelp")?.contains(event.target)) {
-        limitHelpTip.setAttribute("aria-expanded", "false");
+      if (!tip.contains(event.target) && !$(tooltipId)?.contains(event.target)) {
+        tip.setAttribute("aria-expanded", "false");
       }
     });
     document.addEventListener("keydown", event => {
-      if (event.key === "Escape") limitHelpTip.setAttribute("aria-expanded", "false");
+      if (event.key === "Escape") tip.setAttribute("aria-expanded", "false");
     });
   }
 
+  bindHelpTip("limitHelpTip", "limitHelp");
+  bindHelpTip("cefrHelpTip", "cefrHelp");
+
   applyTheme();
   syncLanguagePairUI();
+  syncPracticeOptionsUI();
   updateStepVisibility();
   applyTranslations();
 })();

@@ -186,6 +186,19 @@ h2 {
 .mode-field {
   margin-bottom: 12px;
 }
+.practice-options {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1.2fr) auto auto;
+  gap: 14px;
+  align-items: end;
+  margin-bottom: 12px;
+}
+@media (max-width: 720px) {
+  .practice-options {
+    grid-template-columns: 1fr;
+    align-items: stretch;
+  }
+}
 .mode-switch {
   display: inline-flex;
   flex-wrap: wrap;
@@ -412,6 +425,7 @@ button.help-tip:focus-visible {
   text-transform: none;
   letter-spacing: normal;
   line-height: 1.4;
+  white-space: pre-line;
   box-shadow: var(--shadow-raised);
   pointer-events: none;
   opacity: 0;
@@ -419,6 +433,9 @@ button.help-tip:focus-visible {
   transition:
     opacity 0.12s ease,
     visibility 0.12s ease;
+}
+.help-tooltip-wide {
+  width: min(420px, 85vw);
 }
 .label-with-help:hover .help-tooltip,
 .label-with-help:focus-within .help-tooltip,

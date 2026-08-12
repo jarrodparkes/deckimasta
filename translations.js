@@ -71,6 +71,40 @@ window.KaniKaiStrings = {
     modeSpeaking: "Speaking",
     modeListening: "Listening",
     modeLegacy: "Legacy",
+    cefrLevel: "Difficulty (CEFR)",
+    cefrHelpAria: "About CEFR levels",
+    cefrTooltip:
+      "CEFR Scale (Global Standard)\n\nA1 (Beginner): Uses basic phrases and everyday expressions; can introduce themselves and ask simple questions.\n\nA2 (Elementary): Understands direct sentences on familiar, routine topics and immediate needs.\n\nB1 (Intermediate): Handles most travel or everyday situations; links simple sentences to describe experiences.\n\nB2 (Upper-Intermediate): Interacts with native speakers fluently and naturally; understands complex technical or abstract texts.\n\nC1 (Advanced): Expresses ideas smoothly and implicitly; uses the language effectively for social, academic, or professional work.\n\nC2 (Proficient): Understands everything with ease; fine-tunes shades of meaning precisely and spontaneously.",
+    cefrA1: "A1 (Beginner)",
+    cefrA2: "A2 (Elementary)",
+    cefrB1: "B1 (Intermediate)",
+    cefrB2: "B2 (Upper-Intermediate)",
+    cefrC1: "C1 (Advanced)",
+    cefrC2: "C2 (Proficient)",
+    correctPronunciation: "Correct pronunciation",
+    correctGrammar: "Correct grammar",
+    difficultyRule:
+      "Start at CEFR {cefrLevel}. {description} Adjust to my ability if this is too difficult or too easy.",
+    cefrDescA1:
+      "Use basic phrases and everyday expressions; keep exchanges simple enough for introductions and simple questions.",
+    cefrDescA2:
+      "Use direct sentences on familiar, routine topics and immediate needs.",
+    cefrDescB1:
+      "Handle everyday or travel-like situations, and link simple sentences to describe experiences.",
+    cefrDescB2:
+      "Interact fluently and naturally, including more complex or abstract topics when they come up.",
+    cefrDescC1:
+      "Express ideas smoothly and with nuance, suitable for social, academic, or professional conversation.",
+    cefrDescC2:
+      "Speak with near-native precision, including fine shades of meaning.",
+    correctionBoth:
+      "When I make a pronunciation or grammar mistake, briefly correct it and then continue the conversation.",
+    correctionPronunciationOnly:
+      "Correct my pronunciation briefly when needed, then continue. Do not correct my grammar unless I ask.",
+    correctionGrammarOnly:
+      "Correct my grammar briefly when needed, then continue. Do not correct my pronunciation unless I ask.",
+    correctionNeither:
+      "Do not correct my pronunciation or grammar unless I ask.",
     practiceHelpSpeaking:
       "Copy this into ChatGPT. The AI waits for your questions and can suggest starter words one at a time.",
     practiceHelpListening:
@@ -111,9 +145,9 @@ Please follow these rules:
 - Answer my questions clearly and keep the conversation going one turn at a time.
 - When I am ready to speak, or when I ask what to practice, introduce one target word at a time as a conversation starter and invite me to begin using it.
 - After I use a suggested word, you may offer the next unused target word one by one.
-- Start at an advanced-beginner/intermediate level, but adjust to my ability.
+- {difficultyRule}
 - Prefer everyday situations rather than artificial example sentences.
-- When I make a mistake, briefly correct it and then continue the conversation.
+- {correctionRule}
 - Keep explanations concise unless I ask for more detail.
 - Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
 - Begin by briefly acknowledging the word list and inviting me to ask my first question.`,
@@ -127,10 +161,10 @@ Please follow these rules:
 - Use the target words naturally in {targetLanguage} as you speak.
 - Ask me questions about the words (meaning, usage, nuance, or context) so I demonstrate that I understand them.
 - Have a real exchange with me, one turn at a time.
-- Start at an advanced-beginner/intermediate level, but adjust to my ability.
+- {difficultyRule}
 - Prefer everyday situations rather than artificial example sentences.
 - Don't force a vocabulary word into every sentence. Let the conversation feel natural.
-- When I make a mistake, briefly correct it and then continue.
+- {correctionRule}
 - Keep explanations concise unless I ask for more detail.
 - Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
 - Start by asking me your first question about one of the words now.`,
@@ -143,10 +177,10 @@ Help me actively use these words in natural {targetLanguage} conversation.
 Please follow these rules:
 - Have a real conversation with me, one turn at a time.
 - Ask me questions that naturally encourage me to use the vocabulary above.
-- Start at an advanced-beginner/intermediate level, but adjust to my ability.
+- {difficultyRule}
 - Prefer everyday situations rather than artificial example sentences.
 - Don't force a vocabulary word into every question. Let the conversation feel natural.
-- When I make a mistake, briefly correct it and then continue the conversation.
+- {correctionRule}
 - If I use one of the target words correctly, keep the conversation going rather than stopping to praise me.
 - Occasionally challenge me to use a specific target word if I haven't used it yet.
 - Keep explanations concise unless I ask for more detail.
@@ -225,6 +259,40 @@ Please follow these rules:
     modeSpeaking: "スピーキング",
     modeListening: "リスニング",
     modeLegacy: "レガシー",
+    cefrLevel: "難易度（CEFR）",
+    cefrHelpAria: "CEFRレベルについて",
+    cefrTooltip:
+      "CEFRスケール（国際標準）\n\nA1（初級）：基本的な言い回しや日常表現が使え、自己紹介や簡単な質問ができる。\n\nA2（初級上）：慣れ親しんだ日常的な話題や当面の用件について、直接的な文が理解できる。\n\nB1（中級）：旅行や日常のほとんどの場面に対応でき、経験を簡単な文をつなげて説明できる。\n\nB2（中級上）：ネイティブと流暢かつ自然にやり取りでき、複雑・抽象的な内容も理解できる。\n\nC1（上級）：考えを滑らかに・含みをもって表現でき、社会・学術・仕事で効果的に使える。\n\nC2（熟達）：ほぼすべてを楽に理解し、意味の微妙な違いを正確かつ即座に使い分けられる。",
+    cefrA1: "A1（初級）",
+    cefrA2: "A2（初級上）",
+    cefrB1: "B1（中級）",
+    cefrB2: "B2（中級上）",
+    cefrC1: "C1（上級）",
+    cefrC2: "C2（熟達）",
+    correctPronunciation: "発音を訂正する",
+    correctGrammar: "文法を訂正する",
+    difficultyRule:
+      "CEFR {cefrLevel}から始めてください。{description} 難しすぎる、または簡単すぎる場合は私の実力に合わせて調整してください。",
+    cefrDescA1:
+      "基本的な言い回しと日常表現を使い、自己紹介や簡単な質問ができる程度のやりとりにしてください。",
+    cefrDescA2:
+      "慣れ親しんだ日常的な話題や当面の用件について、直接的な文を使ってください。",
+    cefrDescB1:
+      "日常や旅行のような場面に対応し、経験を簡単な文をつなげて説明できる程度にしてください。",
+    cefrDescB2:
+      "流暢で自然なやり取りにし、必要ならより複雑・抽象的な話題も含めてください。",
+    cefrDescC1:
+      "考えを滑らかに・ニュアンス付きで表現し、社会・学術・仕事の会話にも適したレベルにしてください。",
+    cefrDescC2:
+      "ほぼネイティブ並みの精度で話し、意味の微妙な違いも扱えるようにしてください。",
+    correctionBoth:
+      "発音や文法を間違えたら簡潔に訂正し、そのまま会話を続けてください。",
+    correctionPronunciationOnly:
+      "発音の誤りは簡潔に訂正してから続けてください。文法は求めない限り訂正しないでください。",
+    correctionGrammarOnly:
+      "文法の誤りは簡潔に訂正してから続けてください。発音は求めない限り訂正しないでください。",
+    correctionNeither:
+      "求めない限り、発音も文法も訂正しないでください。",
     practiceHelpSpeaking:
       "これをChatGPTに貼り付けてください。AIはあなたの質問を待ち、練習する単語を一つずつ提案できます。",
     practiceHelpListening:
@@ -265,9 +333,9 @@ Please follow these rules:
 - 質問には分かりやすく答え、一度に一往復ずつ会話を続けてください。
 - 私が話し始める準備ができたとき、または何を練習するか聞かれたときは、目標の単語を一つずつ会話のきっかけとして提示し、それを使って話し始めるよう促してください。
 - 提案した単語を使ったあとは、まだ使っていない目標の単語を一つずつ次に提案して構いません。
-- 初級後半〜中級レベルから始め、私の実力に合わせて調整してください。
+- {difficultyRule}
 - 作り物の例文より、日常的な場面を優先してください。
-- 間違えたら簡潔に訂正し、そのまま会話を続けてください。
+- {correctionRule}
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
 - 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
 - まず単語リストを短く確認し、最初の質問をするよう促して始めてください。`,
@@ -281,10 +349,10 @@ Please follow these rules:
 - 話すとき、目標の単語を自然な{targetLanguage}の中で使ってください。
 - 単語の意味・使い方・ニュアンス・文脈などについて質問し、理解できているか確認してください。
 - 一度に一往復ずつ、実際のやり取りをしてください。
-- 初級後半〜中級レベルから始め、私の実力に合わせて調整してください。
+- {difficultyRule}
 - 作り物の例文より、日常的な場面を優先してください。
 - すべての文に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
-- 間違えたら簡潔に訂正し、そのまま続けてください。
+- {correctionRule}
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
 - 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
 - 今すぐ、単語の一つについての最初の質問をして始めてください。`,
@@ -297,10 +365,10 @@ Please follow these rules:
 次のルールに従ってください：
 - 一度に一往復ずつ、実際の会話をしてください。
 - 上記の単語を自然に使いたくなるような質問をしてください。
-- 初級後半〜中級レベルから始め、私の実力に合わせて調整してください。
+- {difficultyRule}
 - 作り物の例文より、日常的な場面を優先してください。
 - すべての質問に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
-- 間違えたら簡潔に訂正し、そのまま会話を続けてください。
+- {correctionRule}
 - 目標の単語を正しく使えたら、褒めて止まらずに会話を続けてください。
 - まだ使っていない目標の単語があれば、ときどきそれを使うよう促してください。
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
