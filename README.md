@@ -14,6 +14,7 @@ KaniKai is a single-page browser app. Load words from a data source (WaniKani to
 - Copy a formatted word list or a full conversation-practice prompt
 - Choose a practice mode (**Speaking**, **Listening**, or **Legacy**) before copying the prompt
 - Open ChatGPT in a new tab when you are ready to practice
+- Switch the interface between **light** and **dark**, or follow your system appearance
 
 To add a data source, see [DATA_SOURCES.md](./DATA_SOURCES.md). Adapters live in `sources/adapters/`; the shared loading system lives in `sources/core/`.
 
