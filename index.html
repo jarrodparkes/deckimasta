@@ -583,10 +583,12 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   }
 
   function buildCorrectionRule() {
-    if (correctPronunciation && correctGrammar) return tPrompt("correctionBoth");
-    if (correctPronunciation) return tPrompt("correctionPronunciationOnly");
-    if (correctGrammar) return tPrompt("correctionGrammarOnly");
-    return tPrompt("correctionNeither");
+    const promptLang = LEARNING_LANGS.includes(nativeLang) ? nativeLang : currentLang;
+    const vars = { nativeLanguage: languageDisplayName(nativeLang, promptLang) };
+    if (correctPronunciation && correctGrammar) return tPrompt("correctionBoth", vars);
+    if (correctPronunciation) return tPrompt("correctionPronunciationOnly", vars);
+    if (correctGrammar) return tPrompt("correctionGrammarOnly", vars);
+    return tPrompt("correctionNeither", vars);
   }
 
   function setLang(lang) {

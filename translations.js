@@ -123,13 +123,13 @@ window.DeckiMastaStrings = {
     cefrDescC2:
       "Speak with near-native precision, including fine shades of meaning.",
     correctionBoth:
-      "When I make a pronunciation or grammar mistake, briefly correct it and then continue the conversation.",
+      "If I use a word with the wrong meaning, or make a pronunciation or grammar mistake: pause the conversation, switch to {nativeLanguage}, briefly name what went wrong and give the correct form, then resume. Keep it short unless I ask for more detail.",
     correctionPronunciationOnly:
-      "Correct my pronunciation briefly when needed, then continue. Do not correct my grammar unless I ask.",
+      "If I use a word with the wrong meaning, or make a pronunciation mistake: pause the conversation, switch to {nativeLanguage}, briefly name what went wrong and give the correct form, then resume. Do not correct my grammar unless I ask. Keep corrections short unless I ask for more detail.",
     correctionGrammarOnly:
-      "Correct my grammar briefly when needed, then continue. Do not correct my pronunciation unless I ask.",
+      "If I use a word with the wrong meaning, or make a grammar mistake: pause the conversation, switch to {nativeLanguage}, briefly name what went wrong and give the correct form, then resume. Do not correct my pronunciation unless I ask. Keep corrections short unless I ask for more detail.",
     correctionNeither:
-      "Do not correct my pronunciation or grammar unless I ask.",
+      "If I use a word with the wrong meaning: pause the conversation, switch to {nativeLanguage}, briefly name what went wrong and give the correct form, then resume. Do not correct my pronunciation or grammar unless I ask.",
     practiceHelpSpeaking:
       "Copy this into ChatGPT. The AI waits for your questions and can suggest starter words one at a time.",
     practiceHelpListening:
@@ -168,11 +168,12 @@ Please follow these rules:
 - Answer my questions clearly and keep the conversation going one turn at a time.
 - When I am ready to speak, or when I ask what to practice, introduce one target word at a time as a conversation starter and invite me to begin using it.
 - After I use a suggested word, you may offer the next unused target word one by one.
+- Stay on task: work through the deck at a steady pace. Short natural digressions are fine, but steer back toward unused target words so we cover the list.
 - {difficultyRule}
 - Prefer everyday situations rather than artificial example sentences.
 - {correctionRule}
 - Keep explanations concise unless I ask for more detail.
-- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
+- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary (except for the correction pauses above).
 - Begin by briefly acknowledging the deck and inviting me to ask my first question.`,
     promptTemplateListening: `I'm studying {targetLanguage} and I have this vocabulary deck:
 
@@ -184,12 +185,13 @@ Please follow these rules:
 - Use the target words naturally in {targetLanguage} as you speak.
 - Ask me questions about the words (meaning, usage, nuance, or context) so I demonstrate that I understand them.
 - Have a real exchange with me, one turn at a time.
+- Stay on task: work through the deck at a steady pace. Short natural digressions are fine, but keep returning to unused target words so we cover the list.
 - {difficultyRule}
 - Prefer everyday situations rather than artificial example sentences.
 - Don't force a vocabulary word into every sentence. Let the conversation feel natural.
 - {correctionRule}
 - Keep explanations concise unless I ask for more detail.
-- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
+- Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary (except for the correction pauses above).
 - Start by asking me your first question about one of the words now.`,
   },
   ja: {
@@ -315,12 +317,13 @@ Please follow these rules:
     cefrDescC2:
       "ほぼネイティブ並みの精度で話し、意味の微妙な違いも扱えるようにしてください。",
     correctionBoth:
-      "発音や文法を間違えたら簡潔に訂正し、そのまま会話を続けてください。",
+      "単語の意味を誤って使った場合、または発音・文法を間違えた場合は、会話の流れをいったん止め、{nativeLanguage}に切り替えて、何が違ったかと正しい形を簡潔に伝え、その後会話を再開してください。詳しい説明を求めない限り短くしてください。",
     correctionPronunciationOnly:
-      "発音の誤りは簡潔に訂正してから続けてください。文法は求めない限り訂正しないでください。",
+      "単語の意味を誤って使った場合、または発音を間違えた場合は、会話の流れをいったん止め、{nativeLanguage}に切り替えて、何が違ったかと正しい形を簡潔に伝え、その後会話を再開してください。文法は求めない限り訂正しないでください。詳しい説明を求めない限り訂正は短くしてください。",
     correctionGrammarOnly:
-      "文法の誤りは簡潔に訂正してから続けてください。発音は求めない限り訂正しないでください。",
-    correctionNeither: "求めない限り、発音も文法も訂正しないでください。",
+      "単語の意味を誤って使った場合、または文法を間違えた場合は、会話の流れをいったん止め、{nativeLanguage}に切り替えて、何が違ったかと正しい形を簡潔に伝え、その後会話を再開してください。発音は求めない限り訂正しないでください。詳しい説明を求めない限り訂正は短くしてください。",
+    correctionNeither:
+      "単語の意味を誤って使った場合は、会話の流れをいったん止め、{nativeLanguage}に切り替えて、何が違ったかと正しい形を簡潔に伝え、その後会話を再開してください。発音と文法は求めない限り訂正しないでください。",
     practiceHelpSpeaking:
       "これをChatGPTに貼り付けてください。AIはあなたの質問を待ち、練習する単語を一つずつ提案できます。",
     practiceHelpListening:
@@ -359,11 +362,12 @@ Please follow these rules:
 - 質問には分かりやすく答え、一度に一往復ずつ会話を続けてください。
 - 私が話し始める準備ができたとき、または何を練習するか聞かれたときは、目標の単語を一つずつ会話のきっかけとして提示し、それを使って話し始めるよう促してください。
 - 提案した単語を使ったあとは、まだ使っていない目標の単語を一つずつ次に提案して構いません。
+- 課題に沿って進めてください。一定のペースでデッキを進め、短い自然な脱線は構いませんが、未使用の目標単語へ戻し、リストをカバーするようにしてください。
 - {difficultyRule}
 - 作り物の例文より、日常的な場面を優先してください。
 - {correctionRule}
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
-- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
+- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください（上記の訂正のための中断を除く）。
 - まずデッキを短く確認し、最初の質問をするよう促して始めてください。`,
     promptTemplateListening: `{targetLanguage}を勉強していて、次の語彙デッキがあります：
 
@@ -375,12 +379,13 @@ Please follow these rules:
 - 話すとき、目標の単語を自然な{targetLanguage}の中で使ってください。
 - 単語の意味・使い方・ニュアンス・文脈などについて質問し、理解できているか確認してください。
 - 一度に一往復ずつ、実際のやり取りをしてください。
+- 課題に沿って進めてください。一定のペースでデッキを進め、短い自然な脱線は構いませんが、未使用の目標単語へ戻し、リストをカバーするようにしてください。
 - {difficultyRule}
 - 作り物の例文より、日常的な場面を優先してください。
 - すべての文に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
 - {correctionRule}
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
-- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
+- 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください（上記の訂正のための中断を除く）。
 - 今すぐ、単語の一つについての最初の質問をして始めてください。`,
   },
 };
