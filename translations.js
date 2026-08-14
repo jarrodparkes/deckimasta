@@ -87,7 +87,7 @@ window.DeckiMastaStrings = {
     csvFileEmpty: "Choose a CSV file to upload first.",
     recentlyLearned: "Step 3: Confirm Your Deck",
     wordsIntro:
-      "This is your deck. Check that it looks right, then start practicing. You can practice with friends in person or create a conversation prompt for ChatGPT.",
+      "This is your deck. Check that it looks right, then start practicing. You can practice with friends in-person or create a conversation prompt for ChatGPT.",
     createPractice: "Practice this deck",
     copyWordList: "Copy deck",
     practiceTitle: "Step 4: Practice Your Deck",

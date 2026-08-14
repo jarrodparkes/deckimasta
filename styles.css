@@ -325,12 +325,17 @@ textarea:focus {
 }
 .row {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr auto;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
   gap: 14px;
   align-items: end;
 }
+/* Grid items default to min-width: auto, so selects and the button would refuse
+   to shrink and bleed past the card edge. */
+.row > * {
+  min-width: 0;
+}
 .row:has(#rangeField[hidden]) {
-  grid-template-columns: 1fr 1fr 1fr auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
 }
 .checkbox-field {
   display: flex;
@@ -643,16 +648,24 @@ code {
   }
 }
 @media (max-width: 750px) {
-  .row {
-    grid-template-columns: 1fr 1fr;
+  /* The :has() variant carries #id specificity, so it has to be listed here too. */
+  .row,
+  .row:has(#rangeField[hidden]) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Own row, but natural width and left-aligned to match the .actions buttons. */
+  .row > button {
+    grid-column: 1 / -1;
+    justify-self: start;
   }
   .word-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 650px) {
-  .row {
-    grid-template-columns: 1fr;
+  .row,
+  .row:has(#rangeField[hidden]) {
+    grid-template-columns: minmax(0, 1fr);
   }
   .lang-pair-row {
     grid-template-columns: 1fr auto 1fr;
