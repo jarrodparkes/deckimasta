@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#9300e4">
-  <title>KaniKai</title>
+  <title>DeckiMasta</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
@@ -13,7 +13,7 @@
     /* Resolve the theme before first paint so the page never flashes the wrong appearance. */
     (() => {
       let saved = null;
-      try { saved = localStorage.getItem("kanikai_theme"); } catch {}
+      try { saved = localStorage.getItem("deckimasta_theme"); } catch {}
       const dark = saved === "dark" ||
         (saved !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
       document.documentElement.dataset.theme = dark ? "dark" : "light";
@@ -24,7 +24,7 @@
 <main>
   <div class="header">
     <div class="header-copy">
-      <h1 data-i18n="title">KaniKai</h1>
+      <h1 data-i18n="title">DeckiMasta</h1>
       <p class="subtitle" data-i18n="subtitle">Turn recently learned vocabulary into words you actually use.</p>
     </div>
     <div class="header-controls">
@@ -280,16 +280,16 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 (() => {
   "use strict";
 
-  const LANG_KEY = "kanikai_lang";
-  const SOURCE_KEY = "kanikai_source";
-  const NATIVE_LANG_KEY = "kanikai_native_lang";
-  const TARGET_LANG_KEY = "kanikai_target_lang";
-  const PRACTICE_MODE_KEY = "kanikai_practice_mode";
-  const CEFR_LEVEL_KEY = "kanikai_cefr_level";
-  const CORRECT_PRONUNCIATION_KEY = "kanikai_correct_pronunciation";
-  const CORRECT_GRAMMAR_KEY = "kanikai_correct_grammar";
+  const LANG_KEY = "deckimasta_lang";
+  const SOURCE_KEY = "deckimasta_source";
+  const NATIVE_LANG_KEY = "deckimasta_native_lang";
+  const TARGET_LANG_KEY = "deckimasta_target_lang";
+  const PRACTICE_MODE_KEY = "deckimasta_practice_mode";
+  const CEFR_LEVEL_KEY = "deckimasta_cefr_level";
+  const CORRECT_PRONUNCIATION_KEY = "deckimasta_correct_pronunciation";
+  const CORRECT_GRAMMAR_KEY = "deckimasta_correct_grammar";
   /** Keep in sync with the pre-paint theme script in <head>. */
-  const THEME_KEY = "kanikai_theme";
+  const THEME_KEY = "deckimasta_theme";
   const THEMES = ["system", "light", "dark"];
   const SUPPORTED_LANGS = ["en", "ja"];
   const LEARNING_LANGS = ["en", "ja"];
@@ -323,8 +323,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     en: "langEnglish",
     ja: "langJapanese"
   };
-  const STRINGS = window.KaniKaiStrings;
-  const KaniKai = window.KaniKai;
+  const STRINGS = window.DeckiMastaStrings;
+  const DeckiMasta = window.DeckiMasta;
 
   const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
@@ -346,7 +346,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   const sourceSelect = $("source");
   const nativeLangSelect = $("nativeLang");
   const targetLangSelect = $("targetLang");
-  const sourceUIHost = KaniKai.createSourceUIHost({
+  const sourceUIHost = DeckiMasta.createSourceUIHost({
     setupHost: $("sourceSetupHost"),
     panelHost: $("sourcePanelHost")
   });
@@ -652,23 +652,23 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     }
 
     const sources =
-      typeof KaniKai.listSources === "function"
-        ? KaniKai.listSources(currentLanguagePair())
+      typeof DeckiMasta.listSources === "function"
+        ? DeckiMasta.listSources(currentLanguagePair())
         : [];
 
     for (const source of sources) {
       const option = document.createElement("option");
       option.value = source.id;
       option.textContent =
-        typeof KaniKai.sourceLabel === "function"
-          ? KaniKai.sourceLabel(source, t)
+        typeof DeckiMasta.sourceLabel === "function"
+          ? DeckiMasta.sourceLabel(source, t)
           : source.label;
       sourceSelect.appendChild(option);
     }
 
     if (!sources.length) {
       const all =
-        typeof KaniKai.listSources === "function" ? KaniKai.listSources() : [];
+        typeof DeckiMasta.listSources === "function" ? DeckiMasta.listSources() : [];
       const option = document.createElement("option");
       option.value = "";
       option.textContent = t(
@@ -693,8 +693,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
   function selectedSource() {
     const sourceId = languagePairSelected() ? sourceSelect.value : "";
-    if (!sourceId || typeof KaniKai.getSource !== "function") return null;
-    return KaniKai.getSource(sourceId);
+    if (!sourceId || typeof DeckiMasta.getSource !== "function") return null;
+    return DeckiMasta.getSource(sourceId);
   }
 
   /**
@@ -708,8 +708,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
     const source = selectedSource();
     const description =
-      source && typeof KaniKai.sourceDescription === "function"
-        ? KaniKai.sourceDescription(source, t)
+      source && typeof DeckiMasta.sourceDescription === "function"
+        ? DeckiMasta.sourceDescription(source, t)
         : "";
 
     tooltip.textContent = description || t("sourceHelpFallback");
@@ -723,8 +723,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     const source = selectedSource();
     const enabled =
       !source ||
-      typeof KaniKai.sourceSupportsLookBack !== "function" ||
-      KaniKai.sourceSupportsLookBack(source);
+      typeof DeckiMasta.sourceSupportsLookBack !== "function" ||
+      DeckiMasta.sourceSupportsLookBack(source);
     field.hidden = !enabled;
     $("range").disabled = !enabled;
   }
@@ -735,7 +735,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
       sourceUIHost.deactivate();
       return;
     }
-    const source = KaniKai.getSource(sourceId);
+    const source = DeckiMasta.getSource(sourceId);
     const ui = sourceUIHost.activate(source, uiContext());
     applyI18n($("sourceSetupHost"));
     applyI18n($("sourcePanelHost"));
@@ -753,8 +753,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     const source = selectedSource();
     const lookBack =
       !source ||
-      typeof KaniKai.sourceSupportsLookBack !== "function" ||
-      KaniKai.sourceSupportsLookBack(source);
+      typeof DeckiMasta.sourceSupportsLookBack !== "function" ||
+      DeckiMasta.sourceSupportsLookBack(source);
 
     let since = null;
     if (lookBack) {
@@ -831,7 +831,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
       const sourceId = sourceSelect.value;
       if (!sourceId) {
         const all =
-          typeof KaniKai.listSources === "function" ? KaniKai.listSources() : [];
+          typeof DeckiMasta.listSources === "function" ? DeckiMasta.listSources() : [];
         setStatus(
           t(all.length ? "noSourcesForLanguages" : "noSourcesRegistered"),
           "error"
@@ -839,11 +839,11 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
         return;
       }
 
-      const source = KaniKai.getSource(sourceId);
+      const source = DeckiMasta.getSource(sourceId);
       if (
         source &&
-        typeof KaniKai.sourceSupportsLanguages === "function" &&
-        !KaniKai.sourceSupportsLanguages(source, currentLanguagePair())
+        typeof DeckiMasta.sourceSupportsLanguages === "function" &&
+        !DeckiMasta.sourceSupportsLanguages(source, currentLanguagePair())
       ) {
         setStatus(t("noSourcesForLanguages"), "error");
         return;
@@ -856,7 +856,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
       localStorage.setItem(SOURCE_KEY, sourceId);
       const options = readSharedLoadOptions();
-      const result = await KaniKai.loadFromSource(sourceId, options);
+      const result = await DeckiMasta.loadFromSource(sourceId, options);
 
       finishLoad({
         words: result.words,
@@ -902,8 +902,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     }
 
     const showSeenAt =
-      typeof KaniKai.sourceSupportsLookBack !== "function" ||
-      KaniKai.sourceSupportsLookBack(selectedSource());
+      typeof DeckiMasta.sourceSupportsLookBack !== "function" ||
+      DeckiMasta.sourceSupportsLookBack(selectedSource());
 
     for (const word of recentWords) {
       const el = document.createElement("div");

@@ -1,5 +1,5 @@
 /**
- * Shared parts-of-speech tags for KaniKai word sources.
+ * Shared parts-of-speech tags for DeckiMasta word sources.
  *
  * Matches Word.parts_of_speech items in DATA_SOURCES.md:
  * anyOf [ preferred enum, free non-empty string ].
@@ -10,7 +10,7 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = (global.KaniKai = global.KaniKai || {});
+  const DeckiMasta = (global.DeckiMasta = global.DeckiMasta || {});
 
   /** @type {readonly string[]} Preferred enum branch (not exhaustive of allowed values). */
   const PARTS_OF_SPEECH = Object.freeze([
@@ -86,9 +86,9 @@
     return result;
   }
 
-  KaniKai.PARTS_OF_SPEECH = PARTS_OF_SPEECH;
-  KaniKai.PARTS_OF_SPEECH_ALIASES = PARTS_OF_SPEECH_ALIASES;
-  KaniKai.isKnownPartOfSpeech = isKnownPartOfSpeech;
-  KaniKai.canonicalizePartOfSpeech = canonicalizePartOfSpeech;
-  KaniKai.normalizePartsOfSpeech = normalizePartsOfSpeech;
+  DeckiMasta.PARTS_OF_SPEECH = PARTS_OF_SPEECH;
+  DeckiMasta.PARTS_OF_SPEECH_ALIASES = PARTS_OF_SPEECH_ALIASES;
+  DeckiMasta.isKnownPartOfSpeech = isKnownPartOfSpeech;
+  DeckiMasta.canonicalizePartOfSpeech = canonicalizePartOfSpeech;
+  DeckiMasta.normalizePartsOfSpeech = normalizePartsOfSpeech;
 })(window);

@@ -11,7 +11,7 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = (global.KaniKai = global.KaniKai || {});
+  const DeckiMasta = (global.DeckiMasta = global.DeckiMasta || {});
 
   function csvError(message, code, lineNumber) {
     const error = new Error(message);
@@ -92,11 +92,11 @@
       throw error;
     }
 
-    if (typeof KaniKai.createWord !== "function") {
-      throw csvError("KaniKai.createWord is required to parse CSV words.", "CSV_DEPENDENCY");
+    if (typeof DeckiMasta.createWord !== "function") {
+      throw csvError("DeckiMasta.createWord is required to parse CSV words.", "CSV_DEPENDENCY");
     }
 
-    return KaniKai.createWord({
+    return DeckiMasta.createWord({
       word,
       alternatives: splitPipe(parts[1]),
       meanings: splitPipe(parts[2]),
@@ -133,5 +133,5 @@
     return words;
   }
 
-  KaniKai.parseWordCsv = parseWordCsv;
+  DeckiMasta.parseWordCsv = parseWordCsv;
 })(window);

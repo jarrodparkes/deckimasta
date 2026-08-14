@@ -1,6 +1,6 @@
-window.KaniKaiStrings = {
+window.DeckiMastaStrings = {
   en: {
-    title: "KaniKai",
+    title: "DeckíMastá",
     subtitle: "Turn recently learned vocabulary into words you actually use.",
     langGroup: "Interface language",
     themeGroup: "Appearance",
@@ -190,7 +190,7 @@ Please follow these rules:
 - Start by asking me your first question about one of the words now.`,
   },
   ja: {
-    title: "KaniKai",
+    title: "DeckíMastá",
     subtitle: "最近覚えた単語を、実際に使える言葉に変えましょう。",
     langGroup: "表示言語",
     themeGroup: "外観",

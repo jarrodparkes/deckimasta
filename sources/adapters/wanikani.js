@@ -1,6 +1,6 @@
 /**
  * WaniKani data source adapter.
- * Maps assignments + vocabulary subjects into the shared KaniKai Word shape.
+ * Maps assignments + vocabulary subjects into the shared DeckiMasta Word shape.
  *
  * Auth: reads the API token from localStorage (wk_conversation_token).
  * Callers may also pass { token } in load options for one-off use.
@@ -8,10 +8,10 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = global.KaniKai;
-  if (!KaniKai || typeof KaniKai.registerSource !== "function") {
+  const DeckiMasta = global.DeckiMasta;
+  if (!DeckiMasta || typeof DeckiMasta.registerSource !== "function") {
     throw new Error(
-      "KaniKai source registry must be loaded before the WaniKani adapter.",
+      "DeckiMasta source registry must be loaded before the WaniKani adapter.",
     );
   }
 
@@ -130,7 +130,7 @@
     const startedAt = assignment.data?.started_at || null;
     const lastSeenAt = assignmentLastSeenAt(assignment) || startedAt;
 
-    return KaniKai.createWord({
+    return DeckiMasta.createWord({
       id: String(subject.id),
       word: d.characters || "",
       alternatives: readingsAsAlternatives(d),
@@ -169,8 +169,8 @@
     }
 
     const loadOptions =
-      typeof KaniKai.createLoadOptions === "function"
-        ? KaniKai.createLoadOptions(options)
+      typeof DeckiMasta.createLoadOptions === "function"
+        ? DeckiMasta.createLoadOptions(options)
         : { since: options.since || null };
 
     // Assignments are authoritative for when the user started / last touched an item.
@@ -300,7 +300,7 @@
     };
   }
 
-  KaniKai.registerSource({
+  DeckiMasta.registerSource({
     id: "wanikani",
     label: "WaniKani",
     labelKey: "sourceLabelWanikani",

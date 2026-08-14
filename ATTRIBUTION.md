@@ -1,6 +1,6 @@
 # Attribution
 
-KaniKai includes curated vocabulary lists from the following projects.
+DeckiMasta includes curated vocabulary lists from the following projects.
 
 ## Top 1000 English (`sources/data/top-1000-english.js`)
 
@@ -15,4 +15,4 @@ KaniKai includes curated vocabulary lists from the following projects.
 - Used for: English → Japanese learners (Japanese headwords with readings and English meanings)
 - OpenJLPT vocabulary level assignments derive from community JLPT lists (including Jonathan Waller’s tanos.co.uk lists, CC BY). See the OpenJLPT project for full sourcing notes.
 
-Modifications: lists were slimmed to the fields KaniKai needs (`id`, `word`, `alternatives` / readings, `meanings`) and shipped as JS globals so they load under `file://`.
+Modifications: lists were slimmed to the fields DeckiMasta needs (`id`, `word`, `alternatives` / readings, `meanings`) and shipped as JS globals so they load under `file://`.

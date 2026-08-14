@@ -1,8 +1,8 @@
-# KaniKai
+# DeckiMasta
 
 Turn vocabulary from any word list into conversation practice.
 
-KaniKai is a single-page browser app. Load words from a data source (WaniKani, JLPT N5, top 1000 English, CSV, and more), optionally focus on recently seen items or sample from your full set, then generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
+DeckiMasta is a single-page browser app. Load words from a data source (WaniKani, JLPT N5, top 1000 English, CSV, and more), optionally focus on recently seen items or sample from your full set, then generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
 
 ## Features
 

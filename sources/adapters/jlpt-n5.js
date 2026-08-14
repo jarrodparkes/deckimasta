@@ -5,10 +5,10 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = global.KaniKai;
-  if (!KaniKai || typeof KaniKai.registerSource !== "function") {
+  const DeckiMasta = global.DeckiMasta;
+  if (!DeckiMasta || typeof DeckiMasta.registerSource !== "function") {
     throw new Error(
-      "KaniKai source registry must be loaded before the jlpt-n5 adapter."
+      "DeckiMasta source registry must be loaded before the jlpt-n5 adapter."
     );
   }
 
@@ -19,11 +19,11 @@
   }
 
   function getRows() {
-    const data = global.KaniKaiData && global.KaniKaiData.jlptN5;
+    const data = global.DeckiMastaData && global.DeckiMastaData.jlptN5;
     return Array.isArray(data) ? data : null;
   }
 
-  KaniKai.registerSource({
+  DeckiMasta.registerSource({
     id: "jlpt-n5",
     label: "JLPT N5",
     labelKey: "sourceLabelJlptN5",
@@ -41,7 +41,7 @@
       }
 
       return rows.map((row) =>
-        KaniKai.createWord({
+        DeckiMasta.createWord({
           id: row.id,
           word: row.word,
           alternatives: row.alternatives || [],

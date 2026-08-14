@@ -21,7 +21,7 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = (global.KaniKai = global.KaniKai || {});
+  const DeckiMasta = (global.DeckiMasta = global.DeckiMasta || {});
   const sources = new Map();
 
   /**
@@ -29,7 +29,7 @@
    * @returns {object}
    */
   function registerSource(source) {
-    if (typeof KaniKai.isWordSource === "function" && !KaniKai.isWordSource(source)) {
+    if (typeof DeckiMasta.isWordSource === "function" && !DeckiMasta.isWordSource(source)) {
       throw new Error("Invalid word source: expected { id, label, requiresAuth, load }");
     }
     if (
@@ -146,12 +146,12 @@
     return sources.has(id);
   }
 
-  KaniKai.registerSource = registerSource;
-  KaniKai.getSource = getSource;
-  KaniKai.listSources = listSources;
-  KaniKai.hasSource = hasSource;
-  KaniKai.sourceSupportsLanguages = sourceSupportsLanguages;
-  KaniKai.sourceSupportsLookBack = sourceSupportsLookBack;
-  KaniKai.sourceLabel = sourceLabel;
-  KaniKai.sourceDescription = sourceDescription;
+  DeckiMasta.registerSource = registerSource;
+  DeckiMasta.getSource = getSource;
+  DeckiMasta.listSources = listSources;
+  DeckiMasta.hasSource = hasSource;
+  DeckiMasta.sourceSupportsLanguages = sourceSupportsLanguages;
+  DeckiMasta.sourceSupportsLookBack = sourceSupportsLookBack;
+  DeckiMasta.sourceLabel = sourceLabel;
+  DeckiMasta.sourceDescription = sourceDescription;
 })(window);

@@ -4,7 +4,7 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = (global.KaniKai = global.KaniKai || {});
+  const DeckiMasta = (global.DeckiMasta = global.DeckiMasta || {});
 
   function loaderError(message, code) {
     const error = new Error(message);
@@ -18,24 +18,24 @@
    * @returns {Promise<{ source: object, words: object[], totalMatched: number, options: object, raw: object[] }>}
    */
   async function loadFromSource(sourceId, options = {}) {
-    if (typeof KaniKai.getSource !== "function") {
+    if (typeof DeckiMasta.getSource !== "function") {
       throw loaderError("Source registry is not available.", "REGISTRY_MISSING");
     }
 
-    const source = KaniKai.getSource(sourceId);
+    const source = DeckiMasta.getSource(sourceId);
     if (!source) {
       throw loaderError('Unknown word source: "' + sourceId + '".', "SOURCE_NOT_FOUND");
     }
 
     const raw = await source.load(options);
     const applied =
-      typeof KaniKai.applyLoadOptionsWithMeta === "function"
-        ? KaniKai.applyLoadOptionsWithMeta(raw, options)
+      typeof DeckiMasta.applyLoadOptionsWithMeta === "function"
+        ? DeckiMasta.applyLoadOptionsWithMeta(raw, options)
         : {
             words: Array.isArray(raw) ? raw : [],
             totalMatched: Array.isArray(raw) ? raw.length : 0,
-            options: KaniKai.createLoadOptions
-              ? KaniKai.createLoadOptions(options)
+            options: DeckiMasta.createLoadOptions
+              ? DeckiMasta.createLoadOptions(options)
               : options
           };
 
@@ -48,5 +48,5 @@
     };
   }
 
-  KaniKai.loadFromSource = loadFromSource;
+  DeckiMasta.loadFromSource = loadFromSource;
 })(window);

@@ -1,19 +1,19 @@
 /**
- * CSV file-upload data source — same row format as csv-paste (KaniKai.parseWordCsv).
+ * CSV file-upload data source — same row format as csv-paste (DeckiMasta.parseWordCsv).
  * The UI reads the selected file and passes { file } (or csvText).
  */
 (function (global) {
   "use strict";
 
-  const KaniKai = global.KaniKai;
-  if (!KaniKai || typeof KaniKai.registerSource !== "function") {
+  const DeckiMasta = global.DeckiMasta;
+  if (!DeckiMasta || typeof DeckiMasta.registerSource !== "function") {
     throw new Error(
-      "KaniKai source registry must be loaded before the file-upload adapter."
+      "DeckiMasta source registry must be loaded before the file-upload adapter."
     );
   }
-  if (typeof KaniKai.parseWordCsv !== "function") {
+  if (typeof DeckiMasta.parseWordCsv !== "function") {
     throw new Error(
-      "KaniKai.parseWordCsv must be loaded before the file-upload adapter."
+      "DeckiMasta.parseWordCsv must be loaded before the file-upload adapter."
     );
   }
 
@@ -58,8 +58,8 @@
     `;
 
     const posList = panel.querySelector(".csv-pos-list");
-    if (posList && Array.isArray(KaniKai.PARTS_OF_SPEECH)) {
-      posList.textContent = KaniKai.PARTS_OF_SPEECH.join(", ");
+    if (posList && Array.isArray(DeckiMasta.PARTS_OF_SPEECH)) {
+      posList.textContent = DeckiMasta.PARTS_OF_SPEECH.join(", ");
     }
 
     const fileInput = panel.querySelector("#csvFile");
@@ -95,7 +95,7 @@
     };
   }
 
-  KaniKai.registerSource({
+  DeckiMasta.registerSource({
     id: "file-upload",
     label: "CSV File",
     labelKey: "sourceLabelCsvFile",
@@ -121,7 +121,7 @@
         throw sourceError("Choose a CSV file to upload first.", "CSV_EMPTY");
       }
 
-      const words = KaniKai.parseWordCsv(text);
+      const words = DeckiMasta.parseWordCsv(text);
       if (!words.length) {
         throw sourceError(
           "No word rows found in the uploaded file.",

@@ -1,6 +1,6 @@
 # Data Sources
 
-KaniKai loads vocabulary through a small abstraction layer so any backend (API, CSV, spreadsheet, static JSON, etc.) can feed the same UI.
+DeckiMasta loads vocabulary through a small abstraction layer so any backend (API, CSV, spreadsheet, static JSON, etc.) can feed the same UI.
 
 This document is the contract for that layer: the shared **word** shape, shared **load options**, the **source interface**, and how to add a new source.
 
@@ -149,7 +149,7 @@ These options are source-agnostic. The app (not the source UI) owns them:
 
 ## Important Interfaces (Word and WordSource)
 
-Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain object:
+Shared helpers live on `window.DeckiMasta` (no bundler). A data source is a plain object:
 
 ```js
 /**
@@ -187,7 +187,7 @@ Shared helpers live on `window.KaniKai` (no bundler). A data source is a plain o
 
 1. Read any source-specific credentials / settings it needs.
 2. Fetch or parse raw data.
-3. Map each item with `KaniKai.createWord(...)` into the shared **Word** shape.
+3. Map each item with `DeckiMasta.createWord(...)` into the shared **Word** shape.
 4. Return the full mapped list for the source’s natural universe (or as much as the source can provide).
 
 ### Optional `createUI(ctx)`
@@ -204,11 +204,11 @@ Adapters may provide their own setup/panel UI. Return an object with any of:
 | `suppressStatus()`       | When true, keep the status line quiet after a successful load                             |
 | `applyTranslations()`    | Extra refresh after i18n (e.g. file name label)                                           |
 
-The app mounts UI into `#sourceSetupHost` / `#sourcePanelHost` via `KaniKai.createSourceUIHost`. Only the selected source’s UI is shown.
+The app mounts UI into `#sourceSetupHost` / `#sourcePanelHost` via `DeckiMasta.createSourceUIHost`. Only the selected source’s UI is shown.
 
-The app then applies `KaniKai.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency as long as the returned words still satisfy the shared contract.
+The app then applies `DeckiMasta.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency as long as the returned words still satisfy the shared contract.
 
-### `window.KaniKai` API
+### `window.DeckiMasta` API
 
 | Helper                                                | Role                                                          |
 | ----------------------------------------------------- | ------------------------------------------------------------- |
@@ -269,8 +269,8 @@ Include scripts before the main app (order matters: core, then adapters):
 
 ## How to Add a Data Source
 
-1. **Create** `sources/adapters/your-source.js` that implements the `WordSource` interface and calls `KaniKai.registerSource(...)`.
-2. **Map** every record with `KaniKai.createWord(...)`.
+1. **Create** `sources/adapters/your-source.js` that implements the `WordSource` interface and calls `DeckiMasta.registerSource(...)`.
+2. **Map** every record with `DeckiMasta.createWord(...)`.
 3. **Handle auth** inside the adapter (no-op if none is required).
 4. **Include** the script from `index.html` after the `sources/core/*` scripts.
 5. **Smoke-test** both modes:
@@ -283,9 +283,9 @@ Include scripts before the main app (order matters: core, then adapters):
 // sources/adapters/example-csv.js
 (function (global) {
   "use strict";
-  const KaniKai = global.KaniKai;
+  const DeckiMasta = global.DeckiMasta;
 
-  KaniKai.registerSource({
+  DeckiMasta.registerSource({
     id: "example-csv",
     label: "Example CSV",
     requiresAuth: false,
@@ -299,7 +299,7 @@ Include scripts before the main app (order matters: core, then adapters):
       const rows = []; // parse file / fetch remote CSV / etc.
 
       return rows.map((row) =>
-        KaniKai.createWord({
+        DeckiMasta.createWord({
           id: row.id,
           word: row.word,
           alternatives: row.alternatives || [],
@@ -316,7 +316,7 @@ Include scripts before the main app (order matters: core, then adapters):
 
 ## Usage
 
-Words are loaded only through registered adapters under `sources/adapters/` via `KaniKai.loadFromSource`.
+Words are loaded only through registered adapters under `sources/adapters/` via `DeckiMasta.loadFromSource`.
 
 ## Checklist for a New Source
 

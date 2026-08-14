@@ -20,7 +20,7 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = (global.KaniKai = global.KaniKai || {});
+  const DeckiMasta = (global.DeckiMasta = global.DeckiMasta || {});
 
   /**
    * @param {{ setupHost: HTMLElement, panelHost: HTMLElement }} hosts
@@ -75,5 +75,5 @@
     };
   }
 
-  KaniKai.createSourceUIHost = createSourceUIHost;
+  DeckiMasta.createSourceUIHost = createSourceUIHost;
 })(window);

@@ -22,7 +22,7 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = (global.KaniKai = global.KaniKai || {});
+  const DeckiMasta = (global.DeckiMasta = global.DeckiMasta || {});
 
   function generateId() {
     if (global.crypto && typeof global.crypto.randomUUID === "function") {
@@ -57,8 +57,8 @@
    */
   function createWord(partial = {}) {
     const normalizePos =
-      typeof KaniKai.normalizePartsOfSpeech === "function"
-        ? KaniKai.normalizePartsOfSpeech
+      typeof DeckiMasta.normalizePartsOfSpeech === "function"
+        ? DeckiMasta.normalizePartsOfSpeech
         : value => (Array.isArray(value) ? value : []);
 
     let createdAt = toIsoString(partial.created_at);
@@ -196,11 +196,11 @@
     );
   }
 
-  KaniKai.createWord = createWord;
-  KaniKai.createLoadOptions = createLoadOptions;
-  KaniKai.matchWords = matchWords;
-  KaniKai.applyLoadOptions = applyLoadOptions;
-  KaniKai.applyLoadOptionsWithMeta = applyLoadOptionsWithMeta;
-  KaniKai.isWordSource = isWordSource;
-  KaniKai.generateId = generateId;
+  DeckiMasta.createWord = createWord;
+  DeckiMasta.createLoadOptions = createLoadOptions;
+  DeckiMasta.matchWords = matchWords;
+  DeckiMasta.applyLoadOptions = applyLoadOptions;
+  DeckiMasta.applyLoadOptionsWithMeta = applyLoadOptionsWithMeta;
+  DeckiMasta.isWordSource = isWordSource;
+  DeckiMasta.generateId = generateId;
 })(window);

@@ -5,10 +5,10 @@
 (function (global) {
   "use strict";
 
-  const KaniKai = global.KaniKai;
-  if (!KaniKai || typeof KaniKai.registerSource !== "function") {
+  const DeckiMasta = global.DeckiMasta;
+  if (!DeckiMasta || typeof DeckiMasta.registerSource !== "function") {
     throw new Error(
-      "KaniKai source registry must be loaded before the top-1000-english adapter.",
+      "DeckiMasta source registry must be loaded before the top-1000-english adapter.",
     );
   }
 
@@ -19,11 +19,11 @@
   }
 
   function getRows() {
-    const data = global.KaniKaiData && global.KaniKaiData.top1000English;
+    const data = global.DeckiMastaData && global.DeckiMastaData.top1000English;
     return Array.isArray(data) ? data : null;
   }
 
-  KaniKai.registerSource({
+  DeckiMasta.registerSource({
     id: "top-1000-english",
     label: "Top 1000 English Words",
     labelKey: "sourceLabelTop1000English",
@@ -44,7 +44,7 @@
       }
 
       return rows.map((row) =>
-        KaniKai.createWord({
+        DeckiMasta.createWord({
           id: row.id,
           word: row.word,
           alternatives: [],
