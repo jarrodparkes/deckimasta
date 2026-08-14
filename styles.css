@@ -2,38 +2,42 @@
 :root {
   color-scheme: light;
 
-  /* WaniKani item-type palette: radicals blue, kanji pink, vocabulary purple. */
-  --radical: #0af;
-  --radical-dark: #0099e6;
-  --radical-deep: #005885;
-  --kanji: #f0a;
-  --vocab: #a0f;
-  --vocab-dark: #9300e4;
-  --leaf: #2ea36e;
-  --sea: #167475;
+  /* Brand palette: navy grounds, teal acts, aqua softens, orange flags, cream backs. */
+  --navy: #0f1d2d;
+  --teal: #2bb39a;
+  --aqua: #7fd4c6;
+  --orange: #f58a2a;
+  --cream: #fff7ed;
 
-  --bg: #f4f4f4;
+  --bg: var(--cream);
   --card: #fff;
-  --text: #464646;
-  --heading: #5e5e5e;
-  --muted: #8b8b8b;
-  --border: #e2e2e2;
-  --tint: rgba(0, 0, 0, 0.035);
-  --tint-hover: rgba(0, 0, 0, 0.06);
-  --accent: var(--radical);
-  --accent-hover: var(--radical-dark);
-  --accent-ring: rgba(0, 170, 255, 0.3);
-  --danger: #d8464a;
-  --success: var(--leaf);
+  --text: #33424e;
+  --heading: var(--navy);
+  --muted: #63737f;
+  --border: #e9dfd3;
+  --tint: rgba(15, 29, 45, 0.04);
+  --tint-hover: rgba(15, 29, 45, 0.07);
+  --accent: var(--teal);
+  --accent-hover: #23a089;
+  --accent-ring: rgba(43, 179, 154, 0.35);
+  /* Filled brand surfaces sit on a deeper teal; white type needs 4.5:1 and the
+     lighter --accent only reaches 2.6:1. Hover darkens rather than lightens. */
+  --accent-solid: #17806e;
+  --accent-solid-hover: #136b5c;
+  --on-accent: #fff;
+  --accent-text: #17806e;
+  --highlight: var(--orange);
+  --danger: #c33f43;
+  --success: var(--accent-text);
   --banner: linear-gradient(
     160deg,
-    var(--vocab) 0%,
-    var(--vocab-dark) 55%,
-    #7d00c4 100%
+    var(--navy) 0%,
+    #143446 55%,
+    #1a6a60 100%
   );
   --radius: 16px;
-  --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-raised: 0 2px 8px rgba(0, 0, 0, 0.12);
+  --shadow: 0 1px 3px rgba(15, 29, 45, 0.09);
+  --shadow-raised: 0 2px 8px rgba(15, 29, 45, 0.14);
   --font-sans:
     "Noto Sans", "Noto Sans JP", system-ui, -apple-system, BlinkMacSystemFont,
     "Segoe UI", "Hiragino Sans", Meiryo, sans-serif;
@@ -41,25 +45,24 @@
 }
 :root[data-theme="dark"] {
   color-scheme: dark;
-  --vocab: #a02ff0;
-  --vocab-dark: #7a00bd;
-  --bg: #1b1c1f;
-  --card: #26282c;
-  --text: #e4e5e7;
-  --heading: #f2f3f4;
-  --muted: #a0a4ab;
-  --border: #383b41;
-  --tint: rgba(255, 255, 255, 0.045);
-  --tint-hover: rgba(255, 255, 255, 0.09);
-  --accent: #33bbff;
-  --accent-hover: #66ccff;
-  --danger: #ff8385;
-  --success: #4cc38a;
+  --bg: var(--navy);
+  --card: #16293a;
+  --text: #dde6ea;
+  --heading: #f4f8f9;
+  --muted: #93a5b2;
+  --border: #2a3e51;
+  --tint: rgba(127, 212, 198, 0.06);
+  --tint-hover: rgba(127, 212, 198, 0.12);
+  --accent-hover: var(--aqua);
+  --accent-ring: rgba(43, 179, 154, 0.42);
+  --accent-text: #5fd0ba;
+  --danger: #ff8f8f;
+  /* Lifted off the navy page background so the banner still reads as a panel. */
   --banner: linear-gradient(
     160deg,
-    #8a1ad0 0%,
-    var(--vocab-dark) 55%,
-    #5f0094 100%
+    #17293a 0%,
+    #163d4b 55%,
+    #1a6a60 100%
   );
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   --shadow-raised: 0 2px 10px rgba(0, 0, 0, 0.5);
@@ -146,12 +149,12 @@ h2 {
 .lang-switch button[aria-pressed="true"],
 .theme-switch button[aria-pressed="true"] {
   background: #fff;
-  color: var(--vocab-dark);
+  color: var(--navy);
 }
 .lang-switch button[aria-pressed="true"]:hover,
 .theme-switch button[aria-pressed="true"]:hover {
   background: #fff;
-  color: var(--vocab-dark);
+  color: var(--navy);
 }
 .lang-switch button:focus-visible,
 .theme-switch button:focus-visible {
@@ -223,12 +226,12 @@ h2 {
   color: var(--text);
 }
 .mode-switch button[aria-pressed="true"] {
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-solid);
+  color: var(--on-accent);
 }
 .mode-switch button[aria-pressed="true"]:hover {
-  background: var(--accent-hover);
-  color: #fff;
+  background: var(--accent-solid-hover);
+  color: var(--on-accent);
 }
 .card {
   background: var(--card);
@@ -345,12 +348,12 @@ textarea:focus {
   margin-top: 16px;
 }
 button {
-  border: 2px solid var(--accent);
+  border: 2px solid var(--accent-solid);
   border-radius: var(--radius);
   padding: 9px 20px;
   cursor: pointer;
-  background: var(--accent);
-  color: #fff;
+  background: var(--accent-solid);
+  color: var(--on-accent);
   font-weight: 700;
   font-size: 0.78rem;
   text-transform: uppercase;
@@ -361,8 +364,8 @@ button {
     color 0.15s ease;
 }
 button:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
+  background: var(--accent-solid-hover);
+  border-color: var(--accent-solid-hover);
 }
 button:focus-visible {
   outline: none;
@@ -376,15 +379,15 @@ button.secondary {
 button.secondary:hover {
   background: var(--tint-hover);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
 }
 button:disabled:hover {
-  background: var(--accent);
-  border-color: var(--accent);
+  background: var(--accent-solid);
+  border-color: var(--accent-solid);
 }
 button.secondary:disabled:hover {
   background: transparent;
@@ -413,7 +416,7 @@ button.help-tip:hover,
 button.help-tip:focus-visible {
   background: var(--tint-hover);
   border-color: var(--accent);
-  color: var(--accent);
+  color: var(--accent-text);
 }
 button.help-tip:focus-visible {
   box-shadow: 0 0 0 3px var(--accent-ring);
@@ -488,8 +491,8 @@ button.help-tip[aria-expanded="true"] + .help-tooltip {
   flex-shrink: 0;
   padding: 3px 11px;
   border-radius: 999px;
-  background: var(--kanji);
-  color: #fff;
+  background: var(--highlight);
+  color: var(--navy);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -508,7 +511,7 @@ button.help-tip[aria-expanded="true"] + .help-tooltip {
   flex-direction: column;
   gap: 2px;
   border: 1px solid var(--border);
-  border-left: 4px solid var(--vocab);
+  border-left: 4px solid var(--aqua);
   border-radius: var(--radius);
   padding: 10px 11px;
   min-width: 0;
@@ -518,7 +521,7 @@ button.help-tip[aria-expanded="true"] + .help-tooltip {
 }
 .word:hover {
   border-color: var(--border);
-  border-left-color: var(--vocab-dark);
+  border-left-color: var(--accent);
   box-shadow: var(--shadow-raised);
 }
 .lemma {
@@ -573,7 +576,7 @@ textarea {
   margin: 0 0 10px;
   padding: 10px 12px;
   border: 1px solid var(--border);
-  border-left: 4px solid var(--radical);
+  border-left: 4px solid var(--accent);
   border-radius: var(--radius);
   background: var(--tint);
   font-size: 0.9rem;
