@@ -27,6 +27,8 @@
   --on-accent: #fff;
   --accent-text: #17806e;
   --highlight: var(--orange);
+  /* Count chip uses a deeper orange so white type clears 4.5:1 (light orange is ~2.5:1). */
+  --highlight-solid: #ad5c14;
   --danger: #c33f43;
   --success: var(--accent-text);
   --banner: linear-gradient(160deg, #23a089 0%, #1a6a60 55%, #1a6a60 100%);
@@ -340,7 +342,8 @@ textarea:focus {
 .checkbox-field input {
   width: auto;
   margin: 0;
-  accent-color: var(--accent);
+  /* Deeper teal so the OS/browser paints a white check (light --accent yields a dark mark). */
+  accent-color: var(--accent-solid);
 }
 .checkbox-field label {
   margin: 0;
@@ -495,8 +498,8 @@ button.help-tip[aria-expanded="true"] + .help-tooltip {
   flex-shrink: 0;
   padding: 3px 11px;
   border-radius: 999px;
-  background: var(--highlight);
-  color: var(--navy);
+  background: var(--highlight-solid);
+  color: var(--on-accent);
   font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -557,7 +560,7 @@ textarea {
   padding: 12px;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: var(--bg);
+  background: var(--card);
   color: var(--text);
   line-height: 1.55;
 }
@@ -565,7 +568,6 @@ textarea {
   min-height: 140px;
   font-family: var(--font-mono);
   font-size: 0.88rem;
-  background: var(--card);
 }
 .source-panel {
   margin-top: 14px;

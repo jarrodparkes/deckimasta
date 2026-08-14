@@ -1,7 +1,7 @@
 window.DeckiMastaStrings = {
   en: {
     title: "DeckíMastá",
-    subtitle: "Turn recently learned vocabulary into words you actually use.",
+    subtitle: "Make vocabulary decks for mastering conversation.",
     langGroup: "Interface language",
     themeGroup: "Appearance",
     themeSystem: "Match system appearance",
@@ -30,9 +30,9 @@ window.DeckiMastaStrings = {
     langJapanese: "Japanese",
     swapLanguages: "Swap native and target languages",
     languagesSameError: "Native and target languages must be different.",
-    loadTitle: "Step 2: Load Words",
+    loadTitle: "Step 2: Build Your Deck",
     loadIntro:
-      "Pick where your vocabulary comes from, then pull in a batch of words.",
+      "Pick where your vocabulary comes from, then assemble a deck to practice.",
     dataSource: "Source",
     sourceHelpAria: "About this source",
     sourceHelpFallback: "Choose a data source to see what it provides.",
@@ -52,6 +52,9 @@ window.DeckiMastaStrings = {
     sourceDescJlptN5:
       "A static JLPT N5 vocabulary list (Japanese words with English meanings). Built for English speakers learning Japanese. No API key; Recency does not apply.",
     lookBack: "Recency",
+    lookBackHelpAria: "About Recency",
+    lookBackHelp:
+      "Only include words you last studied within this time window. Sources without study dates hide this option.",
     range24: "Last 24 hours",
     range48: "Last 2 days",
     range72: "Last 3 days",
@@ -60,9 +63,9 @@ window.DeckiMastaStrings = {
     limitResults: "Limit",
     limitPlaceholder: "All",
     randomize: "Randomize",
-    loadVocabulary: "Load",
+    loadVocabulary: "Build deck",
     loadHelp:
-      "Leave the limit blank to keep every match. Randomize shuffles before applying the limit.",
+      "Leave the limit blank to keep every match in the deck. Randomize shuffles before applying the limit.",
     loadHelpAria: "About Limit",
     noSourcesRegistered: "No data sources are registered.",
     noSourcesForLanguages:
@@ -82,14 +85,14 @@ window.DeckiMastaStrings = {
     csvChooseFile: "Choose file",
     csvNoFileChosen: "No file chosen",
     csvFileEmpty: "Choose a CSV file to upload first.",
-    recentlyLearned: "Step 3: Confirm Words",
+    recentlyLearned: "Step 3: Confirm Your Deck",
     wordsIntro:
-      "These are the words you just loaded. Check that the list looks right, and start practicing. You can practice with friends in person or create a conversation prompt to practice with ChatGPT.",
-    createPractice: "Create conversation practice",
-    copyWordList: "Copy word list",
-    practiceTitle: "Step 4: Practice Words",
+      "This is your deck. Check that it looks right, then start practicing. You can practice with friends in person or create a conversation prompt for ChatGPT.",
+    createPractice: "Practice this deck",
+    copyWordList: "Copy deck",
+    practiceTitle: "Step 4: Practice Your Deck",
     practiceIntro:
-      "Choose how you want to practice. The prompt will change based on your settings.",
+      "Choose how you want to practice this deck. The prompt will change based on your settings.",
     practiceMode: "Practice mode",
     modeSpeaking: "Speaking",
     modeListening: "Listening",
@@ -140,25 +143,25 @@ window.DeckiMastaStrings = {
       "WaniKani rejected the token. Check that it is correct and has read access.",
     apiError: "WaniKani API error ({status}).",
     enterTokenFirst: "Enter and save your WaniKani API token first.",
-    loading: "Loading your recent vocabulary...",
-    noVocabulary: "No vocabulary found in that time range.",
-    foundWords: "Found {count} vocabulary word.",
-    foundWordsPlural: "Found {count} vocabulary words.",
-    foundWordsFiltered: "Found {count} vocabulary words ({details}).",
+    loading: "Building your deck...",
+    noVocabulary: "No words found for a deck in that time range.",
+    foundWords: "Deck ready: {count} word.",
+    foundWordsPlural: "Deck ready: {count} words.",
+    foundWordsFiltered: "Deck ready: {count} words ({details}).",
     randomized: "randomized",
     showing: "showing {count}",
     wordCount: "{count} word",
     wordCountPlural: "{count} words",
-    emptyWords: "Nothing here yet. Try a wider time range.",
-    wordListCopied: "Word list copied.",
+    emptyWords: "Your deck is empty. Try a wider time range.",
+    wordListCopied: "Deck copied.",
     promptCopied: "Prompt copied.",
     clipboardFailed:
       "Clipboard access failed. You can select and copy the text manually.",
-    promptTemplateSpeaking: `I'm studying {targetLanguage} and I just learned these vocabulary words:
+    promptTemplateSpeaking: `I'm studying {targetLanguage} and I have this vocabulary deck:
 
 {list}
 
-Help me practice speaking about these words in natural {targetLanguage} conversation.
+Help me practice speaking with this deck in natural {targetLanguage} conversation.
 
 Please follow these rules:
 - Wait for me to ask questions about the words. Do not start by quizzing me.
@@ -170,12 +173,12 @@ Please follow these rules:
 - {correctionRule}
 - Keep explanations concise unless I ask for more detail.
 - Speak primarily in {targetLanguage}, using {nativeLanguage} only when necessary.
-- Begin by briefly acknowledging the word list and inviting me to ask my first question.`,
-    promptTemplateListening: `I'm studying {targetLanguage} and I just learned these vocabulary words:
+- Begin by briefly acknowledging the deck and inviting me to ask my first question.`,
+    promptTemplateListening: `I'm studying {targetLanguage} and I have this vocabulary deck:
 
 {list}
 
-Help me practice listening comprehension with these words.
+Help me practice listening comprehension with this deck.
 
 Please follow these rules:
 - Use the target words naturally in {targetLanguage} as you speak.
@@ -191,7 +194,7 @@ Please follow these rules:
   },
   ja: {
     title: "DeckíMastá",
-    subtitle: "最近覚えた単語を、実際に使える言葉に変えましょう。",
+    subtitle: "会話を極めるための語彙デッキを作りましょう。",
     langGroup: "表示言語",
     themeGroup: "外観",
     themeSystem: "システムの外観に合わせる",
@@ -220,8 +223,8 @@ Please follow these rules:
     langJapanese: "日本語",
     swapLanguages: "母語と学習言語を入れ替える",
     languagesSameError: "母語と学習言語は別の言語にしてください。",
-    loadTitle: "ステップ2: 単語を読み込む",
-    loadIntro: "単語をどこから取り込むかを選び、まとめて読み込みます。",
+    loadTitle: "ステップ2: デッキを作る",
+    loadIntro: "単語の取り込み元を選び、練習用のデッキを組み立てます。",
     dataSource: "ソース",
     sourceHelpAria: "このソースについて",
     sourceHelpFallback: "データソースを選ぶと、内容の説明が表示されます。",
@@ -241,6 +244,9 @@ Please follow these rules:
     sourceDescJlptN5:
       "JLPT N5語彙の静的リスト（日本語の語と英語の意味）です。英語話者が日本語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
     lookBack: "直近",
+    lookBackHelpAria: "直近について",
+    lookBackHelp:
+      "この期間内に最後に学習した単語だけを含めます。学習日がないソースでは、この項目は表示されません。",
     range24: "過去24時間",
     range48: "過去2日間",
     range72: "過去3日間",
@@ -249,9 +255,9 @@ Please follow these rules:
     limitResults: "件数",
     limitPlaceholder: "すべて",
     randomize: "ランダム",
-    loadVocabulary: "読み込む",
+    loadVocabulary: "デッキを作る",
     loadHelp:
-      "件数を空欄にすると、該当するすべてを表示します。ランダムをオンにすると、制限を適用する前にシャッフルします。",
+      "件数を空欄にすると、該当するすべてをデッキに含めます。ランダムをオンにすると、制限を適用する前にシャッフルします。",
     loadHelpAria: "件数について",
     noSourcesRegistered: "登録されたデータソースがありません。",
     noSourcesForLanguages:
@@ -271,14 +277,14 @@ Please follow these rules:
     csvChooseFile: "ファイルを選択",
     csvNoFileChosen: "選択されていません",
     csvFileEmpty: "先にCSVファイルを選んでください。",
-    recentlyLearned: "ステップ3: 単語を確認",
+    recentlyLearned: "ステップ3: デッキを確認",
     wordsIntro:
-      "読み込んだ単語の一覧です。内容を確認して、問題なければ練習を始めましょう。友達と実際に話したり、ChatGPTに会話プロンプトを作成して練習したりできます。",
-    createPractice: "会話練習を作成",
-    copyWordList: "単語リストをコピー",
-    practiceTitle: "ステップ4: 単語を練習",
+      "これがあなたのデッキです。内容を確認して、問題なければ練習を始めましょう。友達と実際に話したり、ChatGPTに会話プロンプトを作成して練習したりできます。",
+    createPractice: "このデッキで練習",
+    copyWordList: "デッキをコピー",
+    practiceTitle: "ステップ4: デッキを練習",
     practiceIntro:
-      "練習のしかたを選んでください。プロンプトは設定を変えるたびに書き換わります。",
+      "このデッキの練習のしかたを選んでください。プロンプトは設定を変えるたびに書き換わります。",
     practiceMode: "練習モード",
     modeSpeaking: "スピーキング",
     modeListening: "リスニング",
@@ -328,25 +334,25 @@ Please follow these rules:
       "WaniKaniがトークンを拒否しました。正しいトークンか、読み取り権限があるか確認してください。",
     apiError: "WaniKani APIエラー（{status}）。",
     enterTokenFirst: "先にWaniKani APIトークンを入力して保存してください。",
-    loading: "最近の単語を読み込み中…",
-    noVocabulary: "その期間に該当する単語が見つかりませんでした。",
-    foundWords: "{count}語の単語が見つかりました。",
-    foundWordsPlural: "{count}語の単語が見つかりました。",
-    foundWordsFiltered: "{count}語の単語が見つかりました（{details}）。",
+    loading: "デッキを作成中…",
+    noVocabulary: "その期間にデッキ用の単語が見つかりませんでした。",
+    foundWords: "{count}語のデッキができました。",
+    foundWordsPlural: "{count}語のデッキができました。",
+    foundWordsFiltered: "{count}語のデッキができました（{details}）。",
     randomized: "ランダム化済み",
     showing: "{count}件を表示",
     wordCount: "{count}語",
     wordCountPlural: "{count}語",
-    emptyWords: "まだ何もありません。期間を広げてみてください。",
-    wordListCopied: "単語リストをコピーしました。",
+    emptyWords: "デッキは空です。期間を広げてみてください。",
+    wordListCopied: "デッキをコピーしました。",
     promptCopied: "プロンプトをコピーしました。",
     clipboardFailed:
       "クリップボードへのアクセスに失敗しました。手動で選択してコピーしてください。",
-    promptTemplateSpeaking: `{targetLanguage}を勉強していて、次の単語を覚えたところです：
+    promptTemplateSpeaking: `{targetLanguage}を勉強していて、次の語彙デッキがあります：
 
 {list}
 
-これらの単語について、自然な{targetLanguage}の会話でスピーキング練習できるよう手伝ってください。
+このデッキについて、自然な{targetLanguage}の会話でスピーキング練習できるよう手伝ってください。
 
 次のルールに従ってください：
 - 私が単語について質問するのを待ってください。いきなりクイズを始めないでください。
@@ -358,12 +364,12 @@ Please follow these rules:
 - {correctionRule}
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
 - 主に{targetLanguage}で話し、必要なときだけ{nativeLanguage}を使ってください。
-- まず単語リストを短く確認し、最初の質問をするよう促して始めてください。`,
-    promptTemplateListening: `{targetLanguage}を勉強していて、次の単語を覚えたところです：
+- まずデッキを短く確認し、最初の質問をするよう促して始めてください。`,
+    promptTemplateListening: `{targetLanguage}を勉強していて、次の語彙デッキがあります：
 
 {list}
 
-これらの単語でリスニング理解の練習ができるよう手伝ってください。
+このデッキでリスニング理解の練習ができるよう手伝ってください。
 
 次のルールに従ってください：
 - 話すとき、目標の単語を自然な{targetLanguage}の中で使ってください。

@@ -9,7 +9,9 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
-  <link rel="stylesheet" href="styles.css">
+  <!-- Bump ?v= whenever styles.css or translations.js change; the host caches assets
+       for 10 minutes, so without it fresh HTML can pair with stale CSS or copy. -->
+  <link rel="stylesheet" href="styles.css?v=2026-08-14d">
   <script>
     /* Resolve the theme before first paint so the page never flashes the wrong appearance. */
     (() => {
@@ -26,10 +28,10 @@
   <div class="header">
     <div class="header-copy">
       <div class="brand">
-        <img class="brand-logo" src="logo.png" alt="" width="1024" height="1024" aria-hidden="true">
+        <img class="brand-logo" src="logo.png" alt="" width="128" height="128" aria-hidden="true">
         <h1 data-i18n="title">DeckiMasta</h1>
       </div>
-      <p class="subtitle" data-i18n="subtitle">Turn recently learned vocabulary into words you actually use.</p>
+      <p class="subtitle" data-i18n="subtitle">Make vocabulary decks for mastering conversation.</p>
     </div>
     <div class="header-controls">
       <div class="theme-switch" role="group" aria-label="Appearance">
@@ -120,9 +122,9 @@
 
   <section id="loadCard" class="card" hidden>
     <div class="card-head">
-      <h2 data-i18n="loadTitle">Step 2: Load Words</h2>
+      <h2 data-i18n="loadTitle">Step 2: Build Your Deck</h2>
       <p class="card-intro" data-i18n="loadIntro">
-        Pick where your vocabulary comes from, then pull in a batch of words.
+        Pick where your vocabulary comes from, then assemble a deck to practice.
       </p>
     </div>
     <div class="row">
@@ -144,7 +146,20 @@
         <select id="source"></select>
       </div>
       <div id="rangeField">
-        <label for="range" data-i18n="lookBack">Recency</label>
+        <label for="range" class="label-with-help">
+          <span data-i18n="lookBack">Recency</span>
+          <button
+            type="button"
+            class="help-tip"
+            id="lookBackHelpTip"
+            data-i18n="lookBackHelpAria"
+            data-i18n-attr="aria-label"
+            aria-label="About Recency"
+            aria-describedby="lookBackHelp"
+            aria-expanded="false"
+          >?</button>
+          <span id="lookBackHelp" role="tooltip" class="help-tooltip" data-i18n="lookBackHelp">Only include words you last studied within this time window. Sources without study dates hide this option.</span>
+        </label>
         <select id="range">
           <option value="24" data-i18n="range24">Last 24 hours</option>
           <option value="48" data-i18n="range48">Last 2 days</option>
@@ -166,7 +181,7 @@
             aria-describedby="limitHelp"
             aria-expanded="false"
           >?</button>
-          <span id="limitHelp" role="tooltip" class="help-tooltip" data-i18n="loadHelp">Leave the limit blank to keep every match. Randomize shuffles before applying the limit.</span>
+          <span id="limitHelp" role="tooltip" class="help-tooltip" data-i18n="loadHelp">Leave the limit blank to keep every match in the deck. Randomize shuffles before applying the limit.</span>
         </label>
         <input id="limit" type="number" min="1" step="1" data-i18n="limitPlaceholder" data-i18n-attr="placeholder" placeholder="All" inputmode="numeric">
       </div>
@@ -174,7 +189,7 @@
         <input id="randomize" type="checkbox">
         <label for="randomize" data-i18n="randomize">Randomize</label>
       </div>
-      <button id="load" data-i18n="loadVocabulary">Load</button>
+      <button id="load" data-i18n="loadVocabulary">Build deck</button>
     </div>
 
     <div id="sourcePanelHost"></div>
@@ -185,17 +200,17 @@
   <section id="wordsCard" class="card" hidden>
     <div class="card-head">
       <div class="summary">
-        <h2 data-i18n="recentlyLearned">Step 3: Confirm Words</h2>
+        <h2 data-i18n="recentlyLearned">Step 3: Confirm Your Deck</h2>
         <strong id="count"></strong>
       </div>
       <p class="card-intro" data-i18n="wordsIntro">
-        These are the words you just loaded. Check that the list looks right, then turn it into a practice prompt.
+        This is your deck. Check that it looks right, then start practicing. You can practice with friends in person or create a conversation prompt for ChatGPT.
       </p>
     </div>
     <div id="words" class="word-list"></div>
     <div class="actions">
-      <button id="practice" data-i18n="createPractice">Create conversation practice</button>
-      <button id="copyWords" class="secondary" data-i18n="copyWordList">Copy word list</button>
+      <button id="practice" data-i18n="createPractice">Practice this deck</button>
+      <button id="copyWords" class="secondary" data-i18n="copyWordList">Copy deck</button>
     </div>
     <div id="wordsStatus" class="status" role="status" aria-live="polite"></div>
   </section>
@@ -203,10 +218,10 @@
   <section id="practiceCard" class="card" hidden>
     <div class="card-head">
       <div class="summary">
-        <h2 data-i18n="practiceTitle">Step 4: Practice Words</h2>
+        <h2 data-i18n="practiceTitle">Step 4: Practice Your Deck</h2>
       </div>
       <p class="card-intro" data-i18n="practiceIntro">
-        Choose how you want to practice. The prompt below is rewritten as you change these settings — copy it into ChatGPT to start the conversation.
+        Choose how you want to practice this deck. The prompt below is rewritten as you change these settings — copy it into ChatGPT to start the conversation.
       </p>
     </div>
     <div class="mode-field">
@@ -266,7 +281,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   </section>
 </main>
 
-<script src="translations.js"></script>
+<script src="translations.js?v=2026-08-14b"></script>
 <script src="sources/core/parts-of-speech.js"></script>
 <script src="sources/core/types.js"></script>
 <script src="sources/core/registry.js"></script>
@@ -1048,6 +1063,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   }
 
   bindHelpTip("limitHelpTip", "limitHelp");
+  bindHelpTip("lookBackHelpTip", "lookBackHelp");
   bindHelpTip("cefrHelpTip", "cefrHelp");
   bindHelpTip("sourceHelpTip", "sourceHelp");
 

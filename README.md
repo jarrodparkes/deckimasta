@@ -1,8 +1,8 @@
 # DeckiMasta
 
-Turn vocabulary from any word list into conversation practice.
+Make vocabulary decks for mastering conversation.
 
-DeckiMasta is a single-page browser app. Load words from a data source (WaniKani, JLPT N5, top 1000 English, CSV, and more), optionally focus on recently seen items or sample from your full set, then generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
+DeckiMasta is a single-page browser app. Load words from a data source (WaniKani, JLPT N5, top 1000 English, CSV, and more), optionally focus on recently seen items or sample from your full set, then build a vocabulary deck and generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
 
 ## Features
 
@@ -35,8 +35,8 @@ To add a data source, see [DATA_SOURCES.md](./DATA_SOURCES.md). Adapters live in
 3. Choose a **Look back** range to keep words whose `last_seen_at` falls in that window.
 4. Optionally set **Limit results** (leave blank for all matches).
 5. Optionally check **Randomize** so the selection is shuffled before the limit is applied.
-6. Click **Load vocabulary**.
-7. Review the list, then click **Create conversation practice**.
+6. Click **Build deck**.
+7. Review the deck, then click **Practice this deck**.
 8. On the practice card, choose a mode (**Speaking** is the default):
    - **Speaking** — the AI waits for your questions and can suggest starter words one at a time
    - **Listening** — the AI uses the target words and asks you questions about them
