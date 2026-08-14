@@ -29,12 +29,7 @@
   --highlight: var(--orange);
   --danger: #c33f43;
   --success: var(--accent-text);
-  --banner: linear-gradient(
-    160deg,
-    var(--navy) 0%,
-    #143446 55%,
-    #1a6a60 100%
-  );
+  --banner: linear-gradient(160deg, #23a089 0%, #1a6a60 55%, #1a6a60 100%);
   --radius: 16px;
   --shadow: 0 1px 3px rgba(15, 29, 45, 0.09);
   --shadow-raised: 0 2px 8px rgba(15, 29, 45, 0.14);
@@ -58,12 +53,7 @@
   --accent-text: #5fd0ba;
   --danger: #ff8f8f;
   /* Lifted off the navy page background so the banner still reads as a panel. */
-  --banner: linear-gradient(
-    160deg,
-    #17293a 0%,
-    #163d4b 55%,
-    #1a6a60 100%
-  );
+  --banner: linear-gradient(160deg, #17293a 0%, #163d4b 55%, #1a6a60 100%);
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
   --shadow-raised: 0 2px 10px rgba(0, 0, 0, 0.5);
 }
@@ -98,11 +88,25 @@ main {
 .header-copy {
   min-width: 0;
 }
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.brand-logo {
+  flex-shrink: 0;
+  width: auto;
+  height: clamp(2.6rem, 6vw, 3.4rem);
+}
 h1 {
   margin: 0 0 6px;
   font-size: clamp(1.7rem, 4vw, 2.35rem);
   font-weight: 700;
   line-height: 1.2;
+}
+.brand h1 {
+  margin: 0;
 }
 h2 {
   margin: 0;
