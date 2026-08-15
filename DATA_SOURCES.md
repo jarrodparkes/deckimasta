@@ -143,7 +143,9 @@ These options are source-agnostic. The app (not the source UI) owns them:
   // (any-match). Untagged words are excluded. null/[] = no POS filter.
   partsOfSpeech: string[] | null,
 
-  // Max words to keep after filtering/sorting/shuffle. null = no limit.
+  // Max words to keep after filtering/sorting/shuffle.
+  // null = no limit. When set, createLoadOptions clamps to 1–100.
+  // The UI defaults to 5.
   limit: number | null,
 
   // If true, shuffle before applying limit.

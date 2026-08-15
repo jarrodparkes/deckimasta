@@ -196,9 +196,9 @@
             aria-describedby="limitHelp"
             aria-expanded="false"
           >?</button>
-          <span id="limitHelp" role="tooltip" class="help-tooltip" data-i18n="loadHelp">Leave the limit blank to keep every match in the deck. Randomize shuffles before applying the limit.</span>
+          <span id="limitHelp" role="tooltip" class="help-tooltip" data-i18n="loadHelp">Limit how many words to include (1–100, default 5). Randomize shuffles before applying the limit.</span>
         </label>
-        <input id="limit" type="number" min="1" step="1" data-i18n="limitPlaceholder" data-i18n-attr="placeholder" placeholder="All" inputmode="numeric">
+        <input id="limit" type="number" min="1" max="100" step="1" value="5" data-i18n="limitPlaceholder" data-i18n-attr="placeholder" placeholder="5" inputmode="numeric">
       </div>
       <div class="checkbox-field">
         <input id="randomize" type="checkbox">
@@ -966,11 +966,14 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     }
 
     const limitRaw = $("limit").value.trim();
-    const limit = limitRaw === "" ? null : Math.max(1, Math.floor(Number(limitRaw)));
+    const parsedLimit = limitRaw === "" ? 5 : Math.floor(Number(limitRaw));
+    const limit = Number.isFinite(parsedLimit)
+      ? Math.min(100, Math.max(1, parsedLimit))
+      : 5;
     const options = {
       since,
       partsOfSpeech: selectedPartsOfSpeech(),
-      limit: Number.isFinite(limit) ? limit : null,
+      limit,
       randomize: $("randomize").checked
     };
 

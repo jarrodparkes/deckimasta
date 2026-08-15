@@ -110,7 +110,7 @@
     let limit = null;
     if (partial.limit != null && partial.limit !== "") {
       const n = Math.floor(Number(partial.limit));
-      if (Number.isFinite(n) && n >= 1) limit = n;
+      if (Number.isFinite(n) && n >= 1) limit = Math.min(100, n);
     }
 
     return {
