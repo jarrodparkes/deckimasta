@@ -125,6 +125,83 @@
       .slice(0, 3);
   }
 
+  /**
+   * WaniKani vocabulary POS dialect → shared DeckiMasta enum.
+   * Keys use the same underscore form as tagKey() below.
+   * Compound heads (e.g. "auxiliary verb") collapse via COMPOUND_SUFFIXES.
+   */
+  const WK_POS_ALIASES = Object.freeze({
+    proper_noun: "noun",
+    i_adjective: "adjective",
+    na_adjective: "adjective",
+    no_adjective: "adjective",
+    い_adjective: "adjective",
+    な_adjective: "adjective",
+    の_adjective: "adjective",
+    godan_verb: "verb",
+    ichidan_verb: "verb",
+    suru_verb: "verb",
+    する_verb: "verb",
+    transitive_verb: "verb",
+    intransitive_verb: "verb",
+  });
+
+  const WK_COMPOUND_SUFFIXES = Object.freeze([
+    "noun",
+    "verb",
+    "adjective",
+    "adverb",
+  ]);
+
+  function wkTagKey(tag) {
+    return String(tag).trim().toLowerCase().replace(/[\s\-・]+/g, "_");
+  }
+
+  /**
+   * Map one WaniKani parts_of_speech string onto a preferred enum tag when
+   * possible. Unrecognized tags pass through trimmed (free string).
+   * @param {string} tag
+   * @returns {string}
+   */
+  function mapWaniKaniPartOfSpeech(tag) {
+    if (typeof tag !== "string") return "";
+    const trimmed = tag.trim();
+    if (!trimmed) return "";
+    const key = wkTagKey(trimmed);
+    if (!key) return "";
+
+    if (
+      typeof DeckiMasta.isKnownPartOfSpeech === "function" &&
+      DeckiMasta.isKnownPartOfSpeech(key)
+    ) {
+      return key;
+    }
+    if (WK_POS_ALIASES[key]) return WK_POS_ALIASES[key];
+
+    for (const suffix of WK_COMPOUND_SUFFIXES) {
+      if (key.endsWith("_" + suffix)) return suffix;
+    }
+
+    return trimmed;
+  }
+
+  /**
+   * @param {unknown} tags
+   * @returns {string[]}
+   */
+  function mapWaniKaniPartsOfSpeech(tags) {
+    if (!Array.isArray(tags)) return [];
+    const seen = new Set();
+    const result = [];
+    for (const tag of tags) {
+      const value = mapWaniKaniPartOfSpeech(tag);
+      if (!value || seen.has(value)) continue;
+      seen.add(value);
+      result.push(value);
+    }
+    return result;
+  }
+
   function mapAssignmentToWord(assignment, subject) {
     const d = subject.data || {};
     const startedAt = assignment.data?.started_at || null;
@@ -137,7 +214,7 @@
       meanings: meaningsFromSubject(d),
       created_at: startedAt,
       last_seen_at: lastSeenAt,
-      parts_of_speech: d.parts_of_speech || [],
+      parts_of_speech: mapWaniKaniPartsOfSpeech(d.parts_of_speech),
     });
   }
 
@@ -307,6 +384,7 @@
     descriptionKey: "sourceDescWanikani",
     requiresAuth: true,
     supportsLookBack: true,
+    supportsPartsOfSpeech: true,
     tokenKey: TOKEN_KEY,
     getToken: getStoredToken,
     supportsLanguages({ native, target }) {

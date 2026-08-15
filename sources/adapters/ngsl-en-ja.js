@@ -30,6 +30,7 @@
     descriptionKey: "sourceDescNgslEnJa",
     requiresAuth: false,
     supportsLookBack: false,
+    supportsPartsOfSpeech: true,
     supportsLanguages({ native, target }) {
       return native === "ja" && target === "en";
     },

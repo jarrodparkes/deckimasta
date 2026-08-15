@@ -172,7 +172,7 @@
             aria-describedby="lookBackHelp"
             aria-expanded="false"
           >?</button>
-          <span id="lookBackHelp" role="tooltip" class="help-tooltip" data-i18n="lookBackHelp">Only include words you last studied within this time window. Sources without study dates hide this option.</span>
+          <span id="lookBackHelp" role="tooltip" class="help-tooltip" data-i18n="lookBackHelp">Only include words you last studied within this time window. Choose All time to include every word from the source. Sources without study dates hide this option.</span>
         </label>
         <select id="range">
           <option value="24" data-i18n="range24">Last 24 hours</option>
@@ -180,6 +180,7 @@
           <option value="72" data-i18n="range72">Last 3 days</option>
           <option value="168" data-i18n="range168">Last 7 days</option>
           <option value="336" data-i18n="range336">Last 14 days</option>
+          <option value="all" data-i18n="rangeAll">All time</option>
         </select>
       </div>
       <div>
@@ -204,6 +205,40 @@
         <label for="randomize" data-i18n="randomize">Randomize</label>
       </div>
       <button id="load" data-i18n="loadVocabulary">Build deck</button>
+    </div>
+
+    <div id="posField" class="pos-field" hidden>
+      <details id="posDetails" class="advanced-filters">
+        <summary>
+          <span id="posSummaryLabel" data-i18n="moreFilters">More filters</span>
+          <span id="posSummaryMeta" class="advanced-filters-meta" hidden></span>
+        </summary>
+        <div class="pos-panel">
+          <div class="pos-toolbar">
+            <label class="label-with-help" id="posFieldLabel">
+              <span data-i18n="partsOfSpeech">Part of speech</span>
+              <button
+                type="button"
+                class="help-tip"
+                id="posHelpTip"
+                data-i18n="partsOfSpeechHelpAria"
+                data-i18n-attr="aria-label"
+                aria-label="About Part of speech"
+                aria-describedby="posHelp"
+                aria-expanded="false"
+              >?</button>
+              <span id="posHelp" role="tooltip" class="help-tooltip" data-i18n="partsOfSpeechHelp">Leave all unchecked to include every part of speech. Checking one or more keeps only words tagged with any of those categories; words without a part of speech are left out.</span>
+            </label>
+            <button
+              type="button"
+              id="posToggleAll"
+              class="text-button"
+              data-i18n="posSelectAll"
+            >Select all</button>
+          </div>
+          <div id="posOptions" class="pos-options" role="group" aria-labelledby="posFieldLabel"></div>
+        </div>
+      </details>
     </div>
 
     <div id="sourcePanelHost"></div>
@@ -523,6 +558,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     updatePracticeHelp();
 
     populateSourceSelect();
+    syncPartsOfSpeechUi();
     if (!sourceUIHost.getActive()) mountSelectedSourceUi();
     else refreshSourceUiTranslations();
 
@@ -687,6 +723,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     if (!languagePairSelected()) {
       updateSourceHelp();
       syncLookBackUi();
+      syncPartsOfSpeechUi();
       return;
     }
 
@@ -716,6 +753,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
       sourceSelect.appendChild(option);
       updateSourceHelp();
       syncLookBackUi();
+      syncPartsOfSpeechUi();
       return;
     }
 
@@ -728,6 +766,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
     updateSourceHelp();
     syncLookBackUi();
+    syncPartsOfSpeechUi();
   }
 
   function selectedSource() {
@@ -768,6 +807,126 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     $("range").disabled = !enabled;
   }
 
+  const POS_LABEL_KEYS = {
+    noun: "posNoun",
+    numeral: "posNumeral",
+    pronoun: "posPronoun",
+    prefix: "posPrefix",
+    suffix: "posSuffix",
+    counter: "posCounter",
+    expression: "posExpression",
+    interjection: "posInterjection",
+    conjunction: "posConjunction",
+    adverb: "posAdverb",
+    adjective: "posAdjective",
+    verb: "posVerb"
+  };
+
+  function posLabel(tag) {
+    const key = POS_LABEL_KEYS[tag];
+    return key ? t(key) : tag;
+  }
+
+  function ensurePosOptions() {
+    const host = $("posOptions");
+    if (!host || host.dataset.ready === "1") return;
+    const tags = Array.isArray(DeckiMasta.PARTS_OF_SPEECH)
+      ? DeckiMasta.PARTS_OF_SPEECH
+      : [];
+    host.innerHTML = "";
+    for (const tag of tags) {
+      const id = "pos-" + tag;
+      const wrap = document.createElement("label");
+      wrap.className = "pos-option";
+      wrap.setAttribute("for", id);
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.id = id;
+      input.name = "partsOfSpeech";
+      input.value = tag;
+      input.addEventListener("change", syncPosSelectionUi);
+      const text = document.createElement("span");
+      text.dataset.posTag = tag;
+      text.textContent = posLabel(tag);
+      wrap.appendChild(input);
+      wrap.appendChild(text);
+      host.appendChild(wrap);
+    }
+    host.dataset.ready = "1";
+  }
+
+  function refreshPosOptionLabels() {
+    $("posOptions")?.querySelectorAll("[data-pos-tag]").forEach(el => {
+      el.textContent = posLabel(el.getAttribute("data-pos-tag"));
+    });
+  }
+
+  function posCheckboxes() {
+    return Array.from(
+      $("posOptions")?.querySelectorAll('input[type="checkbox"]') || []
+    );
+  }
+
+  function syncPosSelectionUi() {
+    const boxes = posCheckboxes();
+    const checked = boxes.filter(input => input.checked);
+    const toggle = $("posToggleAll");
+    if (toggle) {
+      const allOn = boxes.length > 0 && checked.length === boxes.length;
+      toggle.textContent = t(allOn ? "posClearAll" : "posSelectAll");
+      toggle.dataset.mode = allOn ? "clear" : "select";
+    }
+
+    const meta = $("posSummaryMeta");
+    if (meta) {
+      if (checked.length) {
+        meta.hidden = false;
+        meta.textContent = t("moreFiltersActive", { count: checked.length });
+      } else {
+        meta.hidden = true;
+        meta.textContent = "";
+      }
+    }
+  }
+
+  function toggleAllPartsOfSpeech() {
+    const boxes = posCheckboxes().filter(input => !input.disabled);
+    if (!boxes.length) return;
+    const allOn = boxes.every(input => input.checked);
+    boxes.forEach(input => {
+      input.checked = !allOn;
+    });
+    syncPosSelectionUi();
+  }
+
+  function syncPartsOfSpeechUi() {
+    const field = $("posField");
+    if (!field) return;
+    ensurePosOptions();
+    refreshPosOptionLabels();
+    const source = selectedSource();
+    const enabled =
+      Boolean(source) &&
+      typeof DeckiMasta.sourceSupportsPartsOfSpeech === "function" &&
+      DeckiMasta.sourceSupportsPartsOfSpeech(source);
+    field.hidden = !enabled;
+    const toggle = $("posToggleAll");
+    if (toggle) toggle.disabled = !enabled;
+    posCheckboxes().forEach(input => {
+      input.disabled = !enabled;
+    });
+    syncPosSelectionUi();
+  }
+
+  function selectedPartsOfSpeech() {
+    const field = $("posField");
+    if (!field || field.hidden) return null;
+    const selected = posCheckboxes()
+      .filter(input => input.checked)
+      .map(input => input.value);
+    return selected.length ? selected : null;
+  }
+
   function mountSelectedSourceUi() {
     const sourceId = languagePairSelected() ? sourceSelect.value : "";
     if (!sourceId) {
@@ -797,14 +956,20 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
     let since = null;
     if (lookBack) {
-      const hours = Number($("range").value);
-      since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+      const rangeValue = $("range").value;
+      if (rangeValue !== "all") {
+        const hours = Number(rangeValue);
+        if (Number.isFinite(hours) && hours > 0) {
+          since = new Date(Date.now() - hours * 60 * 60 * 1000).toISOString();
+        }
+      }
     }
 
     const limitRaw = $("limit").value.trim();
     const limit = limitRaw === "" ? null : Math.max(1, Math.floor(Number(limitRaw)));
     const options = {
       since,
+      partsOfSpeech: selectedPartsOfSpeech(),
       limit: Number.isFinite(limit) ? limit : null,
       randomize: $("randomize").checked
     };
@@ -1035,6 +1200,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     if (sourceSelect.value) localStorage.setItem(SOURCE_KEY, sourceSelect.value);
     updateSourceHelp();
     syncLookBackUi();
+    syncPartsOfSpeechUi();
     mountSelectedSourceUi();
   });
   $("load").addEventListener("click", loadWords);
@@ -1084,8 +1250,14 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
   bindHelpTip("limitHelpTip", "limitHelp");
   bindHelpTip("lookBackHelpTip", "lookBackHelp");
+  bindHelpTip("posHelpTip", "posHelp");
   bindHelpTip("cefrHelpTip", "cefrHelp");
   bindHelpTip("sourceHelpTip", "sourceHelp");
+
+  $("posToggleAll")?.addEventListener("click", event => {
+    event.preventDefault();
+    toggleAllPartsOfSpeech();
+  });
 
   applyTheme();
   syncLanguagePairUI();

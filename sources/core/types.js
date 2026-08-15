@@ -15,6 +15,7 @@
  * LoadOptions:
  *   {
  *     since: Date | string | null, // filter on last_seen_at; null = no look-back
+ *     partsOfSpeech: string[] | null, // keep words matching any tag; null/[] = no POS filter
  *     limit: number | null,
  *     randomize: boolean
  *   }
@@ -85,7 +86,12 @@
 
   /**
    * @param {object} [partial]
-   * @returns {{ since: string|null, limit: number|null, randomize: boolean }}
+   * @returns {{
+   *   since: string|null,
+   *   partsOfSpeech: string[]|null,
+   *   limit: number|null,
+   *   randomize: boolean
+   * }}
    */
   function createLoadOptions(partial = {}) {
     let since = null;
@@ -93,6 +99,13 @@
       const iso = toIsoString(partial.since);
       since = iso;
     }
+
+    const normalizePos =
+      typeof DeckiMasta.normalizePartsOfSpeech === "function"
+        ? DeckiMasta.normalizePartsOfSpeech
+        : value => (Array.isArray(value) ? value : []);
+    const partsOfSpeechRaw = normalizePos(partial.partsOfSpeech);
+    const partsOfSpeech = partsOfSpeechRaw.length ? partsOfSpeechRaw : null;
 
     let limit = null;
     if (partial.limit != null && partial.limit !== "") {
@@ -102,6 +115,7 @@
 
     return {
       since,
+      partsOfSpeech,
       limit,
       randomize: Boolean(partial.randomize)
     };
@@ -117,10 +131,12 @@
   }
 
   /**
-   * Filter by optional `since` (on last_seen_at) and sort newest-first.
+   * Filter by optional `since` (on last_seen_at), optional parts of speech,
+   * then sort newest-first. POS filter runs after look-back: keep words whose
+   * parts_of_speech intersects the selected tags; untagged words are excluded.
    * @param {object[]} words
    * @param {object} [options]
-   * @returns {{ words: object[], options: { since: string|null, limit: number|null, randomize: boolean } }}
+   * @returns {{ words: object[], options: object }}
    */
   function matchWords(words, options = {}) {
     const opts = createLoadOptions(options);
@@ -134,6 +150,15 @@
       });
     }
 
+    if (opts.partsOfSpeech && opts.partsOfSpeech.length) {
+      const wanted = new Set(opts.partsOfSpeech);
+      result = result.filter(word => {
+        const tags = Array.isArray(word.parts_of_speech) ? word.parts_of_speech : [];
+        if (!tags.length) return false;
+        return tags.some(tag => wanted.has(tag));
+      });
+    }
+
     result.sort(
       (a, b) => new Date(b.last_seen_at).getTime() - new Date(a.last_seen_at).getTime()
     );
@@ -142,7 +167,7 @@
   }
 
   /**
-   * Apply shared look-back / sort / randomize / limit after a source returns words.
+   * Apply shared look-back / POS / sort / randomize / limit after a source returns words.
    * @param {object[]} words
    * @param {object} [options]
    * @returns {object[]}
@@ -152,7 +177,7 @@
   }
 
   /**
-   * Same as applyLoadOptions, plus totalMatched (after look-back, before limit).
+   * Same as applyLoadOptions, plus totalMatched (after look-back + POS, before limit).
    * @param {object[]} words
    * @param {object} [options]
    * @returns {{ words: object[], totalMatched: number, options: object }}

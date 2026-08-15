@@ -9,6 +9,7 @@
  *     descriptionKey?: string,     // optional i18n key for the source tooltip
  *     requiresAuth: boolean,
  *     supportsLookBack?: boolean,  // default true; false for static curated lists
+ *     supportsPartsOfSpeech?: boolean, // default false; true when source provides POS tags
  *     load: (options?) => Promise<Word[]>,
  *     createUI?: (ctx) => SourceUI,  // optional adapter-owned UI
  *     // Optional: qualify which native/target pairs this source supports.
@@ -89,6 +90,17 @@
   }
 
   /**
+   * Whether a source provides parts_of_speech for the shared POS filter.
+   * Defaults to false when omitted (opt-in).
+   * @param {object} source
+   * @returns {boolean}
+   */
+  function sourceSupportsPartsOfSpeech(source) {
+    if (!source) return false;
+    return source.supportsPartsOfSpeech === true;
+  }
+
+  /**
    * Localized label for a source, falling back to source.label.
    * @param {object} source
    * @param {(key: string) => string} [t]
@@ -152,6 +164,7 @@
   DeckiMasta.hasSource = hasSource;
   DeckiMasta.sourceSupportsLanguages = sourceSupportsLanguages;
   DeckiMasta.sourceSupportsLookBack = sourceSupportsLookBack;
+  DeckiMasta.sourceSupportsPartsOfSpeech = sourceSupportsPartsOfSpeech;
   DeckiMasta.sourceLabel = sourceLabel;
   DeckiMasta.sourceDescription = sourceDescription;
 })(window);

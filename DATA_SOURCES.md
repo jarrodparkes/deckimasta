@@ -9,7 +9,7 @@ This document is the contract for that layer: the shared **word** shape, shared 
 - One source at a time (no merging yet)
 - Sources own their own auth / credentials when needed
 - Sources return the shared word shape
-- The app applies shared post-processing (optional look-back, sort, randomize, limit)
+- The app applies shared post-processing (optional look-back, parts of speech, sort, randomize, limit)
 
 ## Word Shape
 
@@ -125,7 +125,7 @@ For words loaded from WaniKani API, the following mapping is used (see `sources/
 - `meanings` ← subject meanings (up to 3)
 - `created_at` ← assignment `started_at` (first time learning started)
 - `last_seen_at` ← latest of assignment `data_updated_at`, `burned_at`, `passed_at`, `resurrected_at`, `started_at`
-- `parts_of_speech` ← subject `parts_of_speech`
+- `parts_of_speech` ← subject `parts_of_speech`, mapped in the adapter onto the shared enum (e.g. `godan verb` / `する verb` → `verb`, `い adjective` → `adjective`)
 
 When `since` is provided, the adapter prefetches with `updated_after` for efficiency. Shared `applyLoadOptions` still enforces the final `last_seen_at` look-back.
 
@@ -139,6 +139,10 @@ These options are source-agnostic. The app (not the source UI) owns them:
   // When null/undefined, do not filter by recency (full set / random sample use case).
   since: Date | string | null,
 
+  // When non-empty, keep words whose parts_of_speech intersects this list
+  // (any-match). Untagged words are excluded. null/[] = no POS filter.
+  partsOfSpeech: string[] | null,
+
   // Max words to keep after filtering/sorting/shuffle. null = no limit.
   limit: number | null,
 
@@ -146,6 +150,8 @@ These options are source-agnostic. The app (not the source UI) owns them:
   randomize: boolean
 }
 ```
+
+Filter order in `applyLoadOptions`: look-back (`since`) → parts of speech → sort → randomize → limit.
 
 ## Important Interfaces (Word and WordSource)
 
@@ -171,6 +177,7 @@ Shared helpers live on `window.DeckiMasta` (no bundler). A data source is a plai
  * @property {string} [descriptionKey] // optional i18n key for the source tooltip
  * @property {boolean} requiresAuth // whether the source needs credentials
  * @property {boolean} [supportsLookBack] // default true; false for static curated lists (no learner timestamps)
+ * @property {boolean} [supportsPartsOfSpeech] // default false; true when the source provides POS tags
  * @property {(options?: object) => Promise<Word[]>} load
  * @property {(ctx: { t: Function, setStatus: Function }) => object} [createUI]
  * @property {(pair: { native: string, target: string }) => boolean} [supportsLanguages]
@@ -180,6 +187,8 @@ Shared helpers live on `window.DeckiMasta` (no bundler). A data source is a plai
 `supportsLanguages({ native, target })` is optional. When present, the source only appears in the Step 2 picker for pairs that return `true`. When omitted, the source is treated as universal (any native/target pair).
 
 `supportsLookBack` is optional and defaults to `true`. Set it to `false` for static curated lists with no learner-progress timestamps. The UI hides Recency for those sources and passes `since: null` so the shared look-back filter does not empty the list.
+
+`supportsPartsOfSpeech` is optional and defaults to `false` (opt-in). Set it to `true` when the source maps `parts_of_speech` for its words. The UI shows a collapsed **More filters** disclosure with the Part of speech multi-select only for those sources and passes selected tags as `partsOfSpeech` in shared load options.
 
 `labelKey` / `descriptionKey` are optional i18n keys. The Source picker shows a `?` tooltip whose text is taken from `descriptionKey` for the currently selected source (among sources available for the active language pair).
 
@@ -206,21 +215,20 @@ Adapters may provide their own setup/panel UI. Return an object with any of:
 
 The app mounts UI into `#sourceSetupHost` / `#sourcePanelHost` via `DeckiMasta.createSourceUIHost`. Only the selected source’s UI is shown.
 
-The app then applies `DeckiMasta.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency as long as the returned words still satisfy the shared contract.
+The app then applies `DeckiMasta.applyLoadOptions(words, options)` for shared filtering (`since` on `last_seen_at`, then optional `partsOfSpeech`), sorting, shuffle, and `limit`. Sources may pre-filter for efficiency as long as the returned words still satisfy the shared contract.
 
 ### `window.DeckiMasta` API
 
 | Helper                                                | Role                                                          |
 | ----------------------------------------------------- | ------------------------------------------------------------- |
 | `PARTS_OF_SPEECH`                                     | Frozen preferred POS enum (language-agnostic)                 |
-| `PARTS_OF_SPEECH_ALIASES`                             | Map of source/legacy tags → preferred enum                    |
 | `isKnownPartOfSpeech(tag)`                            | Whether a tag is in the preferred enum                        |
-| `canonicalizePartOfSpeech(tag)`                       | Apply alias collapse for one tag                              |
-| `normalizePartsOfSpeech(tags)`                        | Trim, alias-collapse, dedupe; unknown tags kept               |
+| `canonicalizePartOfSpeech(tag)`                       | Prefer enum spelling when case/spacing match; else keep free  |
+| `normalizePartsOfSpeech(tags)`                        | Trim, enum-case normalize, dedupe; unknown tags kept          |
 | `createWord(partial)`                                 | Normalize a Word; generate `id` if missing; mirror timestamps |
-| `createLoadOptions(partial)`                          | Normalize `{ since, limit, randomize }`                       |
-| `matchWords(words, options)`                          | Look-back filter + sort (no shuffle/limit)                    |
-| `applyLoadOptions(words, options)`                    | Shared look-back → sort → shuffle → limit                     |
+| `createLoadOptions(partial)`                          | Normalize `{ since, partsOfSpeech, limit, randomize }`        |
+| `matchWords(words, options)`                          | Look-back + POS filter + sort (no shuffle/limit)              |
+| `applyLoadOptions(words, options)`                    | Shared look-back → POS → sort → shuffle → limit               |
 | `applyLoadOptionsWithMeta(words, options)`            | Same, plus `totalMatched` before limit                        |
 | `loadFromSource(sourceId, options)`                   | Registry lookup → `source.load` → apply shared options        |
 | `parseWordCsv(text)`                                  | Parse CSV-like paste/file text into Word[]                    |
@@ -231,6 +239,7 @@ The app then applies `DeckiMasta.applyLoadOptions(words, options)` for shared fi
 | `listSources({ native, target }?)`                    | All sources, or only those supporting the language pair       |
 | `sourceSupportsLanguages(source, { native, target })` | Whether a source accepts the given pair                       |
 | `sourceSupportsLookBack(source)`                      | Whether Recency / `since` applies (default true)              |
+| `sourceSupportsPartsOfSpeech(source)`                 | Whether Part of speech filter applies (default false)         |
 | `sourceLabel(source, t)`                              | Localized picker label                                        |
 | `sourceDescription(source, t)`                        | Localized tooltip text for the selected source                |
 
@@ -323,12 +332,14 @@ Words are loaded only through registered adapters under `sources/adapters/` via 
 - [ ] Stable `id` when the backend provides one; otherwise generated per load
 - [ ] `word` + `alternatives` + `meanings` always present (arrays may be empty)
 - [ ] `created_at` and `last_seen_at` always ISO strings (duplicated when only one timestamp exists)
-- [ ] `parts_of_speech` mapped to the shared language-agnostic enum when possible (or left for `normalizePartsOfSpeech` aliases)
+- [ ] `parts_of_speech` mapped to the shared language-agnostic enum in the adapter when the source uses a dialect (e.g. WaniKani); CSV authors write preferred tags directly
 - [ ] Credentials handled only inside the source
 - [ ] `supportsLanguages({ native, target })` declared when the source only fits certain language pairs (omit for universal)
 - [ ] `supportsLookBack: false` when the source has no learner-progress timestamps (static lists)
+- [ ] `supportsPartsOfSpeech: true` when the source provides `parts_of_speech` (enables the shared POS filter UI)
 - [ ] `descriptionKey` (and optional `labelKey`) so the Source tooltip can explain the source
 - [ ] Works with and without the shared `since` look-back filter
+- [ ] Works with and without the shared `partsOfSpeech` filter when `supportsPartsOfSpeech` is set
 - [ ] Registered for one-at-a-time selection in the UI
 
 ## Built-in curated lists

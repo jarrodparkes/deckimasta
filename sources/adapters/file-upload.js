@@ -102,6 +102,7 @@
     descriptionKey: "sourceDescCsvFile",
     requiresAuth: false,
     supportsLookBack: true,
+    supportsPartsOfSpeech: true,
     // Works for any native/target pair (omit supportsLanguages = universal).
     createUI,
 

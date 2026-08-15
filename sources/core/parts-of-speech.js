@@ -4,8 +4,9 @@
  * Matches Word.parts_of_speech items in DATA_SOURCES.md:
  * anyOf [ preferred enum, free non-empty string ].
  *
- * Preferred tags are language-agnostic. Source-specific finer tags
- * should be mapped to the preferred tags.
+ * Preferred tags are language-agnostic. Source-specific dialects
+ * (e.g. WaniKani "godan verb") must be mapped in the adapter before
+ * createWord — core only normalizes casing/spacing for known tags.
  */
 (function (global) {
   "use strict";
@@ -28,23 +29,6 @@
     "verb",
   ]);
 
-  /**
-   * Map source-specific / legacy tags onto the preferred enum.
-   * Unknown tags pass through unchanged (schema anyOf free string).
-   * @type {Readonly<Record<string, string>>}
-   */
-  const PARTS_OF_SPEECH_ALIASES = Object.freeze({
-    proper_noun: "noun",
-    i_adjective: "adjective",
-    na_adjective: "adjective",
-    no_adjective: "adjective",
-    godan_verb: "verb",
-    ichidan_verb: "verb",
-    suru_verb: "verb",
-    transitive_verb: "verb",
-    intransitive_verb: "verb",
-  });
-
   const PARTS_OF_SPEECH_SET = new Set(PARTS_OF_SPEECH);
 
   /**
@@ -56,16 +40,31 @@
   }
 
   /**
-   * Collapse a raw tag onto a preferred enum value when an alias exists.
+   * Lowercase and underscore-separate a raw tag for enum lookup.
+   * @param {string} tag
+   * @returns {string}
+   */
+  function tagKey(tag) {
+    return String(tag).trim().toLowerCase().replace(/[\s\-・]+/g, "_");
+  }
+
+  /**
+   * If the tag matches a preferred enum value (ignoring case/spacing), return
+   * that enum value. Otherwise return the trimmed original (free string).
+   * Source-specific aliases belong in adapters, not here.
    * @param {string} tag
    * @returns {string}
    */
   function canonicalizePartOfSpeech(tag) {
-    return PARTS_OF_SPEECH_ALIASES[tag] || tag;
+    const trimmed = String(tag).trim();
+    if (!trimmed) return "";
+    const key = tagKey(trimmed);
+    if (PARTS_OF_SPEECH_SET.has(key)) return key;
+    return trimmed;
   }
 
   /**
-   * Normalize POS tags: trim, alias-collapse, drop empties/non-strings, dedupe.
+   * Normalize POS tags: trim, collapse known enum spellings, drop empties, dedupe.
    * Preferred enum values and free strings are both kept (schema anyOf).
    * @param {string[]} tags
    * @returns {string[]}
@@ -76,10 +75,8 @@
     const result = [];
     for (const tag of tags) {
       if (typeof tag !== "string") continue;
-      const raw = tag.trim();
-      if (!raw) continue;
-      const value = canonicalizePartOfSpeech(raw);
-      if (seen.has(value)) continue;
+      const value = canonicalizePartOfSpeech(tag);
+      if (!value || seen.has(value)) continue;
       seen.add(value);
       result.push(value);
     }
@@ -87,7 +84,6 @@
   }
 
   DeckiMasta.PARTS_OF_SPEECH = PARTS_OF_SPEECH;
-  DeckiMasta.PARTS_OF_SPEECH_ALIASES = PARTS_OF_SPEECH_ALIASES;
   DeckiMasta.isKnownPartOfSpeech = isKnownPartOfSpeech;
   DeckiMasta.canonicalizePartOfSpeech = canonicalizePartOfSpeech;
   DeckiMasta.normalizePartsOfSpeech = normalizePartsOfSpeech;

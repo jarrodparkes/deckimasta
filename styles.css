@@ -337,6 +337,118 @@ textarea:focus {
 .row:has(#rangeField[hidden]) {
   grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
 }
+.pos-field {
+  margin-top: 14px;
+}
+.pos-field[hidden] {
+  display: none;
+}
+.advanced-filters {
+  margin-top: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--tint);
+}
+.advanced-filters > summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  list-style: none;
+  cursor: pointer;
+  color: var(--heading);
+  font-weight: 700;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  user-select: none;
+}
+.advanced-filters > summary::-webkit-details-marker {
+  display: none;
+}
+.advanced-filters > summary::before {
+  content: "";
+  width: 0.45em;
+  height: 0.45em;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
+  transition: transform 0.15s ease;
+  flex-shrink: 0;
+}
+.advanced-filters[open] > summary::before {
+  transform: rotate(45deg);
+}
+.advanced-filters-meta {
+  color: var(--accent-text);
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 0.85rem;
+}
+.pos-panel {
+  padding: 0 12px 12px;
+  border-top: 1px solid var(--border);
+}
+.pos-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  margin-bottom: 8px;
+}
+.pos-toolbar .label-with-help {
+  margin-bottom: 0;
+}
+button.text-button {
+  border: none;
+  background: transparent;
+  color: var(--accent-text);
+  padding: 0;
+  font-size: 0.85rem;
+  font-weight: 700;
+  text-transform: none;
+  letter-spacing: 0;
+  box-shadow: none;
+}
+button.text-button:hover:not(:disabled) {
+  background: transparent;
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+button.text-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+.pos-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+}
+.pos-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--text);
+  cursor: pointer;
+  user-select: none;
+}
+.pos-option input {
+  width: auto;
+  margin: 0;
+  accent-color: var(--accent-solid);
+}
 .checkbox-field {
   display: flex;
   align-items: center;
