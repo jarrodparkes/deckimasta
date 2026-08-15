@@ -51,6 +51,9 @@ window.DeckiMastaStrings = {
     sourceLabelJlptN5: "JLPT N5",
     sourceDescJlptN5:
       "A static JLPT N5 vocabulary list (Japanese words with English meanings). Built for English speakers learning Japanese. No API key; Recency does not apply.",
+    sourceLabelToeicTsl: "TOEIC Service List (TSL)",
+    sourceDescToeicTsl:
+      "A static TOEIC-oriented English vocabulary list (~1,270 words) with Japanese glosses. Built for Japanese speakers learning English. No API key; Recency does not apply.",
     lookBack: "Recency",
     lookBackHelpAria: "About Recency",
     lookBackHelp:
@@ -245,6 +248,9 @@ Please follow these rules:
     sourceLabelJlptN5: "JLPT N5",
     sourceDescJlptN5:
       "JLPT N5語彙の静的リスト（日本語の語と英語の意味）です。英語話者が日本語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
+    sourceLabelToeicTsl: "TOEIC英単語（TSL）",
+    sourceDescToeicTsl:
+      "TOEIC向け英語語彙の静的リスト（約1,270語）と日本語訳です。日本語話者が英語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
     lookBack: "直近",
     lookBackHelpAria: "直近について",
     lookBackHelp:

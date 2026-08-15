@@ -2,7 +2,7 @@
 
 Make vocabulary decks for mastering conversation.
 
-DeckiMasta is a single-page browser app. Load words from a data source (WaniKani, JLPT N5, top 1000 English, CSV, and more), optionally focus on recently seen items or sample from your full set, then build a vocabulary deck and generate a ChatGPT-ready prompt for one-turn-at-a-time conversation practice.
+DeckiMasta is a single-page browser app. Load words from a data source and builds vocabulary decks that can be used for one-turn-at-a-time conversation practice.
 
 ## Features
 
@@ -11,6 +11,7 @@ DeckiMasta is a single-page browser app. Load words from a data source (WaniKani
   - **WaniKani** (English → Japanese, API token)
   - **JLPT N5** static vocabulary (English → Japanese)
   - **Top 1000 English** static frequency list with Japanese glosses (Japanese → English)
+  - **TOEIC Service List (TSL)** static TOEIC-oriented English vocabulary with Japanese glosses (Japanese → English)
   - **CSV Paste** / **CSV File** (any pair)
 - Source picker **tooltips** that explain the selected source for the current language pair
 - Optional **look-back** filter on `last_seen_at` when the source has learner progress (hidden for static lists)
