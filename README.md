@@ -12,6 +12,7 @@ DeckiMasta is a single-page browser app. Load words from a data source and build
   - **JLPT N5** static vocabulary (English → Japanese)
   - **Top 1000 English** static frequency list with Japanese glosses (Japanese → English)
   - **TOEIC Service List (TSL)** static TOEIC-oriented English vocabulary with Japanese glosses (Japanese → English)
+  - **New General Service List (NGSL)** static high-frequency English vocabulary with Japanese glosses (Japanese → English)
   - **CSV Paste** / **CSV File** (any pair)
 - Source picker **tooltips** that explain the selected source for the current language pair
 - Optional **look-back** filter on `last_seen_at` when the source has learner progress (hidden for static lists)

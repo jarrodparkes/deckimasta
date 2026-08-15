@@ -23,4 +23,12 @@ DeckiMasta includes curated vocabulary lists from the following projects.
 - Used for: Japanese → English learners (English headwords with Japanese glosses)
 - Used raw CSV and converted to JS file slimmed for DeckiMasta
 
-Modifications: lists were slimmed to the fields DeckiMasta needs (`id`, `word`, `alternatives` / readings, `meanings`) and shipped as JS globals so they load under `file://`. Dictionary markup in TSL glosses was normalized (sense splits, countability tags stripped), and each TSL entry keeps only the first primary Japanese gloss for cleaner study cards.
+## New General Service List / NGSL (`sources/data/ngsl-en-ja.js`)
+
+- Upstream CSV: [koba-ninkigumi/ngsl](https://github.com/koba-ninkigumi/ngsl) (`NGSL-1.01_en_ja.csv`)
+- Word list credit: New General Service List by Browne, C., Culligan, B., and Phillips, J. ([newgeneralservicelist.com](https://www.newgeneralservicelist.com/new-general-service-list))
+- License: [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)
+- Used for: Japanese → English learners (English headwords with Japanese glosses)
+- Intermediate CSV: `sources/data/ngsl_english_japanese_normalized.csv`
+
+Modifications: lists were slimmed to the fields DeckiMasta needs (`id`, `word`, `alternatives` / readings, `meanings`, and `parts_of_speech` when available) and shipped as JS globals so they load under `file://`. Dictionary markup in TSL glosses was normalized (sense splits, countability tags stripped), and each TSL entry keeps only the first primary Japanese gloss for cleaner study cards. NGSL rows keep Japanese glosses and mapped POS tags from the normalized CSV.

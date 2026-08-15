@@ -337,6 +337,7 @@ Words are loaded only through registered adapters under `sources/adapters/` via 
 | ------------------ | ------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------ |
 | `top-1000-english` | ja → en | `sources/data/top-1000-english.js` | [SMenigat/thousand-most-common-words](https://github.com/SMenigat/thousand-most-common-words)                      | MIT          |
 | `toeic-tsl`        | ja → en | `sources/data/toeic-tsl.js`        | [DiQt TOEIC英単語 TOEIC Service List（TSL）](https://www.diqt.net/ja/word_tags/3/download) (Browne & Culligan TSL) | CC BY-SA 4.0 |
+| `ngsl-en-ja`       | ja → en | `sources/data/ngsl-en-ja.js`       | [koba-ninkigumi/ngsl](https://github.com/koba-ninkigumi/ngsl) (NGSL 1.01 en/ja; Browne, Culligan & Phillips)       | CC BY-SA 4.0 |
 | `jlpt-n5`          | en → ja | `sources/data/jlpt-n5.js`          | [evanclan/OpenJLPT](https://github.com/evanclan/OpenJLPT) N5 vocab                                                 | CC BY-SA 4.0 |
 
 See [ATTRIBUTION.md](./ATTRIBUTION.md) for license notices.

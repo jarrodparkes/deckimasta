@@ -54,6 +54,9 @@ window.DeckiMastaStrings = {
     sourceLabelToeicTsl: "TOEIC Service List (TSL)",
     sourceDescToeicTsl:
       "A static TOEIC-oriented English vocabulary list (~1,270 words) with Japanese glosses. Built for Japanese speakers learning English. No API key; Recency does not apply.",
+    sourceLabelNgslEnJa: "New General Service List (NGSL)",
+    sourceDescNgslEnJa:
+      "A static high-frequency English vocabulary list (~2,800 words) with Japanese glosses, based on the New General Service List. Built for Japanese speakers learning English. No API key; Recency does not apply.",
     lookBack: "Recency",
     lookBackHelpAria: "About Recency",
     lookBackHelp:
@@ -251,6 +254,9 @@ Please follow these rules:
     sourceLabelToeicTsl: "TOEIC英単語（TSL）",
     sourceDescToeicTsl:
       "TOEIC向け英語語彙の静的リスト（約1,270語）と日本語訳です。日本語話者が英語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
+    sourceLabelNgslEnJa: "新一般語彙リスト（NGSL）",
+    sourceDescNgslEnJa:
+      "英語の高頻度語彙の静的リスト（約2,800語）と日本語訳です（New General Service List準拠）。日本語話者が英語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
     lookBack: "直近",
     lookBackHelpAria: "直近について",
     lookBackHelp:
