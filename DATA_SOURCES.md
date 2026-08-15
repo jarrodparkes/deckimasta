@@ -145,7 +145,7 @@ These options are source-agnostic. The app (not the source UI) owns them:
 
   // Max words to keep after filtering/sorting/shuffle.
   // null = no limit. When set, createLoadOptions clamps to 1–100.
-  // The UI defaults to 5.
+  // The UI defaults to 10.
   limit: number | null,
 
   // If true, shuffle before applying limit.

@@ -88,11 +88,11 @@ window.DeckiMastaStrings = {
     range336: "Last 14 days",
     rangeAll: "All time",
     limitResults: "Limit",
-    limitPlaceholder: "5",
+    limitPlaceholder: "10",
     randomize: "Randomize",
     loadVocabulary: "Build deck",
     loadHelp:
-      "Limit how many words to include (1–100, default 5). Randomize shuffles before applying the limit.",
+      "Limit how many words to include (1–100, default 10). Randomize shuffles before applying the limit.",
     loadHelpAria: "About Limit",
     noSourcesRegistered: "No data sources are registered.",
     noSourcesForLanguages:
@@ -309,11 +309,11 @@ Please follow these rules:
     range336: "過去14日間",
     rangeAll: "全期間",
     limitResults: "件数",
-    limitPlaceholder: "5",
+    limitPlaceholder: "10",
     randomize: "ランダム",
     loadVocabulary: "デッキを作る",
     loadHelp:
-      "含める単語数を 1〜100 で指定します（初期値は 5）。ランダムをオンにすると、制限を適用する前にシャッフルします。",
+      "含める単語数を 1〜100 で指定します（初期値は 10）。ランダムをオンにすると、制限を適用する前にシャッフルします。",
     loadHelpAria: "件数について",
     noSourcesRegistered: "登録されたデータソースがありません。",
     noSourcesForLanguages:

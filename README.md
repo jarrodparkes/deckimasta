@@ -37,7 +37,7 @@ To add a data source, see [DATA_SOURCES.md](./DATA_SOURCES.md). Adapters live in
 2. Choose a **Data source**.
 3. Choose a **Look back** range to keep words whose `last_seen_at` falls in that window, or **All time** to skip the recency filter (hidden when the source has no study dates).
 4. Optionally open **More filters** to choose one or more **Part of speech** tags when the source provides them (hidden otherwise). Matching is any-tag; untagged words are excluded once you select a tag. Use **Select all** / **Clear all** to flip the whole set.
-5. Set **Limit** (default 5; allowed range 1–100).
+5. Set **Limit** (default 10; allowed range 1–100).
 6. Optionally check **Randomize** so the selection is shuffled before the limit is applied.
 7. Click **Build deck**.
 8. Review the deck, then click **Practice this deck**.
