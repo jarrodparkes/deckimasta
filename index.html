@@ -383,6 +383,15 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     C1: "cefrDescC1",
     C2: "cefrDescC2"
   };
+  /** Spoken delivery guidance per level; complexity alone does not slow the AI down. */
+  const CEFR_PACE_KEYS = {
+    A1: "cefrPaceA1",
+    A2: "cefrPaceA2",
+    B1: "cefrPaceB1",
+    B2: "cefrPaceB2",
+    C1: "cefrPaceC1",
+    C2: "cefrPaceC2"
+  };
   const PRACTICE_TEMPLATE_KEYS = {
     speaking: "promptTemplateSpeaking",
     listening: "promptTemplateListening"
@@ -632,7 +641,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     const level = CEFR_LEVELS.includes(cefrLevel) ? cefrLevel : "B1";
     return tPrompt("difficultyRule", {
       cefrLevel: tPrompt(CEFR_LABEL_KEYS[level]),
-      description: tPrompt(CEFR_DESC_KEYS[level])
+      description: tPrompt(CEFR_DESC_KEYS[level]),
+      pace: tPrompt(CEFR_PACE_KEYS[level])
     });
   }
 

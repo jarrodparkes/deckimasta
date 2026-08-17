@@ -136,7 +136,16 @@ window.DeckiMastaStrings = {
     correctPronunciation: "Correct pronunciation",
     correctGrammar: "Correct grammar",
     difficultyRule:
-      "Start at CEFR {cefrLevel}. {description} Adjust to my ability if this is too difficult or too easy.",
+      "Start at CEFR {cefrLevel}. {description} {pace} Adjust to my ability if this is too difficult or too easy.",
+    cefrPaceA1:
+      "Speak slowly and clearly, one short sentence at a time, pausing between sentences; being easy to follow matters more than sounding natural.",
+    cefrPaceA2:
+      "Speak slowly and clearly, keeping sentences short and pausing between them; being easy to follow matters more than sounding natural.",
+    cefrPaceB1:
+      "Speak a little slower than normal conversation and enunciate clearly.",
+    cefrPaceB2: "Speak at a normal conversational pace.",
+    cefrPaceC1: "Speak at a natural native pace.",
+    cefrPaceC2: "Speak at a full native pace, without simplifying your delivery.",
     cefrDescA1:
       "Use basic phrases and everyday expressions; keep exchanges simple enough for introductions and simple questions.",
     cefrDescA2:
@@ -197,6 +206,7 @@ Please follow these rules:
 - After I use a suggested word, you may offer the next unused target word one by one.
 - Stay on task: work through the deck at a steady pace. Short natural digressions are fine, but steer back toward unused target words so we cover the list.
 - {difficultyRule}
+- If I ask you to slow down, repeat something, or say it more simply, do that before moving on.
 - Prefer everyday situations rather than artificial example sentences.
 - {correctionRule}
 - Keep explanations concise unless I ask for more detail.
@@ -214,6 +224,7 @@ Please follow these rules:
 - Have a real exchange with me, one turn at a time.
 - Stay on task: work through the deck at a steady pace. Short natural digressions are fine, but keep returning to unused target words so we cover the list.
 - {difficultyRule}
+- If I ask you to slow down, repeat something, or say it more simply, do that before moving on.
 - Prefer everyday situations rather than artificial example sentences.
 - Don't force a vocabulary word into every sentence. Let the conversation feel natural.
 - {correctionRule}
@@ -357,7 +368,15 @@ Please follow these rules:
     correctPronunciation: "発音を訂正する",
     correctGrammar: "文法を訂正する",
     difficultyRule:
-      "CEFR {cefrLevel}から始めてください。{description} 難しすぎる、または簡単すぎる場合は私の実力に合わせて調整してください。",
+      "CEFR {cefrLevel}から始めてください。{description} {pace} 難しすぎる、または簡単すぎる場合は私の実力に合わせて調整してください。",
+    cefrPaceA1:
+      "ゆっくり、はっきりと、短い文を一つずつ話し、文の間に少し間を置いてください。自然に聞こえることよりも、聞き取りやすさを優先してください。",
+    cefrPaceA2:
+      "ゆっくり、はっきりと話してください。文は短くし、文の間に間を置いてください。自然に聞こえることよりも、聞き取りやすさを優先してください。",
+    cefrPaceB1: "普通の会話より少しゆっくり、はっきりと話してください。",
+    cefrPaceB2: "普通の会話のペースで話してください。",
+    cefrPaceC1: "ネイティブの自然なペースで話してください。",
+    cefrPaceC2: "ネイティブと同じ速さで、話し方を簡単にせずに話してください。",
     cefrDescA1:
       "基本的な言い回しと日常表現を使い、自己紹介や簡単な質問ができる程度のやりとりにしてください。",
     cefrDescA2:
@@ -418,6 +437,7 @@ Please follow these rules:
 - 提案した単語を使ったあとは、まだ使っていない目標の単語を一つずつ次に提案して構いません。
 - 課題に沿って進めてください。一定のペースでデッキを進め、短い自然な脱線は構いませんが、未使用の目標単語へ戻し、リストをカバーするようにしてください。
 - {difficultyRule}
+- もっとゆっくり話す・もう一度言う・もっと簡単に言い直すよう私が頼んだときは、先にそれをしてから続けてください。
 - 作り物の例文より、日常的な場面を優先してください。
 - {correctionRule}
 - 詳しい説明を求めない限り、説明は簡潔にしてください。
@@ -435,6 +455,7 @@ Please follow these rules:
 - 一度に一往復ずつ、実際のやり取りをしてください。
 - 課題に沿って進めてください。一定のペースでデッキを進め、短い自然な脱線は構いませんが、未使用の目標単語へ戻し、リストをカバーするようにしてください。
 - {difficultyRule}
+- もっとゆっくり話す・もう一度言う・もっと簡単に言い直すよう私が頼んだときは、先にそれをしてから続けてください。
 - 作り物の例文より、日常的な場面を優先してください。
 - すべての文に無理に単語を入れないでください。会話が自然に感じられるようにしてください。
 - {correctionRule}
