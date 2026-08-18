@@ -1,6 +1,6 @@
 # DeckiMasta
 
-Make vocabulary decks for mastering conversation with friends.
+Make vocabulary decks for mastering conversation.
 
 DeckiMasta is a single-page browser app. Load words from a data source and builds vocabulary decks that can be used for one-turn-at-a-time conversation practice.
 
