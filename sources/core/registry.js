@@ -14,7 +14,9 @@
  *     createUI?: (ctx) => SourceUI,  // optional adapter-owned UI
  *     // Optional: qualify which native/target pairs this source supports.
  *     // Omit (or always return true) to accept any pair.
- *     supportsLanguages?: ({ native: string, target: string }) => boolean
+ *     supportsLanguages?: ({ native: string, target: string }) => boolean,
+ *     secret?: boolean             // omit from unfiltered lists; still returned
+ *                                  // when a matching language pair is requested
  *   }
  *
  * Auth/credentials and source-specific controls are owned by each source.
@@ -132,22 +134,37 @@
   }
 
   /**
-   * @param {{ native?: string, target?: string }} [filter]
+   * Whether a source is a hidden / easter-egg entry.
+   * Defaults to false when omitted.
+   * @param {object} source
+   * @returns {boolean}
+   */
+  function sourceIsSecret(source) {
+    return Boolean(source && source.secret);
+  }
+
+  /**
+   * @param {{ native?: string, target?: string, includeSecret?: boolean }} [filter]
    *   When native and target are both set, only sources that support that pair.
+   *   Secret sources are omitted unless includeSecret is true or a language pair
+   *   is provided (so ESL → EN still finds its one-off source).
    * @returns {object[]}
    */
   function listSources(filter) {
     const all = Array.from(sources.values());
-    if (
-      !filter ||
-      filter.native == null ||
-      filter.native === "" ||
-      filter.target == null ||
-      filter.target === ""
-    ) {
-      return all;
-    }
-    return all.filter(source => sourceSupportsLanguages(source, filter));
+    const includeSecret = Boolean(filter && filter.includeSecret);
+    const pairFilter =
+      Boolean(filter) &&
+      filter.native != null &&
+      filter.native !== "" &&
+      filter.target != null &&
+      filter.target !== "";
+
+    return all.filter((source) => {
+      if (sourceIsSecret(source) && !includeSecret && !pairFilter) return false;
+      if (pairFilter && !sourceSupportsLanguages(source, filter)) return false;
+      return true;
+    });
   }
 
   /**
@@ -165,6 +182,7 @@
   DeckiMasta.sourceSupportsLanguages = sourceSupportsLanguages;
   DeckiMasta.sourceSupportsLookBack = sourceSupportsLookBack;
   DeckiMasta.sourceSupportsPartsOfSpeech = sourceSupportsPartsOfSpeech;
+  DeckiMasta.sourceIsSecret = sourceIsSecret;
   DeckiMasta.sourceLabel = sourceLabel;
   DeckiMasta.sourceDescription = sourceDescription;
 })(window);

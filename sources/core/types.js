@@ -205,6 +205,7 @@
   /**
    * Minimal structural check for the WordSource interface.
    * Optional: supportsLanguages({ native, target }) => boolean
+   * Optional: secret (boolean) — hidden from unfiltered listSources
    * @param {object} source
    * @returns {boolean}
    */

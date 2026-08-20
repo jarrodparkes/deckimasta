@@ -28,6 +28,8 @@ window.DeckiMastaStrings = {
     selectLanguage: "Select a language",
     langEnglish: "English",
     langJapanese: "Japanese",
+    langEsl: "English Second Language (ESL)",
+    eslUnlocked: "English Second Language (ESL) unlocked.",
     swapLanguages: "Swap native and target languages",
     languagesSameError: "Native and target languages must be different.",
     loadTitle: "Step 2: Build Your Deck",
@@ -57,6 +59,9 @@ window.DeckiMastaStrings = {
     sourceLabelNgslEnJa: "New General Service List (NGSL)",
     sourceDescNgslEnJa:
       "A static high-frequency English vocabulary list (~2,800 words) with Japanese glosses, based on the New General Service List. Built for Japanese speakers learning English. No API key; Recency does not apply.",
+    sourceLabelEslEn: "ESL Word List",
+    sourceDescEslEn:
+      "A starter English word list with simple English meanings. Edit the CSV in the box before you build a deck; Recency applies when rows have dates.",
     lookBack: "Recency",
     lookBackHelpAria: "About Recency",
     lookBackHelp:
@@ -145,7 +150,8 @@ window.DeckiMastaStrings = {
       "Speak a little slower than normal conversation and enunciate clearly.",
     cefrPaceB2: "Speak at a normal conversational pace.",
     cefrPaceC1: "Speak at a natural native pace.",
-    cefrPaceC2: "Speak at a full native pace, without simplifying your delivery.",
+    cefrPaceC2:
+      "Speak at a full native pace, without simplifying your delivery.",
     cefrDescA1:
       "Use basic phrases and everyday expressions; keep exchanges simple enough for introductions and simple questions.",
     cefrDescA2:
@@ -261,6 +267,8 @@ Please follow these rules:
     selectLanguage: "言語を選択",
     langEnglish: "英語",
     langJapanese: "日本語",
+    langEsl: "第二言語としての英語（ESL）",
+    eslUnlocked: "第二言語としての英語（ESL）のロックを解除しました。",
     swapLanguages: "母語と学習言語を入れ替える",
     languagesSameError: "母語と学習言語は別の言語にしてください。",
     loadTitle: "ステップ2: デッキを作る",
@@ -289,6 +297,9 @@ Please follow these rules:
     sourceLabelNgslEnJa: "新一般語彙リスト（NGSL）",
     sourceDescNgslEnJa:
       "英語の高頻度語彙の静的リスト（約2,800語）と日本語訳です（New General Service List準拠）。日本語話者が英語を学ぶ方向け。APIキー不要で、直近フィルタは使いません。",
+    sourceLabelEslEn: "ESL単語リスト",
+    sourceDescEslEn:
+      "やさしい英語の意味がついた英語の単語リストです。デッキを作る前に箱の中のCSVを編集できます。行に日付があれば直近フィルタが使えます。",
     lookBack: "直近",
     lookBackHelpAria: "直近について",
     lookBackHelp:

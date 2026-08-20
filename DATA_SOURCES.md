@@ -262,6 +262,13 @@ sources/
     # top-1000-english.js, jlpt-n5.js, …
 ```
 
+CSV-backed lists (`esl-en.csv`, `ngsl_english_japanese_normalized.csv`, `toeic-list.csv`) are embedded as JS so they load under `file://`. After editing a CSV, regenerate its JS file:
+
+```bash
+python3 scripts/regenerate-data-js.py            # all CSV-backed sources
+python3 scripts/regenerate-data-js.py esl-en     # one source
+```
+
 `sources/core/` is the loading system. `sources/adapters/` is only concrete sources.
 
 Include scripts before the main app (order matters: core, then adapters):
@@ -346,11 +353,12 @@ Words are loaded only through registered adapters under `sources/adapters/` via 
 
 ## Built-in curated lists
 
-| Source id          | Pair    | Data file                          | Upstream                                                                                                           | License      |
-| ------------------ | ------- | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------ |
-| `top-1000-english` | ja → en | `sources/data/top-1000-english.js` | [SMenigat/thousand-most-common-words](https://github.com/SMenigat/thousand-most-common-words)                      | MIT          |
-| `toeic-tsl`        | ja → en | `sources/data/toeic-tsl.js`        | [DiQt TOEIC英単語 TOEIC Service List（TSL）](https://www.diqt.net/ja/word_tags/3/download) (Browne & Culligan TSL) | CC BY-SA 4.0 |
-| `ngsl-en-ja`       | ja → en | `sources/data/ngsl-en-ja.js`       | [koba-ninkigumi/ngsl](https://github.com/koba-ninkigumi/ngsl) (NGSL 1.01 en/ja; Browne, Culligan & Phillips)       | CC BY-SA 4.0 |
-| `jlpt-n5`          | en → ja | `sources/data/jlpt-n5.js`          | [evanclan/OpenJLPT](https://github.com/evanclan/OpenJLPT) N5 vocab                                                 | CC BY-SA 4.0 |
+| Source id          | Pair     | Data file                                           | Upstream                                                                                                           | License      |
+| ------------------ | -------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ------------ |
+| `top-1000-english` | ja → en  | `sources/data/top-1000-english.js`                  | [SMenigat/thousand-most-common-words](https://github.com/SMenigat/thousand-most-common-words)                      | MIT          |
+| `toeic-tsl`        | ja → en  | `sources/data/toeic-tsl.js`                         | [DiQt TOEIC英単語 TOEIC Service List（TSL）](https://www.diqt.net/ja/word_tags/3/download) (Browne & Culligan TSL) | CC BY-SA 4.0 |
+| `ngsl-en-ja`       | ja → en  | `sources/data/ngsl-en-ja.js`                        | [koba-ninkigumi/ngsl](https://github.com/koba-ninkigumi/ngsl) (NGSL 1.01 en/ja; Browne, Culligan & Phillips)       | CC BY-SA 4.0 |
+| `esl-en`           | esl → en | `sources/data/esl-en.csv` (embedded in `esl-en.js`) | Original starter list; editable in the Source panel like CSV Paste                                                 | —            |
+| `jlpt-n5`          | en → ja  | `sources/data/jlpt-n5.js`                           | [evanclan/OpenJLPT](https://github.com/evanclan/OpenJLPT) N5 vocab                                                 | CC BY-SA 4.0 |
 
 See [ATTRIBUTION.md](./ATTRIBUTION.md) for license notices.

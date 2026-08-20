@@ -100,6 +100,10 @@ main {
   flex-shrink: 0;
   width: auto;
   height: clamp(2.6rem, 6vw, 3.4rem);
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-drag: none;
+  touch-action: manipulation;
 }
 h1 {
   margin: 0 0 6px;
@@ -681,7 +685,8 @@ textarea {
   color: var(--text);
   line-height: 1.55;
 }
-#csvPaste {
+#csvPaste,
+#eslCsvPaste {
   min-height: 140px;
   font-family: var(--font-mono);
   font-size: 0.88rem;

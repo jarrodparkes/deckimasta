@@ -1,0 +1,17 @@
+/**
+ * Embedded copy of sources/data/esl-en.csv for file:// loads.
+ * Edit the .csv, then run: python3 scripts/regenerate-data-js.py esl-en
+ */
+(function (global) {
+  "use strict";
+  const DeckiMastaData = (global.DeckiMastaData = global.DeckiMastaData || {});
+  DeckiMastaData.eslEnCsv = [
+    "word,alternatives,meanings,created_at,last_seen_at,parts_of_speech",
+    "throw a hissy fit,throw a tantrum|have a meltdown,a burst of uncontrolled behavior,2026-08-20,2026-08-20,expression",
+    "to drink from a firehose,,to be overwhelmed by something,2026-08-20,2026-08-20,expression",
+    "reception,connection|signal,ability to receive an electromagnetic signal,2026-08-20,2026-08-20,noun",
+    "reception,catch,when someone catches an object in a sporting event,2026-08-20,2026-08-20,noun",
+    "reception,,describing the process of being received into a place,2026-08-20,2026-08-20,adjective|noun",
+    "reception,,a formal party or decribing the level of welcomeness,2026-08-20,2026-08-20,noun",
+  ].join("\n");
+})(window);

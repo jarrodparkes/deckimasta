@@ -25,7 +25,7 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500;700&family=Noto+Sans+JP:wght@400;500;700&display=swap">
   <!-- Bump ?v= whenever styles.css or translations.js change; the host caches assets
        for 10 minutes, so without it fresh HTML can pair with stale CSS or copy. -->
-  <link rel="stylesheet" href="styles.css?v=2026-08-14d">
+  <link rel="stylesheet" href="styles.css?v=2026-08-20a">
   <script>
     /* Resolve the theme before first paint so the page never flashes the wrong appearance. */
     (() => {
@@ -42,7 +42,7 @@
   <div class="header">
     <div class="header-copy">
       <div class="brand">
-        <img class="brand-logo" src="logo.png" alt="" width="128" height="128" aria-hidden="true">
+        <img class="brand-logo" src="logo.png" alt="" width="128" height="128" aria-hidden="true" draggable="false">
         <h1 data-i18n="title">DeckiMasta</h1>
       </div>
       <p class="subtitle" data-i18n="subtitle">Make vocabulary decks for mastering conversation.</p>
@@ -330,7 +330,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   </section>
 </main>
 
-<script src="translations.js?v=2026-08-15a"></script>
+<script src="translations.js?v=2026-08-20b"></script>
 <script src="sources/core/parts-of-speech.js"></script>
 <script src="sources/core/types.js"></script>
 <script src="sources/core/registry.js"></script>
@@ -346,6 +346,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 <script src="sources/adapters/toeic-tsl.js"></script>
 <script src="sources/data/ngsl-en-ja.js"></script>
 <script src="sources/adapters/ngsl-en-ja.js"></script>
+<script src="sources/data/esl-en.js"></script>
+<script src="sources/adapters/esl-en.js"></script>
 <script src="sources/adapters/csv-paste.js"></script>
 <script src="sources/adapters/file-upload.js"></script>
 <script>
@@ -365,6 +367,9 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   const THEMES = ["system", "light", "dark"];
   const SUPPORTED_LANGS = ["en", "ja"];
   const LEARNING_LANGS = ["en", "ja"];
+  const SECRET_NATIVE_LANGS = ["esl"];
+  const ESL_LANG = "esl";
+  const PROMPT_LANG_BY_NATIVE = { esl: "en" };
   const PRACTICE_MODES = ["speaking", "listening"];
   const CEFR_LEVELS = ["A1", "A2", "B1", "B2", "C1", "C2"];
   const CEFR_LABEL_KEYS = {
@@ -402,7 +407,8 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   };
   const LANG_NAME_KEYS = {
     en: "langEnglish",
-    ja: "langJapanese"
+    ja: "langJapanese",
+    esl: "langEsl"
   };
   const STRINGS = window.DeckiMastaStrings;
   const DeckiMasta = window.DeckiMasta;
@@ -410,6 +416,10 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   const darkQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
   let recentWords = [];
+  let secretNativeUnlocked = false;
+  try {
+    localStorage.removeItem("deckimasta_unlock_esl");
+  } catch {}
   let currentLang = detectLang();
   let currentTheme = detectTheme();
   let nativeLang = detectLearningLang(NATIVE_LANG_KEY);
@@ -440,7 +450,69 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
   function detectLearningLang(key) {
     const saved = localStorage.getItem(key);
+    if (SECRET_NATIVE_LANGS.includes(saved)) {
+      localStorage.removeItem(key);
+      return "";
+    }
+    if (key === NATIVE_LANG_KEY && isValidNativeLang(saved)) return saved;
+    if (key === TARGET_LANG_KEY && isValidTargetLang(saved)) return saved;
     return LEARNING_LANGS.includes(saved) ? saved : "";
+  }
+
+  function isSecretNativeUnlocked(code = ESL_LANG) {
+    return SECRET_NATIVE_LANGS.includes(code) && secretNativeUnlocked;
+  }
+
+  function isValidNativeLang(code) {
+    if (!code) return false;
+    if (LEARNING_LANGS.includes(code)) return true;
+    return isSecretNativeUnlocked(code);
+  }
+
+  function isValidTargetLang(code) {
+    return LEARNING_LANGS.includes(code);
+  }
+
+  /** Practice prompt copy uses the native language's string pack (ESL → English). */
+  function promptStringsLang() {
+    if (PROMPT_LANG_BY_NATIVE[nativeLang]) return PROMPT_LANG_BY_NATIVE[nativeLang];
+    if (LEARNING_LANGS.includes(nativeLang)) return nativeLang;
+    return currentLang;
+  }
+
+  /**
+   * Reveal ESL in the native-language picker for this page load only.
+   * @param {string} [code]
+   * @returns {boolean}
+   */
+  function unlockSecretNative(code = ESL_LANG) {
+    if (!SECRET_NATIVE_LANGS.includes(code)) return false;
+    secretNativeUnlocked = true;
+    ensureSecretNativeOption();
+    setLanguagePair({ native: code, target: "en" });
+    syncLanguagePairUI();
+    updateStepVisibility();
+    populateSourceSelect();
+    mountSelectedSourceUi();
+    return true;
+  }
+
+  function ensureSecretNativeOption() {
+    if (!nativeLangSelect) return;
+    const existing = nativeLangSelect.querySelector('option[value="' + ESL_LANG + '"]');
+    if (!isSecretNativeUnlocked(ESL_LANG)) {
+      if (existing) existing.remove();
+      return;
+    }
+    if (existing) {
+      existing.textContent = t("langEsl");
+      return;
+    }
+    const option = document.createElement("option");
+    option.value = ESL_LANG;
+    option.setAttribute("data-i18n", "langEsl");
+    option.textContent = t("langEsl");
+    nativeLangSelect.appendChild(option);
   }
 
   function languagePairSelected() {
@@ -512,7 +584,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
 
   /** Practice prompts follow the learner's native language, not the UI chrome language. */
   function tPrompt(key, vars = {}) {
-    const lang = LEARNING_LANGS.includes(nativeLang) ? nativeLang : currentLang;
+    const lang = promptStringsLang();
     return formatString(
       (STRINGS[lang] || STRINGS.en)[key] ?? STRINGS.en[key] ?? key,
       vars
@@ -539,9 +611,12 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   }
 
   function syncLanguagePairUI() {
+    ensureSecretNativeOption();
     if (nativeLangSelect) nativeLangSelect.value = nativeLang;
     if (targetLangSelect) targetLangSelect.value = targetLang;
-    $("swapLanguages").disabled = !(nativeLang && targetLang);
+    const canSwap =
+      Boolean(nativeLang && targetLang) && !SECRET_NATIVE_LANGS.includes(nativeLang);
+    $("swapLanguages").disabled = !canSwap;
   }
 
   function applyTranslations() {
@@ -647,7 +722,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   }
 
   function buildCorrectionRule() {
-    const promptLang = LEARNING_LANGS.includes(nativeLang) ? nativeLang : currentLang;
+    const promptLang = promptStringsLang();
     const vars = { nativeLanguage: languageDisplayName(nativeLang, promptLang) };
     if (correctPronunciation && correctGrammar) return tPrompt("correctionBoth", vars);
     if (correctPronunciation) return tPrompt("correctionPronunciationOnly", vars);
@@ -672,14 +747,16 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   }
 
   function setLanguagePair({ native, target }) {
-    const nextNative = normalizeLearningLang(native, nativeLang);
-    const nextTarget = normalizeLearningLang(target, targetLang);
+    const nextNative = normalizeNativeLang(native, nativeLang);
+    const nextTarget = normalizeTargetLang(target, targetLang);
     if (nextNative === nativeLang && nextTarget === targetLang) return;
 
     nativeLang = nextNative;
     targetLang = nextTarget;
-    persistLearningLang(NATIVE_LANG_KEY, nativeLang);
-    persistLearningLang(TARGET_LANG_KEY, targetLang);
+    if (!SECRET_NATIVE_LANGS.includes(nativeLang)) {
+      persistLearningLang(NATIVE_LANG_KEY, nativeLang);
+      persistLearningLang(TARGET_LANG_KEY, targetLang);
+    }
     syncLanguagePairUI();
     clearLoadedWords();
     updateStepVisibility();
@@ -687,14 +764,27 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
     mountSelectedSourceUi();
   }
 
-  function normalizeLearningLang(value, fallback) {
+  function normalizeNativeLang(value, fallback) {
     if (value === "") return "";
-    return LEARNING_LANGS.includes(value) ? value : fallback;
+    return isValidNativeLang(value) ? value : fallback;
+  }
+
+  function normalizeTargetLang(value, fallback) {
+    if (value === "") return "";
+    return isValidTargetLang(value) ? value : fallback;
   }
 
   function persistLearningLang(key, value) {
     if (value) localStorage.setItem(key, value);
     else localStorage.removeItem(key);
+  }
+
+  function persistSourceId(id) {
+    if (!id) return;
+    const source =
+      typeof DeckiMasta.getSource === "function" ? DeckiMasta.getSource(id) : null;
+    if (source && source.secret) return;
+    localStorage.setItem(SOURCE_KEY, id);
   }
 
   function updateStepVisibility() {
@@ -771,7 +861,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
       sourceSelect.value = previous;
     } else {
       sourceSelect.value = sources[0].id;
-      localStorage.setItem(SOURCE_KEY, sourceSelect.value);
+      persistSourceId(sourceSelect.value);
     }
 
     updateSourceHelp();
@@ -1071,7 +1161,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
         return;
       }
 
-      localStorage.setItem(SOURCE_KEY, sourceId);
+      persistSourceId(sourceId);
       const options = readSharedLoadOptions();
       const result = await DeckiMasta.loadFromSource(sourceId, options);
 
@@ -1158,7 +1248,7 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   function createPrompt({ scroll = true } = {}) {
     if (!recentWords.length || !languagePairSelected()) return;
 
-    const promptLang = LEARNING_LANGS.includes(nativeLang) ? nativeLang : currentLang;
+    const promptLang = promptStringsLang();
     const templateKey = PRACTICE_TEMPLATE_KEYS[practiceMode] || PRACTICE_TEMPLATE_KEYS.speaking;
     $("prompt").value = tPrompt(templateKey, {
       list: wordListText(),
@@ -1206,11 +1296,35 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   });
   $("swapLanguages").addEventListener("click", () => {
     if (!nativeLang || !targetLang) return;
+    if (SECRET_NATIVE_LANGS.includes(nativeLang)) return;
     setLanguagePair({ native: targetLang, target: nativeLang });
   });
 
+  (function bindLogoEasterEgg() {
+    const logo = document.querySelector(".brand-logo");
+    if (!logo) return;
+    const CLICKS_TO_UNLOCK = 5;
+    const CLICK_GAP_MS = 1500;
+    let clicks = 0;
+    let gapTimer = 0;
+
+    logo.addEventListener("click", () => {
+      window.clearTimeout(gapTimer);
+      clicks += 1;
+      if (clicks >= CLICKS_TO_UNLOCK) {
+        clicks = 0;
+        unlockSecretNative();
+        setStatusOn(languageStatus, t("eslUnlocked"), "success");
+        return;
+      }
+      gapTimer = window.setTimeout(() => {
+        clicks = 0;
+      }, CLICK_GAP_MS);
+    });
+  })();
+
   sourceSelect.addEventListener("change", () => {
-    if (sourceSelect.value) localStorage.setItem(SOURCE_KEY, sourceSelect.value);
+    persistSourceId(sourceSelect.value);
     updateSourceHelp();
     syncLookBackUi();
     syncPartsOfSpeechUi();
@@ -1277,6 +1391,9 @@ C2 (Proficient): Understands everything with ease; fine-tunes shades of meaning 
   syncPracticeOptionsUI();
   updateStepVisibility();
   applyTranslations();
+
+  DeckiMasta.unlockSecretNative = unlockSecretNative;
+  DeckiMasta.isSecretNativeUnlocked = isSecretNativeUnlocked;
 })();
 </script>
 </body>
